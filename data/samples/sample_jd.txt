@@ -1,0 +1,25 @@
+﻿JOB TITLE: Associate Product Manager / Business Technology Analyst
+COMPANY: GlobalTech Consulting & Digital Solutions
+LOCATION: Bengaluru / Hybrid
+EMPLOYMENT TYPE: Full-time
+
+ABOUT THE ROLE:
+We are looking for a proactive, analytical Associate Product Manager / Business Technology Analyst to join our Enterprise Digital Transformation practice. In this role, you will interface directly between business stakeholders and engineering teams to translate complex business needs into agile product requirements, data models, and scalable digital solutions.
+
+RESPONSIBILITIES:
+- Conduct rigorous requirement discovery workshops with client executives and translate findings into PRDs, user stories, and acceptance criteria.
+- Perform deep data analysis using SQL and Python to extract actionable insights and track core product KPIs.
+- Design executive-ready KPI dashboards using Power BI and Tableau.
+- Collaborate with engineering architects to evaluate trade-offs in cloud technology, AI integration, and workflow automation.
+- Drive agile sprint ceremonies and monitor delivery metrics using JIRA.
+
+REQUIRED QUALIFICATIONS:
+- MBA in Information Systems, Digital Transformation, Business Analytics, or equivalent technical post-graduate degree.
+- Strong foundational programming knowledge in Python and advanced database querying with SQL (joins, window functions, indexing).
+- Hands-on experience with BI tools: Power BI (strongly preferred) and Tableau.
+- Proven problem-solving ability, financial analysis acumen, and structured communication.
+- Familiarity with enterprise software development lifecycle (SDLC) and agile methodologies.
+
+NICE TO HAVE:
+- Exposure to generative AI, LLM APIs, and agentic workflows.
+- Previous consulting or technology internship experience.

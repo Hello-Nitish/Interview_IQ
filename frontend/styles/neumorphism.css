@@ -1,0 +1,734 @@
+/* ==========================================================================
+   InterviewIQ — Executive Light UI Design System
+   High-Contrast & Resilient Font Styling (Guaranteed Zero Invisible Text)
+   ========================================================================== */
+
+:root {
+  --bg-color: #F8FAFC;
+  --surface-color: #FFFFFF;
+  --inset-bg: #F1F5F9;
+  --text-main: #0F172A;
+  --text-body: #1E293B;
+  --text-muted: #64748B;
+  --primary-accent: #2563EB;
+  --border-color: #E2E8F0;
+  --success-color: #10B981;
+  --warning-color: #F59E0B;
+  --danger-color: #EF4444;
+}
+
+/* --------------------------------------------------------------------------
+   1. Universal Canvas & Base Typography
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+  background-color: var(--bg-color) !important;
+  color: var(--text-main) !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6,
+.stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4, .stMarkdown h5, .stMarkdown h6,
+[data-testid="stMarkdownContainer"] h1,
+[data-testid="stMarkdownContainer"] h2,
+[data-testid="stMarkdownContainer"] h3,
+[data-testid="stMarkdownContainer"] h4 {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Body text, Paragraphs, Spans, Labels, Lists */
+p, span, label, li,
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] span,
+[data-testid="stMarkdownContainer"] li {
+  color: var(--text-body) !important;
+}
+
+b, strong,
+[data-testid="stMarkdownContainer"] b,
+[data-testid="stMarkdownContainer"] strong {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+small, .stCaption, [data-testid="stCaptionContainer"] p {
+  color: #64748B !important;
+}
+
+code {
+  color: #1D4ED8 !important;
+  background: #EFF6FF !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  border: 1px solid #DBEAFE !important;
+  font-size: 0.85em !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+}
+
+/* --------------------------------------------------------------------------
+   2. Executive Sidebar Navigation
+   -------------------------------------------------------------------------- */
+[data-testid="stSidebar"], section[data-testid="stSidebar"] {
+  background-color: #FFFFFF !important;
+  border-right: 1px solid var(--border-color) !important;
+}
+
+[data-testid="stSidebar"] * {
+  color: var(--text-body) !important;
+}
+
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3,
+[data-testid="stSidebar"] strong,
+[data-testid="stSidebar"] b {
+  color: #0F172A !important;
+}
+
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] small {
+  color: #475569 !important;
+}
+
+/* --------------------------------------------------------------------------
+   3. Executive Raised Card & Inset Recessed Box
+   -------------------------------------------------------------------------- */
+.neuro-card {
+  background: var(--surface-color) !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+  padding: 24px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+  color: var(--text-body) !important;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.neuro-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.03) !important;
+}
+
+.neuro-card h1, .neuro-card h2, .neuro-card h3, .neuro-card h4, .neuro-card h5, .neuro-card h6 {
+  color: #0F172A !important;
+}
+
+.neuro-card p, .neuro-card div, .neuro-card li, .neuro-card td {
+  color: var(--text-body) !important;
+}
+
+.neuro-inset {
+  background: var(--inset-bg) !important;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border-color);
+  color: var(--text-body) !important;
+}
+
+.neuro-inset h1, .neuro-inset h2, .neuro-inset h3, .neuro-inset h4 {
+  color: #0F172A !important;
+}
+
+.neuro-inset p, .neuro-inset div, .neuro-inset span, .neuro-inset li {
+  color: var(--text-body) !important;
+}
+
+/* --------------------------------------------------------------------------
+   4. Buttons & Interactive Controls
+   -------------------------------------------------------------------------- */
+.stButton > button {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  border: 1px solid #CBD5E1 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04) !important;
+  padding: 10px 22px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.stButton > button * {
+  color: #0F172A !important;
+  font-weight: 600 !important;
+}
+
+.stButton > button:hover {
+  background: #F8FAFC !important;
+  color: var(--primary-accent) !important;
+  border-color: var(--primary-accent) !important;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.12) !important;
+}
+
+.stButton > button:hover * {
+  color: var(--primary-accent) !important;
+}
+
+.stButton > button:active {
+  background: #F1F5F9 !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08) !important;
+  transform: scale(0.98) !important;
+}
+
+/* Form Submit Primary Button */
+[data-testid="stFormSubmitButton"] button {
+  background: #2563EB !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  border: none !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+[data-testid="stFormSubmitButton"] button * {
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+
+[data-testid="stFormSubmitButton"] button:hover {
+  background: #1D4ED8 !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4) !important;
+  transform: translateY(-1px);
+}
+
+[data-testid="stFormSubmitButton"] button:active {
+  transform: scale(0.98) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* --------------------------------------------------------------------------
+   5. Streamlit Tabs Styling
+   -------------------------------------------------------------------------- */
+[data-baseweb="tab-list"] {
+  background-color: transparent !important;
+  border-bottom: 2px solid var(--border-color) !important;
+  gap: 6px !important;
+}
+
+[data-baseweb="tab"] {
+  background-color: #FFFFFF !important;
+  border: 1px solid var(--border-color) !important;
+  border-bottom: none !important;
+  border-radius: 10px 10px 0 0 !important;
+  padding: 10px 18px !important;
+  color: #334155 !important;
+  font-weight: 600 !important;
+}
+
+[data-baseweb="tab"] * {
+  color: #334155 !important;
+}
+
+[data-baseweb="tab"]:hover {
+  background-color: #F8FAFC !important;
+}
+
+[data-baseweb="tab"]:hover * {
+  color: var(--primary-accent) !important;
+}
+
+[aria-selected="true"][data-baseweb="tab"] {
+  background-color: #EFF6FF !important;
+  border-color: #BFDBFE !important;
+  border-bottom: 2px solid var(--primary-accent) !important;
+}
+
+[aria-selected="true"][data-baseweb="tab"] * {
+  color: var(--primary-accent) !important;
+  font-weight: 700 !important;
+}
+
+/* --------------------------------------------------------------------------
+   6. Streamlit Expanders
+   -------------------------------------------------------------------------- */
+[data-testid="stExpander"] {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+  margin-bottom: 12px !important;
+}
+
+[data-testid="stExpander"] summary {
+  color: #0F172A !important;
+  font-weight: 600 !important;
+  padding: 12px 16px !important;
+}
+
+[data-testid="stExpander"] summary * {
+  color: #0F172A !important;
+  font-weight: 600 !important;
+}
+
+[data-testid="stExpander"] summary:hover {
+  background-color: #F8FAFC !important;
+}
+
+[data-testid="stExpander"] summary:hover * {
+  color: var(--primary-accent) !important;
+}
+
+[data-testid="stExpanderDetails"] {
+  background: #FFFFFF !important;
+  padding: 16px !important;
+  border-top: 1px solid var(--inset-bg) !important;
+}
+
+[data-testid="stExpanderDetails"] * {
+  color: var(--text-body) !important;
+}
+
+/* --------------------------------------------------------------------------
+   7. Form Inputs, Radios & Uploaders
+   -------------------------------------------------------------------------- */
+[data-testid="stRadio"] {
+  background: #FFFFFF !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 12px !important;
+  padding: 14px 18px !important;
+  margin-bottom: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+}
+
+[data-testid="stRadio"] [data-testid="stWidgetLabel"] p,
+[data-testid="stRadio"] > label {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+}
+
+[data-testid="stRadio"] div[role="radiogroup"] label {
+  background: transparent !important;
+  padding: 6px 12px !important;
+  border-radius: 8px !important;
+  margin: 3px 0 !important;
+}
+
+[data-testid="stRadio"] div[role="radiogroup"] label:hover {
+  background: #F8FAFC !important;
+}
+
+[data-testid="stRadio"] div[role="radiogroup"] label * {
+  color: var(--text-body) !important;
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
+}
+
+[data-testid="stTextInput"] input,
+[data-testid="stTextArea"] textarea,
+textarea, input {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #CBD5E1 !important;
+  border-radius: 8px !important;
+  font-size: 0.9rem !important;
+}
+
+[data-testid="stTextInput"] input:focus,
+[data-testid="stTextArea"] textarea:focus {
+  border-color: var(--primary-accent) !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15) !important;
+}
+
+[data-testid="stWidgetLabel"] p, [data-testid="stWidgetLabel"] span {
+  color: #0F172A !important;
+  font-weight: 600 !important;
+}
+
+[data-testid="stFileUploader"] {
+  background: #FFFFFF !important;
+  border: 2px dashed #CBD5E1 !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+}
+
+[data-testid="stFileUploader"] * {
+  color: #334155 !important;
+}
+
+/* --------------------------------------------------------------------------
+   8. Executive Data Table
+   -------------------------------------------------------------------------- */
+.neuro-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 12px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.neuro-table th {
+  background: #F1F5F9 !important;
+  color: #334155 !important;
+  padding: 12px 14px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  border-bottom: 1px solid #CBD5E1;
+}
+
+.neuro-table td {
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #F1F5F9;
+  background: #FFFFFF !important;
+  vertical-align: top;
+  color: var(--text-body) !important;
+}
+
+.neuro-table tr:hover td {
+  background: #F8FAFC !important;
+}
+
+.neuro-table td b, .neuro-table td strong {
+  color: #0F172A !important;
+}
+
+/* --------------------------------------------------------------------------
+   9. Executive Status Badges
+   -------------------------------------------------------------------------- */
+.neuro-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.neuro-badge-strong, .neuro-badge-matched {
+  background: #DCFCE7 !important;
+  color: #15803D !important;
+  border: 1px solid #86EFAC !important;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.neuro-badge-partial, .neuro-badge-missing-pref {
+  background: #FEF3C7 !important;
+  color: #B45309 !important;
+  border: 1px solid #FCD34D !important;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.neuro-badge-gap, .neuro-badge-missing {
+  background: #FEE2E2 !important;
+  color: #B91C1C !important;
+  border: 1px solid #FCA5A5 !important;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.neuro-badge-mandatory {
+  background: #EFF6FF !important;
+  color: #1D4ED8 !important;
+  border: 1px solid #BFDBFE !important;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.neuro-badge-preferred {
+  background: #FAF5FF !important;
+  color: #7E22CE !important;
+  border: 1px solid #E9D5FF !important;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   10. Meta Banner & Decision Cards
+   -------------------------------------------------------------------------- */
+.neuro-meta-banner {
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%) !important;
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.15);
+}
+
+.neuro-meta-banner * {
+  color: #FFFFFF !important;
+}
+
+.neuro-meta-banner p, .neuro-meta-banner span {
+  color: #94A3B8 !important;
+}
+
+.neuro-meta-banner strong, .neuro-meta-banner b, .neuro-meta-banner h2 {
+  color: #FFFFFF !important;
+}
+
+.neuro-decision-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  margin-bottom: 24px;
+  border-left: 8px solid #2563EB;
+}
+
+.neuro-decision-card * {
+  color: var(--text-body);
+}
+
+.neuro-decision-hire {
+  background: linear-gradient(135deg, #ECFDF5 0%, #FFFFFF 100%) !important;
+  border: 1.5px solid #A7F3D0 !important;
+  border-left: 8px solid #10B981 !important;
+}
+
+.neuro-decision-shortlist {
+  background: linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 100%) !important;
+  border: 1.5px solid #BFDBFE !important;
+  border-left: 8px solid #2563EB !important;
+}
+
+.neuro-decision-conditional {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FFFFFF 100%) !important;
+  border: 1.5px solid #FDE68A !important;
+  border-left: 8px solid #F59E0B !important;
+}
+
+.neuro-decision-reject {
+  background: linear-gradient(135deg, #FFF1F2 0%, #FFFFFF 100%) !important;
+  border: 1.5px solid #FECDD3 !important;
+  border-left: 8px solid #EF4444 !important;
+}
+
+/* --------------------------------------------------------------------------
+   11. Alert Callouts Contrast
+   -------------------------------------------------------------------------- */
+[data-testid="stAlert"] {
+  border-radius: 12px !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-testid="stAlert"] * {
+  color: #0F172A !important;
+}
+
+/* --------------------------------------------------------------------------
+   12. Universal Input Placeholders & Spinners
+   -------------------------------------------------------------------------- */
+::placeholder,
+input::placeholder,
+textarea::placeholder,
+[data-testid="stTextInput"] input::placeholder,
+[data-testid="stTextArea"] textarea::placeholder {
+  color: #94A3B8 !important;
+  opacity: 1 !important;
+}
+
+[data-testid="stSpinner"] * {
+  color: #0F172A !important;
+  font-weight: 600 !important;
+}
+
+/* --------------------------------------------------------------------------
+   13. Exam Question & Review Components
+   -------------------------------------------------------------------------- */
+.neuro-exam-card {
+  background: #FFFFFF !important;
+  border-radius: 14px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.neuro-exam-header {
+  background: #F8FAFC;
+  padding: 12px 18px;
+  border-bottom: 1px solid #E2E8F0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.neuro-exam-body {
+  padding: 18px;
+  color: #0F172A !important;
+}
+
+.neuro-review-item {
+  background: #FFFFFF !important;
+  border-radius: 14px;
+  border: 1px solid #E2E8F0;
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.neuro-review-item:hover {
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   14. High-Performance 60fps Micro-Animations & Accessibility
+   -------------------------------------------------------------------------- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer-progress {
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite linear;
+}
+
+@keyframes pulseSubtle {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.02); opacity: 0.88; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.pulse-badge {
+  animation: pulseSubtle 2.2s infinite ease-in-out;
+}
+
+/* Standardized SVG Icon Utility */
+.ui-svg-icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.neuro-card:hover .ui-svg-icon {
+  transform: scale(1.05);
+}
+
+/* Interactive Card Elevation Lift */
+.neuro-card-interactive {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.neuro-card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.09), 0 4px 10px -2px rgba(15, 23, 42, 0.03) !important;
+}
+
+/* Frosted Glass Floating Containers */
+.frosted-glass {
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+}
+
+/* Multiple-Choice Option Cards */
+.quiz-option-card {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  transition: all 0.2s ease;
+}
+
+.quiz-option-card:hover {
+  border-color: #2563EB;
+  background: #F8FAFC;
+  transform: translateX(3px);
+}
+
+.quiz-option-card.selected {
+  border-color: #2563EB;
+  background: #EFF6FF;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Mobile & Tablet Responsive Design */
+@media (max-width: 768px) {
+  .neuro-card {
+    padding: 14px 16px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  [data-testid="stSidebar"] {
+    min-width: 100% !important;
+  }
+  
+  h1, .stMarkdown h1, [data-testid="stMarkdownContainer"] h1 {
+    font-size: 1.45rem !important;
+  }
+  
+  h2, .stMarkdown h2, [data-testid="stMarkdownContainer"] h2 {
+    font-size: 1.25rem !important;
+  }
+  
+  h3, .stMarkdown h3, [data-testid="stMarkdownContainer"] h3 {
+    font-size: 1.1rem !important;
+  }
+}
+
+/* Universal Accessibility: Reduced Motion Preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transform: none !important;
+  }
+}
+
+

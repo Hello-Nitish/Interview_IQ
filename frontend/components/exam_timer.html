@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  body {
+    background: transparent;
+    padding: 6px 0;
+  }
+  .timer-container {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 12px 18px;
+    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    transition: border-color 0.3s ease;
+  }
+  .timer-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .timer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: #EFF6FF;
+    color: #2563EB;
+    border: 1px solid #BFDBFE;
+  }
+  .timer-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0F172A;
+  }
+  .timer-sub {
+    font-size: 0.8rem;
+    color: #64748B;
+  }
+  .timer-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .time-display {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #10B981;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    background: #F8FAFC;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+    min-width: 120px;
+    text-align: center;
+  }
+  .time-warning {
+    color: #D97706 !important;
+    background: #FFFBEB !important;
+    border-color: #FDE68A !important;
+  }
+  .time-critical {
+    color: #DC2626 !important;
+    background: #FEF2F2 !important;
+    border-color: #FECACA !important;
+    animation: pulse 1s infinite alternate;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.03); opacity: 0.85; }
+  }
+  .proctor-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #F1F5F9;
+    color: #475569;
+  }
+  .proctor-alert {
+    background: #FEE2E2 !important;
+    color: #991B1B !important;
+    font-weight: 700 !important;
+  }
+</style>
+</head>
+<body>
+
+<div class="timer-container" id="timerBox">
+  <div class="timer-left">
+    <div>
+      <span class="timer-badge">⏱️ Institutional Proctoring Engine</span>
+      <div class="timer-title">30-Question Timed Technical Examination</div>
+      <div class="timer-sub">Exam window will automatically lock and submit upon expiration.</div>
+    </div>
+  </div>
+  <div class="timer-right">
+    <div class="proctor-pill" id="proctorStatus">🛡️ Active Tab Focused</div>
+    <div class="time-display" id="countdown">30:00</div>
+  </div>
+</div>
+
+<script>
+  // Configuration
+  const TOTAL_SECONDS = 30 * 60; // 30 minutes
+  const SESSION_KEY = "interviewiq_exam_timer_r" + (new URLSearchParams(window.location.search).get("round") || "1");
+  
+  let timeRemaining = parseInt(sessionStorage.getItem(SESSION_KEY) || TOTAL_SECONDS, 10);
+  let violationCount = 0;
+  let isExpired = false;
+
+  const countdownEl = document.getElementById("countdown");
+  const timerBox = document.getElementById("timerBox");
+  const proctorEl = document.getElementById("proctorStatus");
+
+  function updateDisplay() {
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    countdownEl.textContent = formatted;
+
+    if (timeRemaining <= 60) {
+      countdownEl.className = "time-display time-critical";
+      timerBox.style.borderColor = "#EF4444";
+    } else if (timeRemaining <= 300) {
+      countdownEl.className = "time-display time-warning";
+      timerBox.style.borderColor = "#F59E0B";
+    } else {
+      countdownEl.className = "time-display";
+      timerBox.style.borderColor = "#E2E8F0";
+    }
+  }
+
+  function autoSubmit() {
+    if (isExpired) return;
+    isExpired = true;
+    countdownEl.textContent = "00:00";
+    proctorEl.textContent = "⌛ TIME EXPIRED";
+    proctorEl.className = "proctor-pill proctor-alert";
+
+    try {
+      const parentDoc = window.parent.document;
+      // Search for Streamlit primary form submit button
+      const submitBtn = parentDoc.querySelector('button[kind="primaryFormSubmit"]') || 
+                        parentDoc.querySelector('button[data-testid="baseButton-primaryFormSubmit"]') ||
+                        parentDoc.querySelector('form button[type="submit"]');
+      if (submitBtn) {
+        submitBtn.click();
+      }
+    } catch(e) {
+      console.warn("Auto-submit triggered across frame:", e);
+    }
+  }
+
+  // Timer Tick Interval
+  const timerInterval = setInterval(() => {
+    if (timeRemaining > 0) {
+      timeRemaining--;
+      sessionStorage.setItem(SESSION_KEY, timeRemaining);
+      updateDisplay();
+    } else {
+      clearInterval(timerInterval);
+      sessionStorage.removeItem(SESSION_KEY);
+      autoSubmit();
+    }
+  }, 1000);
+
+  // Proctoring Focus Monitor
+  function handleFocusLoss() {
+    violationCount++;
+    proctorEl.textContent = `⚠️ Warning: Tab Blur (${violationCount})`;
+    proctorEl.className = "proctor-pill proctor-alert";
+  }
+
+  function handleFocusGain() {
+    if (violationCount === 0) {
+      proctorEl.textContent = "🛡️ Active Tab Focused";
+      proctorEl.className = "proctor-pill";
+    } else {
+      proctorEl.textContent = `🛡️ Focus Restored (${violationCount} notices)`;
+    }
+  }
+
+  window.addEventListener("blur", handleFocusLoss);
+  window.addEventListener("focus", handleFocusGain);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) handleFocusLoss();
+    else handleFocusGain();
+  });
+
+  updateDisplay();
+</script>
+
+</body>
+</html>

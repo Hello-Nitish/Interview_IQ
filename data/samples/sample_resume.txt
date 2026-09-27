@@ -1,0 +1,39 @@
+﻿RAHUL SHARMA
+Bengaluru, India | rahul.sharma@email.com | +91-9876543210 | linkedin.com/in/rahulsharma
+
+PROFESSIONAL SUMMARY
+MBA in Digital Transformation & Technology Management candidate with a Bachelor of Technology in Computer Science. 
+2 years of prior experience in technical data analysis, Python backend services, and cloud reporting. 
+Passionate about leveraging AI agents and digital workflow automation to solve high-impact enterprise problems.
+
+EDUCATION
+- Master of Business Administration (MBA) - Digital Transformation
+  XYZ School of Management (2024 - 2026) | CGPA: 8.7/10
+- Bachelor of Technology (B.Tech) - Computer Science & Engineering
+  ABC Institute of Technology (2018 - 2022) | CGPA: 8.4/10
+
+TECHNICAL SKILLS
+- Programming: Python (Flask, FastAPI, Pandas, NumPy), SQL (PostgreSQL, MySQL)
+- Analytics & BI: Microsoft Excel (VLOOKUP, Pivots, Macros), Tableau, Basic Financial Modeling
+- Cloud & Tools: Git, Docker, Google Cloud Platform, JIRA, Postman
+
+KEY PROJECTS
+1. Customer Churn Prediction Engine (Python, Scikit-learn, FastAPI)
+   - Architected a predictive churn model on 100,000+ telecom customer records using Random Forest & XGBoost.
+   - Boosted prediction accuracy to 88.5% and reduced customer churn false-positive rate by 14%.
+   - Deployed REST APIs using FastAPI and integrated a monitoring dashboard for retention teams.
+
+2. Supply Chain Cost Optimization Model (Excel, SQL, Python)
+   - Analyzed 3 years of procurement log data across 12 distribution hubs using SQL window functions.
+   - Identified inventory holding bottlenecks, formulating an optimal inventory replenishment model that cut carrying costs by 11.2%.
+
+EXPERIENCE
+Associate Data Analyst — FinTech Solutions Pvt. Ltd. (Jul 2022 - Jun 2024)
+- Designed automated daily reconciliation workflows in Python & SQL processing 50,000+ transaction batches daily.
+- Collaborated with product managers to define business requirements and delivered 15+ automated Tableau dashboards.
+- Received Spot Award for reducing daily reporting latency from 4 hours to 20 minutes via query optimization.
+
+CERTIFICATIONS & ACHIEVEMENTS
+- Google Cloud Certified Associate Cloud Engineer (2023)
+- Certified Scrum Master (CSM) (2024)
+- 1st Place — National B-School Digital Transformation Hackathon (2025)

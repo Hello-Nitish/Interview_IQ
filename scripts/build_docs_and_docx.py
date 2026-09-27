@@ -1,0 +1,1 @@
+# Generator script initialized

@@ -1,0 +1,63 @@
+# ==============================================================================
+# InterviewIQ - Production .gitignore
+# ==============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# SQLite Databases, WAL files, and Cache
+data/interviewiq.db*
+*.db
+*.db-wal
+*.db-shm
+*.sqlite3
+
+# Candidate Sessions & Evaluation Snapshots (preserve directory structure)
+data/sessions/*.json
+!data/sessions/.gitkeep
+
+# Logs, Diagnostics & Temp Files
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+logs/
+temp/
+
+# Unit Test & Coverage Outputs
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# IDE, Editor & OS Specific Files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Streamlit Local Cache
+.streamlit/secrets.toml

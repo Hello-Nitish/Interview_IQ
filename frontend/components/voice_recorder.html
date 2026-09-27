@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  body {
+    background: transparent;
+    padding: 8px 0;
+  }
+  .voice-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
+  }
+  .voice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .voice-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0F172A;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nlp-badge {
+    background: #EFF6FF;
+    color: #2563EB;
+    border: 1px solid #BFDBFE;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    text-transform: uppercase;
+  }
+  .controls-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .record-btn {
+    background: #DC2626;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+  .record-btn.recording {
+    background: #991B1B;
+    animation: pulse 1.2s infinite alternate;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+    100% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+  }
+  .speak-btn {
+    background: #2563EB;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .copy-btn {
+    background: #059669;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  .copy-btn:hover {
+    background: #047857;
+  }
+  .lang-select {
+    background: #F8FAFC;
+    border: 1px solid #CBD5E1;
+    color: #334155;
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+  }
+  .visualizer-canvas {
+    width: 90px;
+    height: 28px;
+    border-radius: 4px;
+    background: #F1F5F9;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .transcript-box {
+    background: #F8FAFC;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    color: #1E293B;
+    line-height: 1.5;
+    min-height: 75px;
+    max-height: 160px;
+    overflow-y: auto;
+  }
+  .transcript-placeholder {
+    color: #94A3B8;
+    font-style: italic;
+  }
+  .status-indicator {
+    font-size: 0.78rem;
+    color: #64748B;
+    margin-top: 6px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .domain-badge {
+    background: #E0E7FF;
+    color: #3730A3;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="voice-card">
+  <div class="voice-header">
+    <div class="voice-title">🎙️ Google Local NLP Verbal Interface</div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <select class="lang-select" id="langSelect" onchange="changeLanguage()">
+        <option value="en-US" selected>🇺🇸 English (US)</option>
+        <option value="en-IN">🇮🇳 English (India)</option>
+        <option value="en-GB">🇬🇧 English (UK)</option>
+        <option value="en-AU">🇦🇺 English (Australia)</option>
+      </select>
+      <span class="nlp-badge">Google STT + Domain NLP</span>
+    </div>
+  </div>
+
+  <div class="controls-row">
+    <button class="record-btn" id="recordBtn" onclick="toggleRecording()">
+      <span id="recordIcon">🔴</span> <span id="recordLabel">Click to Speak (Record)</span>
+    </button>
+    <button class="copy-btn" id="copyBtn" onclick="copyTranscriptToClipboard()" title="Copy live transcript to clipboard">
+      📋 Copy Transcript
+    </button>
+    <button class="speak-btn" onclick="readInterviewerPrompt()">
+      🔊 Hear Question
+    </button>
+    <canvas id="audioVisualizer" class="visualizer-canvas" width="90" height="28"></canvas>
+  </div>
+
+  <div class="transcript-box" id="transcriptBox">
+    <span class="transcript-placeholder" id="placeholder">Your verbal response will be transcribed live here via Google Local NLP with domain phonetic auto-correction...</span>
+  </div>
+
+  <div class="status-indicator">
+    <span id="engineStatus">Engine: Ready (Noise Suppression & Echo Cancellation Active)</span>
+    <span id="wordCount">Words: 0 | Domain Terms: 0</span>
+  </div>
+</div>
+
+<script>
+  let recognition = null;
+  let isRecording = false;
+  let userWantsRecording = false;
+  let finalTranscript = "";
+  let audioContext = null;
+  let analyser = null;
+  let microphoneStream = null;
+  let animFrameId = null;
+
+  const recordBtn = document.getElementById("recordBtn");
+  const recordLabel = document.getElementById("recordLabel");
+  const recordIcon = document.getElementById("recordIcon");
+  const transcriptBox = document.getElementById("transcriptBox");
+  const engineStatus = document.getElementById("engineStatus");
+  const wordCountEl = document.getElementById("wordCount");
+  const langSelect = document.getElementById("langSelect");
+  const visualizerCanvas = document.getElementById("audioVisualizer");
+  const canvasCtx = visualizerCanvas.getContext("2d");
+
+  // Client-Side High-Frequency Domain Phonetic Auto-Corrections
+  const CLIENT_DOMAIN_CORRECTIONS = {
+    "macy": "MECE",
+    "missy": "MECE",
+    "me c": "MECE",
+    "ebita": "EBITDA",
+    "a bit the": "EBITDA",
+    "piano": "P&L",
+    "p and l": "P&L",
+    "sequel": "SQL",
+    "c cool": "SQL",
+    "pi torch": "PyTorch",
+    "pie torch": "PyTorch",
+    "cuber netties": "Kubernetes",
+    "koober netees": "Kubernetes",
+    "k p i": "KPI",
+    "c a c": "CAC",
+    "l t v": "LTV",
+    "r o i": "ROI",
+    "a r r": "ARR",
+    "m r r": "MRR",
+    "d c f": "DCF",
+    "n p v": "NPV",
+    "mac kinsey": "McKinsey",
+    "b c g": "BCG",
+    "s w o t": "SWOT",
+    "sass": "SaaS"
+  };
+
+  function applyClientDomainCorrections(text) {
+    let corrected = text;
+    for (const [misheard, canonical] of Object.entries(CLIENT_DOMAIN_CORRECTIONS)) {
+      const regex = new RegExp("\\b" + misheard + "\\b", "gi");
+      corrected = corrected.replace(regex, canonical);
+    }
+    return corrected;
+  }
+
+  // Initialize Web Speech API
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = langSelect.value || "en-US";
+
+    recognition.onstart = () => {
+      isRecording = true;
+      recordBtn.className = "record-btn recording";
+      recordIcon.textContent = "⏹️";
+      recordLabel.textContent = "Listening... (Click to Stop)";
+      engineStatus.textContent = `Engine: Live listening [${recognition.lang}] via Google Local NLP`;
+      startAudioVisualizer();
+    };
+
+    recognition.onresult = (event) => {
+      let interimTranscript = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript + " ";
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+      
+      const rawText = (finalTranscript + interimTranscript).trim();
+      const cleanedText = applyClientDomainCorrections(rawText);
+      transcriptBox.textContent = cleanedText || "Listening...";
+      
+      // Update word and domain term count
+      const words = cleanedText ? cleanedText.split(/\s+/).filter(w => w.length > 0) : [];
+      let domainCount = 0;
+      const canonicals = Object.values(CLIENT_DOMAIN_CORRECTIONS);
+      words.forEach(w => {
+        if (canonicals.includes(w)) domainCount++;
+      });
+      wordCountEl.textContent = `Words: ${words.length} | Domain Terms: ${domainCount}`;
+
+      // Notify parent Streamlit container
+      try {
+        const textInputs = window.parent.document.querySelectorAll('textarea');
+        if (textInputs && textInputs.length > 0) {
+          const targetInput = textInputs[textInputs.length - 1];
+          targetInput.value = cleanedText;
+          targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      } catch (e) {
+        // Sandboxed iframe fallback
+      }
+    };
+
+    recognition.onerror = (event) => {
+      if (event.error !== 'no-speech') {
+        engineStatus.textContent = `Speech Note: ${event.error}`;
+      }
+    };
+
+    recognition.onend = () => {
+      // Auto-restart keep-alive if candidate hasn't explicitly clicked stop
+      if (userWantsRecording) {
+        try {
+          recognition.start();
+        } catch (e) {
+          stopRecording();
+        }
+      } else {
+        stopRecording();
+      }
+    };
+  } else {
+    engineStatus.textContent = "Web Speech API not supported in this browser; use standard text input.";
+    recordBtn.disabled = true;
+  }
+
+  function changeLanguage() {
+    if (recognition) {
+      recognition.lang = langSelect.value;
+      if (isRecording) {
+        userWantsRecording = false;
+        recognition.stop();
+        setTimeout(() => {
+          userWantsRecording = true;
+          recognition.start();
+        }, 200);
+      }
+    }
+  }
+
+  async function startAudioVisualizer() {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+      microphoneStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      });
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 64;
+      const source = audioContext.createMediaStreamSource(microphoneStream);
+      source.connect(analyser);
+
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      function draw() {
+        if (!isRecording) return;
+        animFrameId = requestAnimationFrame(draw);
+        analyser.getByteFrequencyData(dataArray);
+
+        canvasCtx.fillStyle = "#F1F5F9";
+        canvasCtx.fillRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+
+        const barWidth = (visualizerCanvas.width / bufferLength) * 1.5;
+        let x = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const barHeight = (dataArray[i] / 255) * visualizerCanvas.height;
+          canvasCtx.fillStyle = "#2563EB";
+          canvasCtx.fillRect(x, visualizerCanvas.height - barHeight, barWidth, barHeight);
+          x += barWidth + 1;
+        }
+      }
+      draw();
+    } catch (e) {
+      // Visualizer fallback
+    }
+  }
+
+  function stopAudioVisualizer() {
+    if (animFrameId) cancelAnimationFrame(animFrameId);
+    if (microphoneStream) {
+      microphoneStream.getTracks().forEach(track => track.stop());
+      microphoneStream = null;
+    }
+    if (audioContext && audioContext.state !== 'closed') {
+      audioContext.close();
+    }
+    canvasCtx.fillStyle = "#F1F5F9";
+    canvasCtx.fillRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+  }
+
+  function toggleRecording() {
+    if (!recognition) return;
+    if (isRecording) {
+      userWantsRecording = false;
+      recognition.stop();
+    } else {
+      finalTranscript = "";
+      userWantsRecording = true;
+      recognition.lang = langSelect.value;
+      recognition.start();
+    }
+  }
+
+  function stopRecording() {
+    isRecording = false;
+    userWantsRecording = false;
+    recordBtn.className = "record-btn";
+    recordIcon.textContent = "🔴";
+    recordLabel.textContent = "Click to Speak (Record)";
+    engineStatus.textContent = "Engine: Finished listening. Verbal answer ready for evaluation.";
+    stopAudioVisualizer();
+  }
+
+  function readInterviewerPrompt() {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      let questionText = "Please introduce yourself and explain how your academic background and project experiences make you an ideal fit for this target position.";
+      try {
+        const parentH4 = window.parent.document.querySelector('.neuro-card h4');
+        if (parentH4) questionText = parentH4.textContent;
+      } catch (e) {}
+
+      const utterance = new SpeechSynthesisUtterance(questionText);
+      utterance.rate = 0.95;
+      utterance.pitch = 1.0;
+      utterance.lang = langSelect.value || "en-US";
+      
+      const voices = window.speechSynthesis.getVoices();
+      const targetLang = (langSelect.value || "en-US").toLowerCase();
+      let selectedVoice = voices.find(v => v.lang.toLowerCase() === targetLang && v.name.includes("Google"));
+      if (!selectedVoice) {
+        selectedVoice = voices.find(v => v.lang.toLowerCase().startsWith(targetLang.slice(0, 2)) && v.name.includes("Google"));
+      }
+      if (selectedVoice) utterance.voice = selectedVoice;
+
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+
+  function copyTranscriptToClipboard() {
+    const raw = transcriptBox.innerText || transcriptBox.textContent || "";
+    const placeholderText = "Your verbal response will be transcribed live here";
+    const copyBtn = document.getElementById("copyBtn");
+    if (!raw || raw.includes(placeholderText) || raw.trim() === "Listening...") {
+      copyBtn.textContent = "⚠️ No speech yet";
+      setTimeout(() => { copyBtn.textContent = "📋 Copy Transcript"; }, 1500);
+      return;
+    }
+    const textToCopy = raw.trim();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        copyBtn.textContent = "✅ Copied!";
+        setTimeout(() => { copyBtn.textContent = "📋 Copy Transcript"; }, 2000);
+      }).catch(() => {
+        fallbackCopy(textToCopy, copyBtn);
+      });
+    } else {
+      fallbackCopy(textToCopy, copyBtn);
+    }
+  }
+
+  function fallbackCopy(text, btn) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      btn.textContent = "✅ Copied!";
+      setTimeout(() => { btn.textContent = "📋 Copy Transcript"; }, 2000);
+    } catch (e) {
+      btn.textContent = "⚠️ Copy failed";
+      setTimeout(() => { btn.textContent = "📋 Copy Transcript"; }, 2000);
+    }
+  }
+</script>
+
+</body>
+</html>
