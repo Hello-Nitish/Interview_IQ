@@ -32,8 +32,15 @@ class TestRigorousUATStreamlitApp(unittest.TestCase):
         self.assertTrue(any("Candidate Onboarding" in lbl for lbl in button_labels))
         self.assertTrue(any("Prep Curriculum" in lbl for lbl in button_labels))
 
+        # If environment pre-loaded an API key, clear it to verify gatekeeper render
+        if not any("Validate & Activate Key" in lbl for lbl in button_labels):
+            at.session_state["custom_api_key"] = ""
+            at.session_state.orchestrator.set_api_key(None)
+            at.run()
+            button_labels = [b.label for b in at.button]
+
         # Verify gatekeeper activates when no API key is present
-        self.assertTrue(any("Validate & Activate Key" in lbl for lbl in button_labels))
+        self.assertTrue(any("Validate & Activate Key" in lbl for lbl in button_labels), f"Expected gatekeeper in {button_labels}")
 
         # Now simulate authenticated state with active API key
         at.session_state["custom_api_key"] = "AIzaSyTestKeyForStreamlitUAT"
