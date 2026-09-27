@@ -19,7 +19,8 @@ FILES_TO_CONVERT = [
     "PROJECT_STATUS",
     "KT_DOCUMENT",
     "TECH_ARCHITECTURE",
-    "BUSINESS_CASE"
+    "BUSINESS_CASE",
+    "GITHUB_DEPLOYMENT_AND_PUSH_STRATEGY"
 ]
 
 def set_cell_background(cell, fill_hex):

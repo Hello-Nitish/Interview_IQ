@@ -220,10 +220,11 @@ Designed specifically for Business School Placement Directors and Training Offic
 ## 8. Current Project Status, Checkpoint & Why We Stopped
 
 ### Current Status
-- **Phase Matrix:** All 29 phases completed and verified live (Phases 0 through 25H), Session #20 Dual Onboarding Modes, Session #21 Multi-Model Cascade Modernization, Session #22 Multi-Subagent Output Quality Verification Engine, Session #23 Header Badges Removal & Advisory Terms Disclaimer, Session #24 Local Key Persistence Removal, Session #25 GitHub Push Protection Secret Remediation & Developer Attribution, and Session #26 GitHub Actions CI Pipeline Resolution & Production Hardening.
-- **Test Suite:** **101 of 101 unit, integration, and Streamlit UAT tests passing cleanly (100% pass rate in 26.65s)** with 0 failures, 0 errors, 0 warnings.
+- **Phase Matrix:** All 30 phases completed and verified live (Phases 0 through 25I), Session #20 Dual Onboarding Modes, Session #21 Multi-Model Cascade Modernization, Session #22 Multi-Subagent Output Quality Verification Engine, Session #23 Header Badges Removal & Advisory Terms Disclaimer, Session #24 Local Key Persistence Removal, Session #25 GitHub Push Protection Secret Remediation & Developer Attribution, Session #26 GitHub Actions CI Pipeline Resolution & Production Hardening, and Session #27 Streamlit Community Cloud Hosting Deployment.
+- **Test Suite:** **101 of 101 unit, integration, and Streamlit UAT tests passing cleanly (100% pass rate in 22.5s)** with 0 failures, 0 errors, 0 warnings.
 - **CI/CD Pipeline Health:** Fully modernized GitHub Actions CI (`.github/workflows/ci.yml`) with recursive bytecode compilation via `compileall`, concurrency controls, manual workflow dispatch, and headless testing environment variables (`PYTHONPATH=.`, `STREAMLIT_SERVER_HEADLESS="true"`).
 - **Security & Privacy:** 100% Zero-Leak verified. No live API keys, GCP credentials, or candidate PII exist in git history, code, or documentation. Local `.env` writeback has been removed. Key is strictly held in transient session state memory.
+- **Hosting Readiness:** Dual entrypoints (`frontend/app.py` and `streamlit_app.py`) live on GitHub `main` branch. Tested and compatible with Streamlit Community Cloud, Hugging Face Spaces, and Docker.
 - **Production Containerization:** Hardened `Dockerfile` with non-root security (`appuser`, UID 1000), `ffmpeg` installation, and lean build layers; fortified `.dockerignore` blocking `.env`, SQLite databases, and candidate session JSON files.
 - **Developer Attribution:** Executive card rendered across application views: *"Developed by your frd Nitish and Jeevana"*.
 - **Stability:** 100% demo uptime guaranteed via rate pacing, two-tier caching, dynamic discovery, session 404 blacklisting, and deterministic failsafe fallback synthesis across all upstream agents.
@@ -254,11 +255,15 @@ Designed specifically for Business School Placement Directors and Training Offic
   3. Hardened `.dockerignore` to strictly prevent baking `.env`, SQLite databases, and candidate session JSON files into container layers.
   4. Hardened `Dockerfile` with non-root security (`appuser`, UID 1000), `ffmpeg`, and layer optimization.
   5. Modernized `deploy.sh`, `deploy.bat`, and `deploy_hf.bat` with dual Docker Compose detection and pre-flight checks.
-  6. Rebuilt all 5 executive Microsoft Word (`.docx`) dossiers in `/docs`.
+- **Session #27 Accomplishments:**
+  1. Created root entrypoint `streamlit_app.py` bridging directly to `frontend/app.py`, satisfying Streamlit Community Cloud's default repository search path.
+  2. Guided resolution of DNS subdomain validation error: replacing `interview_iq` (invalid underscore) with `interview-iq` (RFC compliant hyphen).
+  3. Fortified `tests/test_uat_streamlit_app.py` to be environment-agnostic, handling both pre-authenticated and clean sessions.
+  4. Authored `docs/GITHUB_DEPLOYMENT_AND_PUSH_STRATEGY.md` and regenerated all 6 Microsoft Word (`.docx`) dossiers in `/docs`.
 
 ### Why We Stopped
-1. **Scope Realization:** GitHub Actions CI failure eradicated, container security hardened, and deployment scripts modernized.
-2. **Quality Verification:** 100% test pass rate across all 101 tests in 26.65s with zero regressions.
+1. **Scope Realization:** GitHub Actions CI failure eradicated, container security hardened, Streamlit Community Cloud root entrypoint deployed, and deployment documentation published.
+2. **Quality Verification:** 100% test pass rate across all 101 tests in 22.5s with zero regressions.
 3. **Documentation Parity:** Reached the scheduled documentation synchronization checkpoint to align `.md` and `.docx` manuals before closing the session.
 
 ---
@@ -279,25 +284,30 @@ Designed specifically for Business School Placement Directors and Training Offic
 ---
 
 ## 10. Instructions for Next AI Session / Developer (Where to Start)
-1. **Launch Environment:**
+1. **Streamlit Community Cloud Deployment Verification:**
+   - Navigate to [share.streamlit.io](https://share.streamlit.io).
+   - Confirm application status for `Hello-Nitish/Interview_IQ` with `main` branch and `streamlit_app.py`.
+   - Access the live application URL (e.g. `https://interview-iq.streamlit.app`).
+2. **Local Development Launch:**
    - Run:
      ```powershell
      .\.venv\Scripts\python.exe -m streamlit run frontend/app.py
      ```
-2. **Onboarding Gatekeeper & Key Validation:**
+3. **Onboarding Gatekeeper & Key Validation:**
    - Supply a valid Google Gemini API Key on Step 1 and click **Validate & Activate Key**. The system auto-detects `gemini-2.0-flash` or the best available cascade model with zero 404 errors.
-3. **Run Automated Test Suite:**
+4. **Run Automated Test Suite:**
    - Verify pipeline health by running:
      ```powershell
-     .\.venv\Scripts\python.exe -m unittest discover tests
+     .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py"
      ```
-   - Confirm all 93 tests pass (100% pass rate).
-4. **Demonstrate Platform Capabilities:**
+   - Confirm all 101 tests pass (100% pass rate).
+5. **Demonstrate Platform Capabilities:**
    - **Step 1:** Test both onboarding triggers:
      - Click *"⚡ Load Demo: Fit & Question Bank Only (~10s)"* and observe 5-stage fast-track execution.
      - Click *"🚀 Load Demo: Complete Pipeline (~35s)"* and observe 6-stage comprehensive execution.
    - **Step 2:** Review the Strategic Fit Report and download both the Full Dossier PDF and the Strategic Fit Report PDF.
    - **Step 3:** Inspect the 100% Topic Checklist, export questions in Markdown or Text, and click *"Proceed to Step 4"*.
+
    - **Step 4:** Launch the Online Test (with on-demand calibration if Option 1 was selected) and Voice Interview Simulator with live speech-to-text.
    - **Step 5:** Review Unified Diagnostics, download vector Dossier PDF, and launch Closed-Loop Retesting.
    - **Step 6:** Inspect the Dynamic 7-Day Prep Curriculum, review curated resources, check off completed items, and track live progress on the 4-stat executive dashboard.

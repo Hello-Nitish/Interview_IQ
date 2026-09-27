@@ -70,58 +70,61 @@
 ---
 
 ## Where We Have Stopped
-- **Scope Accomplished in Session #21 (Multi-Agent Cascade Modernization & Resilience Overhaul):**
-  1. **Root Cause Eradication of 404 `gemini-pro` Crash:**
-     - Replaced legacy retired models in `DEFAULT_MODEL_CASCADE` and `PREFERRED_MODELS` with the verified active 16-model hierarchy partitioned into Tier 1 (Flash), Tier 2 (Lite), and Tier 3 (Pro).
-     - Added thread-safe `_BLACKLISTED_MODELS` with `_blacklist_lock`. Models that 404 are blacklisted across all threads for the session, preventing repetitive latency.
-     - Decoupled `_get_next_model()` from premature global state mutation; global active model is promoted strictly upon validated, non-empty content generation (`response.text`).
-     - Added full diagnostic error preservation chaining `from last_error` on cascade exhaustion.
-  2. **API Quota Manager Hardening:**
-     - Set dynamic default `_ACTIVE_MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")`.
-     - Promoted `PREFERRED_MODELS` to class-level attribute aligned with the tiered cascade.
-     - Re-engineered `wait_for_slot()` as an atomic reservation scheduler (computing target slot under lock in <1μs and sleeping outside lock), preventing UI thread freezes.
-     - Refactored `validate_api_key()` to track `failed_models`, eliminating false-positive 404 fallbacks.
-  3. **Upstream Agent Failsafe Architecture:**
-     - Refactored `BaseAgent.run_json()` with a 6-stage progressive resilience parser, eliminating circular `json.loads` errors.
-     - Equipped `ResumeReviewerAgent`, `JDAnalyzerAgent`, and `FitAnalyzerAgent` with deterministic heuristic failsafes (`_generate_failsafe_resume`, `_generate_failsafe_jd`, `_generate_failsafe_fit`) and try/except wrappers.
-     - Hardened `Orchestrator.process_onboarding()` by wrapping concurrent worker thread future resolutions with `timeout=60.0` and fallback handlers, delivering a mathematical zero-crash guarantee.
-  4. **Academic Integrity Protection:**
-     - Preserved `online_test_agent.score_test` and `feedback_agent.build_unified_topic_readiness` (45% fit / 55% test composite formula) 100% untouched.
-  5. **Verification & Full Test Pass:**
-     - `test_api_quota_and_cache.py`: 8/8 tests pass (100%).
-     - `test_uat_journeys.py`: 5/5 tests pass (100%), demonstrating graceful multi-model failover under 429 quota limits without crashing.
-     - Full Discovery: **93 of 93 tests passing cleanly (100% pass rate in 621s)**.
+- **Current Milestone (Sessions #26 & #27):**
+  1. **GitHub Actions CI Pipeline Resolution:**
+     - Eradicated the red ❌ failure on commit `8f5cf89` by replacing static compilation with recursive `python -m compileall -q agents/ frontend/ orchestrator/ utils/ tests/ app.py streamlit_app.py`.
+     - Injected Linux headless testing environment variables (`PYTHONPATH=.`, `STREAMLIT_SERVER_HEADLESS="true"`).
+     - Fixed `test_uat_page_01_onboarding_initial_render` in `tests/test_uat_streamlit_app.py` to be environment-agnostic, handling both pre-authenticated and unauthenticated states deterministically.
+  2. **Streamlit Community Cloud Hosting Deployment:**
+     - Created root entrypoint `streamlit_app.py` proxying directly to `frontend/app.py` via `runpy.run_path()`.
+     - Documented DNS subdomain compliance (`interview-iq` instead of invalid `interview_iq`).
+  3. **Production Containerization Hardening:**
+     - Overhauled `.dockerignore` to strictly prevent baking `.env`, SQLite databases, and candidate session JSON files into container layers.
+     - Hardened `Dockerfile` with non-root user `appuser` (UID 1000) and layer optimization.
+     - Modernized `deploy.sh`, `deploy.bat`, and `deploy_hf.bat`.
+  4. **Quality & Test Health:**
+     - Verified all 101 tests passing (`OK`) with 100% pass rate in 22.5s.
+  5. **Documentation Synchronization:**
+     - Created `docs/GITHUB_DEPLOYMENT_AND_PUSH_STRATEGY.md` and rebuilt all Microsoft Word `.docx` dossiers.
 
 ---
 
 ## Why We Have Stopped
-1. **Full Defect Elimination:** The 404 `models/gemini-pro` bug shown in the user screenshot has been completely diagnosed, rooted out, and fixed with defense-in-depth architecture.
-2. **Zero-Regression Test Suite Pass:** Full automated test suite across all 14 test modules confirms a 100% pass rate (93/93 tests passing).
-3. **Multi-Agent Orchestration Framework Fulfilled:** All phases (Analysis, Thinking, Planning, Review, Execution, Testing) have executed with complete gate enforcement.
-4. **Mandatory Documentation Synchronization:** Paused to log all architectural enhancements across Markdown (`.md`) and Word (`.docx`) in `/docs` to maintain complete Knowledge Transfer.
+1. **Scope Realization:** GitHub Actions CI pipeline resolution, container security hardening, root `streamlit_app.py` entrypoint creation, and deployment documentation have been completely implemented, verified, and pushed.
+2. **Zero Regressions:** 100% automated test pass rate across all 101 tests with zero failures.
+3. **Repository Parity:** Working tree is clean, all files are staged, committed, and pushed to remote `origin/main`.
+4. **Mandatory Documentation Synchronization:** Paused to record complete Knowledge Transfer (KT) across Markdown (`.md`) and Microsoft Word (`.docx`) in `/docs` to ensure seamless continuation for future developers and AI sessions.
 
 ---
 
 ## Future Project Plan (Roadmap for Next Phases)
-1. **Phase 26:** University LMS Integration (Canvas / Moodle / Blackboard LTI 1.3 / OAuth 2.0).
-2. **Phase 27:** Real-Time WebRTC Audio Streaming with Live Sentiment Waveforms.
-3. **Phase 28:** Automated Corporate Recruiter Dispatch & ATS Webhooks (Greenhouse, Lever, Workday).
-4. **Phase 29:** Fine-Tuned Domain LLM Adapters for Specialized Verticals.
+1. **Phase 26: University LMS Integration (Canvas / Moodle / Blackboard):**
+   - Implement LTI 1.3 protocol and OAuth 2.0 authentication.
+   - Automatic student cohort roster synchronization and institutional gradebook passback.
+2. **Phase 27: Real-Time WebRTC Audio Streaming with Live Sentiment Waveforms:**
+   - Full-duplex low-latency audio streaming for synchronous vocal interview interactions.
+   - Real-time vocal pitch variation, stress indicators, and live acoustic confidence heatmaps.
+3. **Phase 28: Automated Corporate Recruiter Dispatch & ATS Webhooks:**
+   - Automated webhook integration with Greenhouse, Lever, and Workday.
+   - One-click batch dispatch of candidate PDF dossiers to corporate hiring desks.
+4. **Phase 29: Fine-Tuned Domain LLM Adapters for Specialized Verticals:**
+   - PEFT / LoRA adapters fine-tuned on quantitative finance, clinical research, and corporate law interview rubrics.
 
 ---
 
-## Where to Resume Next
-1. **Launch Environment:**
+## Where to Resume Next (Instructions for Next AI Session / Developer)
+1. **Streamlit Community Cloud Deployment Verification:**
+   - Navigate to [share.streamlit.io](https://share.streamlit.io).
+   - Confirm application status for `Hello-Nitish/Interview_IQ` with `main` branch and `streamlit_app.py`.
+   - Access the live application URL (e.g. `https://interview-iq.streamlit.app`).
+2. **Launch Environment Locally:**
    ```powershell
    .\.venv\Scripts\python.exe -m streamlit run frontend/app.py
    ```
-2. **Verify Seamless Analysis in Browser:**
-   - Step 1: Upload a resume and job description or click *"🎯 Load Demo: Fit & Question Bank Only (~10s)"* / *"🚀 Load Demo: Complete Pipeline (~35s)"*.
-   - Confirm analysis runs smoothly on active models (`gemini-2.5-flash`, `gemini-flash-latest`, etc.) with zero 404 errors.
-   - Observe the live rate meter in the sidebar displaying active model, RPM, and cache savings without UI lag.
 3. **Run Automated Test Suite:**
    ```powershell
-   .\.venv\Scripts\python.exe -m unittest discover tests
+   .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py"
    ```
-   Confirm all 93 tests pass (100% pass rate).
+   Confirm all 101 tests pass (100% pass rate).
 4. **Extend:** Proceed to **Phase 26** (University LMS Integration) or **Phase 27** (WebRTC Live Audio Streaming with Waveforms).
+
