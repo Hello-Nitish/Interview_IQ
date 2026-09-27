@@ -43,7 +43,7 @@ jobs:
 
     - name: Recursive syntax and bytecode compilation verification
       run: |
-        python -m compileall -q agents/ frontend/ orchestrator/ utils/ tests/ app.py
+        python -m compileall -q agents/ frontend/ orchestrator/ utils/ tests/ app.py streamlit_app.py
 
     - name: Run automated test suite
       run: |
