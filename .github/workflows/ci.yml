@@ -5,14 +5,27 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     name: Build & Test (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.10", "3.11"]
+
+    env:
+      PYTHONPATH: .
+      STREAMLIT_SERVER_HEADLESS: "true"
+      STREAMLIT_BROWSER_GATHER_USAGE_STATS: "false"
+      GEMINI_API_KEY: "ci-mock-key-for-test-suite"
+      CI: "true"
 
     steps:
     - name: Check out repository
@@ -29,15 +42,10 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: Syntax and compilation verification
+    - name: Recursive syntax and bytecode compilation verification
       run: |
-        python -m py_compile frontend/app.py
-        python -m py_compile utils/database.py
-        python -m py_compile utils/pdf_exporter.py
-        python -m py_compile agents/case_study_agent.py
-        python -m py_compile agents/compensation_negotiator.py
-        python -m py_compile agents/cohort_analyzer.py
+        python -m compileall -q agents/ frontend/ orchestrator/ utils/ tests/ app.py
 
     - name: Run automated test suite
       run: |
-        python -m unittest discover tests
+        python -m unittest discover -s tests -p "test_*.py" -v

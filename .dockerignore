@@ -1,12 +1,59 @@
-.venv/
+# ==============================================================================
+# InterviewIQ — Production .dockerignore
+# ==============================================================================
+
+# Environment & Secrets (P0 CRITICAL)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.streamlit/secrets.toml
+
+# Relational Persistence & Live Databases (P0 CRITICAL)
+data/interviewiq.db*
+*.db
+*.db-wal
+*.db-shm
+*.sqlite3
+
+# Candidate Sessions & Evaluator State (preserve directory structure)
+data/sessions/*.json
+!data/sessions/.gitkeep
+
+# Python & Build Artifacts
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
+.venv/
+env/
+venv/
+dist/
+build/
+*.egg-info/
+
+# Testing & Coverage
 .pytest_cache/
+.coverage
+htmlcov/
+tests/
+
+# Documentation & Non-Runtime Reference Material
+reference/
+docs/*.docx
+docs/*.md
+
+# Deployment Scripts & OS Host Artifacts
+deploy*.bat
+deploy*.sh
+launch.bat
 .git/
+.github/
 .gitignore
 .dockerignore
 *.log
+temp/
+logs/
 .DS_Store
 Thumbs.db

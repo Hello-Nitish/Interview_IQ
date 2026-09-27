@@ -29,13 +29,16 @@ git add .
 echo [*] Creating deployment commit...
 git commit -m "Deploy update to Hugging Face Spaces" 2>nul
 
-echo [*] Pushing main branch to Hugging Face Space...
-git push -u space main --force
+echo [*] Pushing HEAD to Hugging Face Space main branch...
+git push -u space HEAD:main --force
 
 if %ERRORLEVEL% EQU 0 (
     echo.
     echo [SUCCESS] Code successfully pushed to Hugging Face Spaces!
     echo Visit your Space on huggingface.co to view live build logs and launch your app.
+    echo.
+    echo NOTE: Remember to configure your GEMINI_API_KEY in:
+    echo Space Settings -^> Variables and secrets -^> New secret
 ) else (
     echo.
     echo [ERROR] Git push failed. Please verify your Space URL and Hugging Face Access Token.
