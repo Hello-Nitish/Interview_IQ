@@ -43,6 +43,19 @@ def get_css_content() -> str:
 
 st.markdown(f"<style>{get_css_content()}</style>", unsafe_allow_html=True)
 
+# Viewport Mode Options & Dynamic Viewport CSS Injection
+VIEW_MODES = [
+    "🖥️ Auto (Responsive)",
+    "📱 Mobile View (390px)",
+    "📟 Tablet View (820px)",
+    "💻 Desktop (Wide)"
+]
+
+if "view_mode" not in st.session_state:
+    st.session_state.view_mode = "🖥️ Auto (Responsive)"
+
+st.markdown(f"<style id='view-mode-override'>{Theme.get_view_mode_css(st.session_state.view_mode)}</style>", unsafe_allow_html=True)
+
 def render_html(html_str: str):
     """Safely render raw HTML in Streamlit.
     Strips leading indentation from each line to prevent CommonMark
@@ -87,6 +100,27 @@ with st.sidebar:
     </div>
     """)
     st.caption("Don't Practice Questions. Experience the Interview.")
+    st.markdown("---")
+
+    # Interactive Viewport & Device Preview Switcher
+    render_html(f"""
+    <div style='font-size:0.75rem; text-transform:uppercase; font-weight:800; color:{Theme.COLORS["text_muted"]}; letter-spacing:0.04em; margin-bottom:6px; display:flex; align-items:center; gap:6px;'>
+        {icon("monitor", size=15, color=Theme.COLORS["primary"])} Viewport Mode
+    </div>
+    """)
+    curr_vm_idx = VIEW_MODES.index(st.session_state.view_mode) if st.session_state.view_mode in VIEW_MODES else 0
+    selected_view_mode = st.selectbox(
+        "Viewport Mode:",
+        options=VIEW_MODES,
+        index=curr_vm_idx,
+        label_visibility="collapsed",
+        key="viewport_mode_selector",
+        help="Select Auto for natural responsive behavior, or simulate Mobile / Tablet screen frames directly on desktop."
+    )
+    if selected_view_mode != st.session_state.view_mode:
+        st.session_state.view_mode = selected_view_mode
+        st.rerun()
+
     st.markdown("---")
     
     # Live API Key Configuration & Status in Sidebar
@@ -189,8 +223,10 @@ with st.sidebar:
     st.markdown("---")
     if st.button("🔄 Reset / Start New Session", use_container_width=True):
         saved_key = st.session_state.custom_api_key
+        saved_vm = st.session_state.get("view_mode", "🖥️ Auto (Responsive)")
         st.session_state.clear()
         st.session_state.custom_api_key = saved_key
+        st.session_state.view_mode = saved_vm
         st.session_state.orchestrator = Orchestrator(api_key=saved_key)
         st.session_state.current_page = "01_upload"
         st.rerun()
@@ -872,7 +908,7 @@ elif page == "02_fit_report":
                 </div>
                 <span class='neuro-badge-matched' style='flex-shrink:0;'>{c_tier}</span>
             </div>
-            <div style='display:grid; grid-template-columns: 2fr 1fr; gap:16px;'>
+            <div class='culture-grid'>
                 <div>
                     <div style='font-size:0.8rem; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom:8px;'>Core Leadership Tenets Evaluated:</div>
                     {p_items_html}
@@ -1414,10 +1450,10 @@ elif page == "04_online_test":
             with open(vr_path, "r", encoding="utf-8") as vf:
                 vr_html = vf.read()
                 if hasattr(st, "iframe"):
-                    st.iframe(vr_html, height=210)
+                    st.iframe(vr_html, height=280)
                 else:
                     import streamlit.components.v1 as components
-                    components.html(vr_html, height=210)
+                    components.html(vr_html, height=280)
 
         # Candidate Verbal Response Text Area & Submission
         v_turn_idx = len(st.session_state.voice_turns)
@@ -1747,10 +1783,10 @@ elif page == "04_online_test":
                     with open(timer_file, "r", encoding="utf-8") as tf:
                         tf_html = tf.read()
                         if hasattr(st, "iframe"):
-                            st.iframe(tf_html, height=105)
+                            st.iframe(tf_html, height=140)
                         else:
                             import streamlit.components.v1 as components
-                            components.html(tf_html, height=105)
+                            components.html(tf_html, height=140)
 
                 with st.form(key=f"online_exam_form_r{round_val}"):
                     candidate_answers = {}
@@ -1826,7 +1862,7 @@ elif page == "05_results":
         if not test_results:
             render_html(UI.empty_state(
                 title="Assessment Results Pending",
-                description="Unified Diagnostics combine your Strategic Fit Analysis (40%) and Scored Online Test (60%). Please submit your 30-MCQ assessment in Step 4 first.",
+                description="Unified Diagnostics combine your Strategic Fit Analysis (45%) and Scored Online Test (55%). Please submit your 30-MCQ assessment in Step 4 first.",
                 icon_name="award",
                 action_hint="Navigate to Step 4 to complete your examination."
             ))
@@ -2238,7 +2274,7 @@ elif page == "06_curriculum":
                     "Cheat Sheet": "📄"
                 }.get(r.get("type"), "🔗")
 
-                r_col1, r_col2 = st.columns([0.08, 0.92])
+                r_col1, r_col2 = st.columns([0.15, 0.85])
                 with r_col1:
                     new_val = st.checkbox("Mark as completed", value=is_checked, key=f"chk_res_d{d_num}_{rid}", label_visibility="collapsed")
                     if new_val != is_checked:

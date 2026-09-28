@@ -49,18 +49,20 @@
 
 ---
 
+---
+
 ## Current Project Status
-- **Engineering Status:** All core functionality, executive UI, multimodal speech, standalone Fit Report PDF and full dossier export, live multi-agent stage tracking, company RAG, relational persistence, Docker orchestration, API quota protections, 7-day personalized micro-curricula, code optimizations, Google Local NLP accuracy overhaul, Session #11 UI/UX Design System, Session #12 dynamic Gemini model discovery & 404 failover, Session #13 bug fixes, Session #14 code optimization, Session #15 UAT testing, Session #16 Scope Pruning (streamlined to 6 clean steps), Session #17 Junk Codebase Audit & Cleanup, Session #18 Complete Section Testing, Session #19 Comprehensive Code, Processing & UI/UX Evolution, Session #20 Dual Onboarding Modes (Strategic Fit & QB Alone vs Complete Pipeline), Session #21 Multi-Model Cascade Modernization & Upstream Resilience, Session #22 Multi-Subagent Output Quality Verification Engine, Session #23 Header Badges Removal & Advisory Terms Disclaimer, Session #24 Local Key Persistence Removal & Zero Personal Data Security Audit, Session #25 GitHub Push Protection Secret Remediation & Developer Attribution, and Session #26 GitHub Actions CI Pipeline Resolution & Production Hardening are complete, tested, and 100% operational.
+- **Engineering Status:** All core functionality, executive UI, multimodal speech, standalone Fit Report PDF and full dossier export, live multi-agent stage tracking, company RAG, relational persistence, Docker orchestration, API quota protections, 7-day personalized micro-curricula, code optimizations, Google Local NLP accuracy overhaul, Session #11 UI/UX Design System, Session #12 dynamic Gemini model discovery & 404 failover, Session #13 bug fixes, Session #14 code optimization, Session #15 UAT testing, Session #16 Scope Pruning (streamlined to 6 clean steps), Session #17 Junk Codebase Audit & Cleanup, Session #18 Complete Section Testing, Session #19 Comprehensive Code, Processing & UI/UX Evolution, Session #20 Dual Onboarding Modes (Strategic Fit & QB Alone vs Complete Pipeline), Session #21 Multi-Model Cascade Modernization & Upstream Resilience, Session #22 Multi-Subagent Output Quality Verification Engine, Session #23 Header Badges Removal & Advisory Terms Disclaimer, Session #24 Local Key Persistence Removal & Zero Personal Data Security Audit, Session #25 GitHub Push Protection Secret Remediation & Developer Attribution, Session #26 GitHub Actions CI Pipeline Resolution & Production Hardening, Session #27 Streamlit Community Cloud Hosting Deployment, and Session #28 Mobile & Tablet Viewport Mode Architecture are complete, tested, and 100% operational.
+- **Viewport Engine:** 4 operational view modes (`🖥️ Auto (Responsive)`, `📱 Mobile View (390px)`, `📟 Tablet View (820px)`, `💻 Desktop (Wide)`) switchable from sidebar with instant reactive CSS injection and desktop simulation frames.
 - **Onboarding Modes:** Fully decoupled dual-mode onboarding:
   1. **Option 1:** *Run Strategic Fit & Question Bank Alone* (Fast Track • 5 Stages • ~10–15s).
   2. **Option 2:** *Perform Complete Analysis from Start till End* (Full Pipeline • 6 Stages • ~35–45s).
-- **Unit & UAT Test Health:** **101 of 101 unit, integration, and UAT tests passing cleanly (100% pass rate in 26.65s)** with 0 failures, 0 errors, 0 warnings. Baseline scoring agents (`online_test_agent.score_test` and `feedback_agent.build_unified_topic_readiness` with 45/55 formula) remain 100% untouched.
+- **Unit & UAT Test Health:** **108 of 108 unit, integration, and UAT tests passing cleanly (100% pass rate in 32.4s)** with 0 failures, 0 errors, 0 warnings. Baseline scoring agents (`online_test_agent.score_test` and `feedback_agent.build_unified_topic_readiness` with 45/55 formula) remain 100% untouched.
 - **CI/CD Pipeline Health:** Fully modernized GitHub Actions CI (`.github/workflows/ci.yml`) with recursive bytecode compilation via `compileall`, concurrency controls, manual workflow dispatch, and headless testing environment variables (`PYTHONPATH=.`, `STREAMLIT_SERVER_HEADLESS="true"`).
 - **Security & Privacy:** 100% Zero-Leak verified. No live API keys, GCP credentials, or candidate PII exist in git history, code, or documentation. Local `.env` writeback has been removed. Key is strictly held in transient session state memory.
 - **Production Containerization:** Hardened `Dockerfile` with non-root security (`appuser`, UID 1000), `ffmpeg` installation, and lean build layers; fortified `.dockerignore` blocking `.env`, SQLite databases, and candidate session JSON files.
 - **Developer Attribution:** Executive card rendered across application views: *"Developed by your frd Nitish and Jeevana"*.
-- **Output Quality Assurance:** In-process Multi-Agent Quality Controller evaluates sub-agent deliverables (completeness, specificity, requirements matrix depth, 5-dimensional questions, option validity, and 48-hour study roadmap viability) and binds real-time quality badges to the executive UI.
-- **Advisory Disclaimer & Terms of Use:** Globally rendered executive footer on all application views specifying probabilistic AI nature, possible errors/false outputs, use at own risk, and terms of use agreement.
+- **Touch Ergonomics & Accessibility:** All interactive elements (buttons, checkboxes, radios, selectboxes) enforce WCAG 2.5.5 Level AAA touch target compliance ($\ge 44$px).
 - **Dynamic Model Auto-Discovery & Zero 404 Guarantee:** Active tiered cascade (`gemini-2.5-flash`, `gemini-flash-latest`, `gemini-3.8-flash`, etc.) with session blacklisting for 404s. Retired models (`gemini-pro`, `gemini-1.5-flash`) can never cause cascading crashes.
 - **Non-Blocking Telemetry:** Atomic timestamp reservation rate pacer guarantees <=12 RPM while releasing mutex lock before sleep, keeping Streamlit UI telemetry 100% non-blocking.
 - **Design System Health:** Centralized Theme tokens (`theme.py`), 40+ zero-dependency inline SVG icons (`icons.py`), decoupled modular UI Kit (`ui_kit.py`), clean hero headers without badge clutter, hardware-accelerated 60fps micro-animations, interactive stepper (`UI.stepper`), and full WCAG AAA contrast compliance.
@@ -70,30 +72,25 @@
 ---
 
 ## Where We Have Stopped
-- **Current Milestone (Sessions #26 & #27):**
-  1. **GitHub Actions CI Pipeline Resolution:**
-     - Eradicated the red ❌ failure on commit `8f5cf89` by replacing static compilation with recursive `python -m compileall -q agents/ frontend/ orchestrator/ utils/ tests/ app.py streamlit_app.py`.
-     - Injected Linux headless testing environment variables (`PYTHONPATH=.`, `STREAMLIT_SERVER_HEADLESS="true"`).
-     - Fixed `test_uat_page_01_onboarding_initial_render` in `tests/test_uat_streamlit_app.py` to be environment-agnostic, handling both pre-authenticated and unauthenticated states deterministically.
-  2. **Streamlit Community Cloud Hosting Deployment:**
-     - Created root entrypoint `streamlit_app.py` proxying directly to `frontend/app.py` via `runpy.run_path()`.
-     - Documented DNS subdomain compliance (`interview-iq` instead of invalid `interview_iq`).
-  3. **Production Containerization Hardening:**
-     - Overhauled `.dockerignore` to strictly prevent baking `.env`, SQLite databases, and candidate session JSON files into container layers.
-     - Hardened `Dockerfile` with non-root user `appuser` (UID 1000) and layer optimization.
-     - Modernized `deploy.sh`, `deploy.bat`, and `deploy_hf.bat`.
-  4. **Quality & Test Health:**
-     - Verified all 101 tests passing (`OK`) with 100% pass rate in 22.5s.
-  5. **Documentation Synchronization:**
-     - Created `docs/GITHUB_DEPLOYMENT_AND_PUSH_STRATEGY.md` and rebuilt all Microsoft Word `.docx` dossiers.
+- **Current Milestone (Session #28):**
+  1. **Mobile and Tablet Viewport Mode & Responsive Experience:**
+     - Interactive Viewport Mode switcher active in sidebar with 4 modes (`🖥️ Auto (Responsive)`, `📱 Mobile View (390px)`, `📟 Tablet View (820px)`, `💻 Desktop (Wide)`).
+     - 4-tier responsive CSS grid engine active in `neumorphism.css` and `theme.py` (<480px, 480px–768px, 769px–1024px, >1024px).
+     - Responsive layout classes (`.responsive-stat-grid`, `.culture-grid`, `.neuro-table-responsive`) and touch-scrollable tabs active.
+     - Touch target compliance ($\ge 44$px) enforced on buttons, radios, and Step 6 checkboxes.
+     - Fluid typography using `clamp()` on `UI.metric_card`, `UI.stat_card`, and `UI.hero_header`.
+     - Hardware voice recorder conditioned with viewport meta tag and 280px height.
+  2. **Quality & Test Health:**
+     - Verified all 108 tests passing (`OK`) with 100% pass rate in 32.4s.
+  3. **Documentation Synchronization:**
+     - Created `docs/MOBILE_AND_TAB_VIEW_GUIDE.md` and rebuilt all 7 Microsoft Word `.docx` dossiers.
 
 ---
 
 ## Why We Have Stopped
-1. **Scope Realization:** GitHub Actions CI pipeline resolution, container security hardening, root `streamlit_app.py` entrypoint creation, and deployment documentation have been completely implemented, verified, and pushed.
-2. **Zero Regressions:** 100% automated test pass rate across all 101 tests with zero failures.
-3. **Repository Parity:** Working tree is clean, all files are staged, committed, and pushed to remote `origin/main`.
-4. **Mandatory Documentation Synchronization:** Paused to record complete Knowledge Transfer (KT) across Markdown (`.md`) and Microsoft Word (`.docx`) in `/docs` to ensure seamless continuation for future developers and AI sessions.
+1. **Scope Realization:** Mobile and Tablet view options, responsive CSS grid engine, touch ergonomics, and comprehensive documentation have been completely implemented, verified, and tested.
+2. **Zero Regressions:** 100% automated test pass rate across all 108 tests with zero failures.
+3. **Mandatory Documentation Synchronization:** Paused to record complete Knowledge Transfer (KT) across Markdown (`.md`) and Microsoft Word (`.docx`) in `/docs` to ensure seamless continuation for future developers and AI sessions.
 
 ---
 
@@ -117,14 +114,16 @@
    - Navigate to [share.streamlit.io](https://share.streamlit.io).
    - Confirm application status for `Hello-Nitish/Interview_IQ` with `main` branch and `streamlit_app.py`.
    - Access the live application URL (e.g. `https://interview-iq.streamlit.app`).
-2. **Launch Environment Locally:**
+2. **Launch Environment Locally & Test Viewport Modes:**
    ```powershell
    .\.venv\Scripts\python.exe -m streamlit run frontend/app.py
    ```
+   - In sidebar under "VIEWPORT MODE", toggle between `📱 Mobile View (390px)`, `📟 Tablet View (820px)`, and `🖥️ Auto (Responsive)`.
 3. **Run Automated Test Suite:**
    ```powershell
    .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py"
    ```
-   Confirm all 101 tests pass (100% pass rate).
+   Confirm all 108 tests pass (100% pass rate).
 4. **Extend:** Proceed to **Phase 26** (University LMS Integration) or **Phase 27** (WebRTC Live Audio Streaming with Waveforms).
+
 

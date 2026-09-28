@@ -270,6 +270,71 @@ class TestRigorousUATStreamlitApp(unittest.TestCase):
         sb_options = [opt for sb in at.selectbox for opt in sb.options]
         self.assertTrue(any("All Assets" in str(opt) for opt in sb_options), f"Expected All Assets in {sb_options}")
 
+    def test_uat_viewport_mode_switcher_toggle(self):
+        """Validates Viewport Mode switcher widget existence and toggling across all 4 modes."""
+        at = AppTest.from_file(self.app_path, default_timeout=60)
+        at.run()
+        self.assertEqual(len(at.exception), 0, f"Exceptions on mount: {at.exception}")
+
+        # Verify default session state
+        self.assertEqual(at.session_state["view_mode"], "🖥️ Auto (Responsive)")
+
+        # Locate viewport selector
+        view_sbs = [sb for sb in at.selectbox if sb.key == "viewport_mode_selector"]
+        self.assertTrue(len(view_sbs) > 0, "Viewport mode selectbox not found in sidebar")
+        sb = view_sbs[0]
+
+        # 1. Switch to Mobile View (390px)
+        sb.select("📱 Mobile View (390px)").run()
+        self.assertEqual(len(at.exception), 0, f"Exceptions on Mobile switch: {at.exception}")
+        self.assertEqual(at.session_state["view_mode"], "📱 Mobile View (390px)")
+
+        # 2. Switch to Tablet View (820px)
+        sb.select("📟 Tablet View (820px)").run()
+        self.assertEqual(len(at.exception), 0, f"Exceptions on Tablet switch: {at.exception}")
+        self.assertEqual(at.session_state["view_mode"], "📟 Tablet View (820px)")
+
+        # 3. Switch to Desktop (Wide)
+        sb.select("💻 Desktop (Wide)").run()
+        self.assertEqual(len(at.exception), 0, f"Exceptions on Desktop switch: {at.exception}")
+        self.assertEqual(at.session_state["view_mode"], "💻 Desktop (Wide)")
+
+        # 4. Switch back to Auto
+        sb.select("🖥️ Auto (Responsive)").run()
+        self.assertEqual(len(at.exception), 0, f"Exceptions on Auto switch: {at.exception}")
+        self.assertEqual(at.session_state["view_mode"], "🖥️ Auto (Responsive)")
+
+    def test_uat_mobile_layout_stacking_invariants(self):
+        """Validates that under Mobile View mode, all Page 1 widgets and buttons execute cleanly."""
+        at = AppTest.from_file(self.app_path, default_timeout=60)
+        at.run()
+
+        # Set mobile view mode
+        at.session_state["view_mode"] = "📱 Mobile View (390px)"
+        at.run()
+        self.assertEqual(len(at.exception), 0, f"Exceptions in unauthenticated mobile mode: {at.exception}")
+
+        # Set key to verify authenticated mobile onboarding layout
+        at.session_state["custom_api_key"] = "AIzaSyFakeKeyForUATTest"
+        at.run()
+        self.assertEqual(len(at.exception), 0, f"Exceptions in authenticated mobile mode: {at.exception}")
+
+        btn_labels = [str(b.label) for b in at.button]
+        self.assertTrue(any("Load Demo" in lbl for lbl in btn_labels), f"Expected Load Demo buttons in mobile view: {btn_labels}")
+
+    def test_uat_step4_iframe_height_contracts(self):
+        """Verifies that voice recorder and exam timer iframe contracts in frontend/app.py use responsive heights."""
+        with open(self.app_path, "r", encoding="utf-8") as f:
+            code = f.read()
+
+        # Voice recorder height must be 280 for mobile responsiveness
+        self.assertIn("st.iframe(vr_html, height=280)", code)
+        self.assertIn("components.html(vr_html, height=280)", code)
+
+        # Exam timer height must be 140 for mobile clock wrap
+        self.assertIn("st.iframe(tf_html, height=140)", code)
+        self.assertIn("components.html(tf_html, height=140)", code)
+
 
 if __name__ == "__main__":
     unittest.main()

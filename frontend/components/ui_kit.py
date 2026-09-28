@@ -110,7 +110,7 @@ class UI:
           <div style='font-size:0.75rem; text-transform:uppercase; font-weight:700; color:{Theme.COLORS['text_muted']}; letter-spacing:0.04em;'>
             {label}
           </div>
-          <div style='font-size:1.8rem; font-weight:900; color:{val_color}; line-height:1.2; margin-top:4px;'>
+          <div style='font-size:clamp(1.35rem, 4vw, 1.8rem); font-weight:900; color:{val_color}; line-height:1.2; margin-top:4px;'>
             {value}
           </div>
           {delta_html}
@@ -198,7 +198,7 @@ class UI:
         '>
           <div>
             {badge_html}
-            <h1 style='color:{Theme.COLORS['text_heading']}; margin:0; font-size:1.85rem; font-weight:800; letter-spacing:-0.02em; display:flex; align-items:center; gap:10px;'>
+            <h1 style='color:{Theme.COLORS["text_heading"]}; margin:0; font-size:clamp(1.3rem, 3.5vw, 1.85rem); font-weight:800; letter-spacing:-0.02em; display:flex; align-items:center; gap:10px;'>
               {icon(icon_name, size=28, color=Theme.COLORS['primary'])} {title}
             </h1>
             <p style='color:{Theme.COLORS['text_muted']}; margin:6px 0 0 0; font-size:0.95rem;'>
@@ -279,19 +279,20 @@ class UI:
                 label_color = Theme.COLORS["text_muted"]
                 border_color = Theme.COLORS["border_light"]
 
-            connector = f"<div style='flex:1; height:2px; background:{border_color}; margin:0 8px;'></div>" if idx < len(steps) else ""
+            connector = f"<div class='stepper-connector {'completed' if idx < current_step else ''}' style='flex:1; height:2px; background:{border_color}; margin:0 8px;'></div>" if idx < len(steps) else ""
+            active_class = "active" if idx == current_step else ""
             items_html.append(f"""
-            <div style='display:flex; align-items:center; {"flex:1;" if idx < len(steps) else ""}'>
+            <div class='stepper-item' style='display:flex; align-items:center; {"flex:1;" if idx < len(steps) else ""}'>
               <div style='display:flex; align-items:center; gap:6px;'>
                 {circle}
-                <span style='font-size:0.8rem; font-weight:700; color:{label_color}; white-space:nowrap;'>{name}</span>
+                <span class='stepper-label {active_class}' style='font-size:0.8rem; font-weight:700; color:{label_color}; white-space:nowrap;'>{name}</span>
               </div>
               {connector}
             </div>
             """)
 
         return f"""
-        <div class='neuro-card' style='
+        <div class='neuro-card neuro-stepper-container' style='
           background:{Theme.COLORS['bg_surface']};
           border:1px solid {Theme.COLORS['border_light']};
           border-radius:{Theme.RADII['lg']};
@@ -346,7 +347,7 @@ class UI:
             </div>
             {icon_html}
           </div>
-          <div style='font-size:1.85rem; font-weight:900; color:{val_color}; line-height:1.1; margin-top:2px;'>
+          <div style='font-size:clamp(1.35rem, 4vw, 1.85rem); font-weight:900; color:{val_color}; line-height:1.1; margin-top:2px;'>
             {value}{trend_html}
           </div>
           {sub_html}

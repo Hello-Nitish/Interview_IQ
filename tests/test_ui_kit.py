@@ -160,6 +160,62 @@ class TestUIKitAndTheme(unittest.TestCase):
         self.assertIn("Developed by your frd Nitish and Jeevana", card_html)
         self.assertIn("<svg", card_html)
 
+    def test_theme_responsive_breakpoints_and_tokens(self):
+        """Verify Theme provides standardized responsive breakpoints and container widths."""
+        self.assertIn("mobile_sm", Theme.BREAKPOINTS)
+        self.assertIn("mobile", Theme.BREAKPOINTS)
+        self.assertIn("tablet", Theme.BREAKPOINTS)
+        self.assertIn("tablet_lg", Theme.BREAKPOINTS)
+        self.assertIn("desktop", Theme.BREAKPOINTS)
+        self.assertEqual(Theme.BREAKPOINTS["mobile"], "480px")
+        self.assertEqual(Theme.BREAKPOINTS["tablet"], "768px")
+        
+        # Verify responsive CSS variables injected in root
+        css_vars = Theme.generate_css_variables()
+        self.assertIn("--breakpoint-mobile: 480px;", css_vars)
+        self.assertIn("--breakpoint-tablet: 768px;", css_vars)
+
+    def test_device_container_css_generation(self):
+        """Verify Theme.get_view_mode_css produces valid scoped styles for view modes."""
+        # Mobile: constrained max-width, preview pill, column stacking
+        mobile_css = Theme.get_view_mode_css("📱 Mobile View (390px)")
+        self.assertIn("max-width: min(420px", mobile_css)
+        self.assertIn("Mobile Preview", mobile_css)
+        self.assertIn("flex-direction: column !important", mobile_css)
+        
+        # Tablet: constrained max-width (820px)
+        tablet_css = Theme.get_view_mode_css("📟 Tablet View (820px)")
+        self.assertIn("max-width: min(820px", tablet_css)
+        self.assertIn("Tablet Preview", tablet_css)
+        
+        # Desktop: wide unconstrained
+        desktop_css = Theme.get_view_mode_css("💻 Desktop (Wide)")
+        self.assertIn("max-width: 1400px", desktop_css)
+
+        # Auto: fluid
+        auto_css = Theme.get_view_mode_css("🖥️ Auto (Responsive)")
+        self.assertIn("max-width: 100%", auto_css)
+
+    def test_device_icons_svg_validity(self):
+        """Verify device viewport switcher icons render well-formed SVGs."""
+        device_icons = ["smartphone", "tablet", "monitor"]
+        for icon_name in device_icons:
+            svg_markup = icon(icon_name, size=18, color="#2563EB")
+            self.assertTrue(svg_markup.startswith("<svg"))
+            self.assertTrue(svg_markup.endswith("</svg>"))
+            self.assertIn("viewBox='0 0 24 24'", svg_markup)
+            self.assertIn("width='18'", svg_markup)
+
+    def test_ui_stepper_adaptive_folding_markup(self):
+        """Verify UI.stepper contains stepper-label and active classes without breaking text assertions."""
+        stepper_html = UI.stepper(current_step=3, total_steps=6)
+        self.assertIn("stepper-label", stepper_html)
+        self.assertIn("stepper-label active", stepper_html)
+        self.assertIn("stepper-connector completed", stepper_html)
+        self.assertIn("Question Bank", stepper_html)
+        self.assertIn("Onboarding", stepper_html)
+        self.assertIn("✓", stepper_html)
+
 
 if __name__ == "__main__":
     unittest.main()
