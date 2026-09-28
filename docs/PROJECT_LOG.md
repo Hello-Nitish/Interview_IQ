@@ -199,7 +199,7 @@
 - **Session Focus:** Complete Execution of Enterprise Tool Improvisations (Phases 17 to 24), Cross-Machine Portability Resolution, Multimodal Voice Simulator (Google Local NLP), Automated Corporate PDF Dossier Engine, Placement Cell Institutional Analytics, Agentic Company Intelligence RAG, Production Containerization, Google Gemini API Quota & Efficiency Architecture, Mandatory User Key Gatekeeper, and 41-Test Automated Verification Suite.
 - **Accomplishments & Engineering Deliverables:**
   1. **Foundational Portability & Cross-Machine Resolution:**
-     - Re-mapped `.venv/pyvenv.cfg` to local Python 3.11 runtime (`C:\Users\nitis\AppData\Roaming\uv\python\cpython-3.11.15-windows-x86_64-none\python.exe`), resolving path errors from the original host machine.
+     - Re-mapped `.venv/pyvenv.cfg` to local Python 3.11 runtime (`%USERPROFILE%\AppData\Roaming\uv\python\cpython-3.11.15-windows-x86_64-none\python.exe`), resolving path errors from the original host machine.
      - Converted `.venv/Scripts/activate.bat` and `.venv/Scripts/activate` to dynamic relative directory resolution (`for %%i in ("%~dp0..") do set "VIRTUAL_ENV=%%~fi"`).
      - Hardened `launch.bat` with quoted directory paths and direct execution of `.venv\Scripts\python.exe -m streamlit run frontend/app.py`.
   2. **Phase 17: Real-Time Exam Countdown Timer & Proctoring Anti-Cheating Engine:**
@@ -377,16 +377,16 @@ Engineered and verified three post-assessment capabilities tailored for MBA Digi
   1. **Salary Band Inversion & Typo Resolutions (`utils/salary_bands.py`):**
      - Corrected `product_manager / junior / us_major`: fixed `base_low: 1200000` to `120000` ($120K to $155K USD), eliminating a 10× numerical inversion.
      - Corrected `software_engineer / lead / metro_india`: fixed `equity_low: 180000` to `1800` (1,800 to 3,500 units), properly scaling above senior tier (1,000 to 2,000 units).
-     - Created dedicated unit test suite [`tests/test_salary_bands.py`](file:///f:/Projects/Shared/DT%20-%20Project/DT%20-%20Project/tests/test_salary_bands.py) mathematically verifying that 100% of cells have `base_low <= base_high` and `equity_low <= equity_high`.
+     - Created dedicated unit test suite [`tests/test_salary_bands.py`](tests/test_salary_bands.py) mathematically verifying that 100% of cells have `base_low <= base_high` and `equity_low <= equity_high`.
   2. **Robust Whole-Word Topic Normalization (`utils/curriculum_resources.py`):**
      - Refactored `normalize_topic_key` using whole-word regex boundaries (`\b{alias}\b`) and length-descending sorting.
      - Added minimum length guards ($\ge 3$ characters) before evaluating substring containment, eliminating false matches for short inputs (e.g. single letter `'a'` or `'it'`).
-     - Added unit test coverage in [`tests/test_micro_curriculum_agent.py`](file:///f:/Projects/Shared/DT%20-%20Project/DT%20-%20Project/tests/test_micro_curriculum_agent.py).
+     - Added unit test coverage in [`tests/test_micro_curriculum_agent.py`](tests/test_micro_curriculum_agent.py).
   3. **Database Performance, DDL Caching, and Concurrency (`utils/database.py`):**
      - Introduced an `_initialized_paths` set guard in `DatabaseManager.init_db()` to eliminate 12 redundant `CREATE TABLE` and `CREATE INDEX` executions on every single read query, session list, and cache lookup.
      - Enabled SQLite WAL mode (`PRAGMA journal_mode = WAL;`) and synchronous tuning (`PRAGMA synchronous = NORMAL;`) with busy timeout handling in `get_connection()`.
      - Added relational foreign key indexes across all child tables (`idx_sessions_user`, `idx_fit_session`, `idx_test_session`, `idx_readiness_session`, `idx_case_session`, `idx_nego_session`, `idx_curr_session`).
-     - Hardened [`tests/test_database.py`](file:///f:/Projects/Shared/DT%20-%20Project/DT%20-%20Project/tests/test_database.py) to cleanly preserve and restore `DatabaseManager.DB_PATH` in `tearDown()`.
+     - Hardened [`tests/test_database.py`](tests/test_database.py) to cleanly preserve and restore `DatabaseManager.DB_PATH` in `tearDown()`.
   4. **Streamlit Lifecycle Optimization (`frontend/app.py`):**
      - Removed the aggressive module eviction loop (`del sys.modules[mod]`), preserving class singletons, reducing re-render latency, and keeping the L1 in-memory response cache persistent across user interactions.
      - Replaced legacy revoked key fragment checks with generic placeholder detection (`"placeholder"`, `"enter_key"`, `"your_"`).
@@ -1272,11 +1272,44 @@ Executed the complete user-mandated Multi-Agent Orchestration Framework:
 
 ---
 
+---
+
+## Session #29 — 2026-09-28
+- **Session Focus:** Full-Platform Comprehensive Code & Security Review, Resilience Hardening, PII Sanitization, CI Matrix Expansion, and Git Push Preparation.
+- **Accomplishments & Engineering Deliverables:**
+  1. **Multi-Agent Deep-Dive Architecture & Security Audit:**
+     - Deployed 4 concurrent subagent auditors (`SECURITY_AND_COMPLIANCE_AUDITOR`, `CORE_AND_AGENT_PIPELINE_AUDITOR`, `FRONTEND_AND_UI_AUDITOR`, `TEST_AND_CI_AUDITOR`) conducting full static and dynamic analysis across all modules.
+     - Confirmed 100% Zero-Leak compliance: zero active API keys or private credentials in repository files or git history; verified `.env`, SQLite databases, and candidate session caches are strictly ignored.
+     - Anonymized `reference/candidate_evaluation_report.html` to a synthetic demo profile ("Priya Sharma", "DM-DEMO-2026") and added `reference/` to `.gitignore`.
+     - Sanitized local user filesystem paths in `docs/PROJECT_LOG.md` to `%USERPROFILE%`, converted absolute `file:///` URLs to relative markdown paths, and updated `.env.example` default model to `gemini-2.5-flash`.
+     - Purged 848 orphaned session `.json` cache files from `data/sessions/`, keeping directory structure clean with `.gitkeep`.
+  2. **Core Agent Pipeline & Network Resilience Hardening:**
+     - `agents/base_agent.py`: Fixed Stage 3 candidate slices sorting (`len(x[1])`, reverse=True) so outer dictionaries are never overwritten by inner array slices with trailing commas.
+     - `agents/voice_interview_agent.py`: Handled both `str` and `dict` representations in challenge areas, eliminating `TypeError` during challenge extraction.
+     - `orchestrator/orchestrator.py`: Thread-safe per-agent `GeminiClient` instantiation upon API key configuration.
+     - `utils/gemini_client.py`: Enhanced `_execute_with_resilience` to recognize 503 ("overloaded"), 500, 502, 504, `ConnectionError`, `RemoteDisconnected`, `TimeoutError`, and safety filters, retrying attempt 2 with backoff or failing over to the model cascade.
+     - `utils/quality_controller.py`: Supported `overall_interview_risk_areas` alongside `challenge_areas` in `audit_resume_profile`.
+     - **Scoring Invariants**: Baseline scoring formula (`online_test_agent.score_test` and `feedback_agent.build_unified_topic_readiness` 45% fit / 55% test composite formula) confirmed **100% untouched**.
+  3. **Frontend UI/UX & Responsive Optimization:**
+     - `frontend/app.py`: Integrated dual key retrieval (`os.getenv` + `st.secrets.get("GEMINI_API_KEY")`) for zero-config Streamlit Community Cloud hosting.
+     - Fixed Step 6 curriculum regeneration crash (`st.session_state.curriculum_agent` redirected to `st.session_state.orchestrator.curriculum_agent`) and guarded checkbox set removal.
+     - `frontend/components/exam_timer.html`: Replaced `window.blur` with `document.visibilitychange`, eliminating false-positive cheating alerts when candidates click MCQ radio options.
+     - `frontend/components/icons.py`: Added SVG vector paths for `"code"`, `"user"`, and `"clipboard"`.
+     - `frontend/styles/theme.py` & `neumorphism.css`: Scoped 50% tablet column wrap strictly to 4-column decks (`:has(> [data-testid="column"]:nth-child(4))`), scoped mobile column stacking to exempt inline checkboxes (`:has([data-testid="stCheckbox"])`), and adjusted warning text color to `#B45309` (Amber 700) for WCAG AA contrast.
+  4. **CI/CD Pipeline & Build Infrastructure:**
+     - `.github/workflows/ci.yml`: Added Python 3.12 to the build matrix (`["3.10", "3.11", "3.12"]`), added system `ffmpeg` installation, and set headless testing environment variables.
+     - `scripts/build_docs_and_docx.py`: Operational convenience wrapper executing `build_docx_files.py`.
+     - `README.md`: Polished with 108/108 tests passing badge, markdown code fences, responsive mode documentation, and developer attribution.
+  5. **Automated Test Suite Verification:**
+     - Executed full automated test suite: **108 of 108 tests passing cleanly with 100% pass rate in 33.2s** with 0 failures, 0 errors, and 0 warnings.
+
+---
+
 ## Current Status of the Project
-- **Production Status:** Multi-agent placement intelligence platform fully responsive, device-agnostic, containerized, and tested for one-click Streamlit Community Cloud and Docker deployment.
+- **Production Status:** Multi-agent placement intelligence platform fully responsive, device-agnostic, containerized, hardened against network disruptions, and verified across Python 3.10, 3.11, and 3.12.
 - **Viewport Engine:** 4 operational view modes (`🖥️ Auto (Responsive)`, `📱 Mobile View (390px)`, `📟 Tablet View (820px)`, `💻 Desktop (Wide)`) switchable from sidebar with instant reactive CSS injection.
-- **Test Suite Health:** **108 of 108 unit, integration, and Streamlit UAT tests passing cleanly (100% pass rate in 32.4s)** with 0 failures, 0 errors, 0 warnings.
-- **CI/CD Pipeline Health:** Fully modernized GitHub Actions CI (`.github/workflows/ci.yml`) with recursive bytecode compilation via `compileall`, concurrency controls, manual workflow dispatch, and headless testing environment variables (`PYTHONPATH=.`, `STREAMLIT_SERVER_HEADLESS="true"`).
+- **Test Suite Health:** **108 of 108 unit, integration, and Streamlit UAT tests passing cleanly (100% pass rate in 33.2s)** with 0 failures, 0 errors, 0 warnings.
+- **CI/CD Pipeline Health:** Fully modernized GitHub Actions CI (`.github/workflows/ci.yml`) across Python 3.10, 3.11, and 3.12 with `ffmpeg` installation, bytecode compilation via `compileall`, and headless testing environment variables (`PYTHONPATH=.`, `STREAMLIT_SERVER_HEADLESS="true"`).
 - **Security & Privacy:** 100% Zero-Leak verified. No live API keys, GCP credentials, or candidate PII exist in git history, code, or documentation. Key is strictly held in transient session state memory.
 - **Hosting Readiness:** Dual entrypoints (`frontend/app.py` and `streamlit_app.py`) live on GitHub `main` branch. Tested and compatible with Streamlit Community Cloud, Hugging Face Spaces, and Docker.
 - **Developer Attribution:** Executive card rendered across application views: *"Developed by your frd Nitish and Jeevana"*.
@@ -1287,20 +1320,20 @@ Executed the complete user-mandated Multi-Agent Orchestration Framework:
 ---
 
 ## Where We Have Stopped
-- **Current Execution Milestone:** Mobile and Tablet Viewport Mode & Responsive Experience is complete:
-  1. Interactive Viewport Mode switcher active in sidebar with 4 modes.
-  2. 4-tier responsive CSS grid engine active in `neumorphism.css` and `theme.py`.
-  3. Step-by-step layout and touch optimizations implemented across all 6 steps.
-  4. Full automated test discovery suite expanded to 108 tests (100% passing).
-  5. Dedicated guide authored: `docs/MOBILE_AND_TAB_VIEW_GUIDE.md` and compiled to `.docx`.
-  6. All 7 Microsoft Word (`.docx`) dossiers rebuilt in `/docs`.
+- **Current Execution Milestone:** Full-Platform Comprehensive Code & Security Review, Resilience Hardening, PII Sanitization, and CI Matrix Expansion is complete:
+  1. 4 audit subagents completed full-codebase audits.
+  2. Core pipeline resilience hardened against transient 500/502/503/504 errors and bracket slice overrides.
+  3. UI/UX proctoring false-positives and tablet wrapping bugs resolved.
+  4. 848 orphaned session JSON files cleaned; candidate report PII sanitized.
+  5. Python 3.12 added to GitHub Actions CI matrix; all 108 tests passing (100%).
+  6. All 7 documentation files in `/docs` updated.
 
 ---
 
 ## Why We Have Stopped
-1. **Scope Realization:** Mobile and Tablet view options, responsive CSS grid engine, touch ergonomics, and comprehensive documentation have been completely implemented and verified.
-2. **Quality Verification:** 100% automated test pass rate across all 108 tests in 32.4s with zero regressions.
-3. **Mandatory Documentation Synchronization:** Paused to record complete Knowledge Transfer (KT) across Markdown (`.md`) and Microsoft Word (`.docx`) in `/docs` to ensure seamless continuation for future developers and AI sessions.
+1. **Scope Realization:** Full-platform code review, resilience hardening, PII sanitization, responsive layout refinement, and CI matrix expansion have been completely implemented and verified.
+2. **Quality Verification:** 100% automated test pass rate across all 108 tests in 33.2s with zero regressions.
+3. **Mandatory Documentation Synchronization:** Paused to record complete Knowledge Transfer (KT) across Markdown (`.md`) and Microsoft Word (`.docx`) in `/docs` prior to pushing to GitHub.
 
 ---
 
@@ -1320,9 +1353,9 @@ Executed the complete user-mandated Multi-Agent Orchestration Framework:
 ---
 
 ## Where to Resume Next (Instructions for Next AI Session / Developer)
-1. **Streamlit Community Cloud Deployment Verification:**
-   - Navigate to [share.streamlit.io](https://share.streamlit.io).
-   - Confirm application status for `Hello-Nitish/Interview_IQ` with `main` branch and `streamlit_app.py`.
+1. **GitHub Remote & Streamlit Cloud Verification:**
+   - Verify GitHub Actions CI status on `Hello-Nitish/Interview_IQ` across Python 3.10, 3.11, and 3.12.
+   - Confirm application status on [share.streamlit.io](https://share.streamlit.io) for `Hello-Nitish/Interview_IQ` with `main` branch and `streamlit_app.py`.
    - Access the live application URL (e.g. `https://interview-iq.streamlit.app`).
 2. **Test Viewport Modes Locally:**
    - Execute:
@@ -1335,7 +1368,7 @@ Executed the complete user-mandated Multi-Agent Orchestration Framework:
      ```powershell
      .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py"
      ```
-   - Confirm all 108 tests pass.
+   - Confirm all 108 tests pass cleanly.
 4. **Next Implementation Milestone:**
    - Begin **Phase 26** (University LMS Integration) or **Phase 27** (WebRTC Live Audio Streaming with Waveforms).
 

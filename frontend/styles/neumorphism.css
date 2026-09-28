@@ -798,12 +798,12 @@ textarea::placeholder,
   }
 
   /* Wrap dense 4-column Streamlit blocks into 2x2 on tablets */
-  [data-testid="stHorizontalBlock"] {
+  [data-testid="stHorizontalBlock"]:has(> [data-testid="column"]:nth-child(4)) {
     flex-wrap: wrap !important;
     gap: 12px !important;
   }
 
-  [data-testid="stHorizontalBlock"] > [data-testid="column"] {
+  [data-testid="stHorizontalBlock"]:has(> [data-testid="column"]:nth-child(4)) > [data-testid="column"] {
     min-width: calc(50% - 12px) !important;
     flex: 1 1 calc(50% - 12px) !important;
   }
@@ -847,18 +847,25 @@ textarea::placeholder,
     border-left-width: 5px !important;
   }
 
-  /* Single-Column Stack for Streamlit Blocks */
-  [data-testid="stHorizontalBlock"] {
+  /* Single-Column Stack for Streamlit Blocks except inline checkboxes */
+  [data-testid="stHorizontalBlock"]:not(:has([data-testid="stCheckbox"])) {
     flex-direction: column !important;
     flex-wrap: wrap !important;
     gap: 12px !important;
   }
 
-  [data-testid="stHorizontalBlock"] > [data-testid="column"] {
+  [data-testid="stHorizontalBlock"]:not(:has([data-testid="stCheckbox"])) > [data-testid="column"] {
     width: 100% !important;
     min-width: 100% !important;
     flex: 1 1 100% !important;
     margin-bottom: 6px !important;
+  }
+
+  [data-testid="stHorizontalBlock"]:has([data-testid="stCheckbox"]) {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
   }
 
   /* Grid Class Collapse */

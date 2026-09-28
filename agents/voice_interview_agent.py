@@ -25,7 +25,13 @@ class VoiceInterviewAgent(BaseAgent):
         cand_name = resume_profile.get("candidate_name", "Candidate")
         role_title = jd_profile.get("role_title", "Target Role")
         challenges = resume_profile.get("challenge_areas", [])
-        top_challenge = challenges[0]["area"] if challenges else "methodological depth"
+        top_challenge = "methodological depth"
+        if challenges:
+            first_c = challenges[0]
+            if isinstance(first_c, dict):
+                top_challenge = first_c.get("area") or first_c.get("challenge") or str(first_c)
+            elif isinstance(first_c, str):
+                top_challenge = first_c.strip() or "methodological depth"
 
         prompt = f"""
 Candidate: {cand_name}

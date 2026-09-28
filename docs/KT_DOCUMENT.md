@@ -268,11 +268,20 @@ Designed specifically for Business School Placement Directors and Training Offic
   5. Conditioned `voice_recorder.html` with viewport meta tag, 16px iOS auto-zoom elimination, and 280px container height.
   6. Expanded automated test suite from 101 to **108 tests** (19 UI kit tests, 13 Streamlit UAT tests) with a **100% pass rate in 32.4s**.
   7. Authored `docs/MOBILE_AND_TAB_VIEW_GUIDE.md` and compiled `docs/MOBILE_AND_TAB_VIEW_GUIDE.docx`.
+- **Session #29 Accomplishments:**
+  1. Deployed 4 specialized subagent auditors (Security, Core Pipeline, Frontend, Test/CI) conducting a full-platform audit across all modules and dependencies.
+  2. Verified 100% Zero-Leak security: zero API keys or secrets in source code, `.env` strictly ignored, and transient key lifecycle verified.
+  3. Anonymized `reference/candidate_evaluation_report.html` to synthetic demo persona ("Priya Sharma", "DM-DEMO-2026") and added `reference/` to `.gitignore`.
+  4. Sanitized local user filesystem paths in `docs/PROJECT_LOG.md` to `%USERPROFILE%`, converted absolute `file:///` URLs to relative links, and updated `.env.example` to `GEMINI_MODEL=gemini-2.5-flash`.
+  5. Hardened core agent pipeline: fixed Stage 3 candidate slice length-descending sorting in `agents/base_agent.py`, supported dictionary/string challenge objects in `agents/voice_interview_agent.py`, added per-agent `GeminiClient` instantiation in `orchestrator/orchestrator.py`, and enhanced `_execute_with_resilience` in `utils/gemini_client.py` with 503/500/network error retries and model cascade fallback.
+  6. Polished frontend UI/UX: fixed Step 6 curriculum regeneration crash in `frontend/app.py`, guarded checkbox set removal, replaced `window.blur` with `document.visibilitychange` in `exam_timer.html` to prevent false positive tab-blur warnings on MCQ clicks, added SVG icons for `code`, `user`, and `clipboard` in `frontend/components/icons.py`, and scoped 50% tablet metric wrapping and mobile checkbox protection in `theme.py` and `neumorphism.css`.
+  7. Modernized CI/CD: added Python 3.12 to `.github/workflows/ci.yml` build matrix alongside 3.10 and 3.11 with system `ffmpeg` installation, and cleaned 848 orphaned local session files from `data/sessions/`.
+  8. Verified 100% test pass rate across all **108 tests** in 33.2s with zero failures, zero errors, and zero warnings.
 
 ### Why We Stopped
-1. **Scope Realization:** Mobile and Tablet viewport modes, responsive CSS grid engine, touch ergonomics, and comprehensive documentation have been completely implemented and verified.
-2. **Quality Verification:** 100% test pass rate across all 108 tests in 32.4s with zero regressions.
-3. **Documentation Parity:** Reached the scheduled documentation synchronization checkpoint to align `.md` and `.docx` manuals before closing the session.
+1. **Scope Realization:** Full-platform comprehensive code review, security hardening, resilience improvements, PII sanitization, and responsive CSS tuning have been completely implemented and verified.
+2. **Quality Verification:** 100% test pass rate across all 108 tests in 33.2s with zero regressions.
+3. **Documentation Parity:** Reached the scheduled documentation synchronization checkpoint to align `.md` and `.docx` manuals before pushing changes to GitHub.
 
 ---
 
@@ -292,9 +301,9 @@ Designed specifically for Business School Placement Directors and Training Offic
 ---
 
 ## 10. Instructions for Next AI Session / Developer (Where to Start)
-1. **Streamlit Community Cloud Deployment Verification:**
-   - Navigate to [share.streamlit.io](https://share.streamlit.io).
-   - Confirm application status for `Hello-Nitish/Interview_IQ` with `main` branch and `streamlit_app.py`.
+1. **GitHub Remote & Streamlit Cloud Verification:**
+   - Confirm GitHub Actions CI status on `Hello-Nitish/Interview_IQ` across Python 3.10, 3.11, and 3.12.
+   - Confirm application status on [share.streamlit.io](https://share.streamlit.io) for `Hello-Nitish/Interview_IQ` with `main` branch and `streamlit_app.py`.
    - Access the live application URL (e.g. `https://interview-iq.streamlit.app`).
 2. **Local Development Launch:**
    - Run:
@@ -303,11 +312,11 @@ Designed specifically for Business School Placement Directors and Training Offic
      ```
 3. **Test Viewport Modes in Sidebar:**
    - In sidebar under "VIEWPORT MODE", toggle between:
-     - `📱 Mobile View (390px)`: Verify centered smartphone frame, phone drop shadow, single-column stacked elements, and 280px voice recorder.
-     - `📟 Tablet View (820px)`: Verify centered iPad frame with 2-column wrapping.
+     - `📱 Mobile View (390px)`: Verify centered smartphone frame, single-column stacked elements, and 280px voice recorder.
+     - `📟 Tablet View (820px)`: Verify centered tablet frame with 2-column wrapping on metric cards and inline checkboxes.
      - `🖥️ Auto (Responsive)`: Resize browser window to observe natural fluid layout.
 4. **Onboarding Gatekeeper & Key Validation:**
-   - Supply a valid Google Gemini API Key on Step 1 and click **Validate & Activate Key**. The system auto-detects `gemini-2.0-flash` or the best available cascade model with zero 404 errors.
+   - Supply a valid Google Gemini API Key on Step 1 and click **Validate & Activate Key**. The system auto-detects `gemini-2.5-flash` or the best available cascade model with zero 404 errors.
 5. **Run Automated Test Suite:**
    - Verify pipeline health by running:
      ```powershell

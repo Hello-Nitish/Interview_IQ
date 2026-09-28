@@ -61,3 +61,6 @@ $RECYCLE.BIN/
 
 # Streamlit Local Cache
 .streamlit/secrets.toml
+
+# Reference Evaluation Reports & Local Mocks
+reference/

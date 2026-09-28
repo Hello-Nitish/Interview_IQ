@@ -40,15 +40,14 @@ class Orchestrator:
     def set_api_key(self, api_key: Optional[str]):
         self.api_key = api_key
         from utils.gemini_client import GeminiClient
-        client = GeminiClient(api_key=api_key)
-        self.resume_agent.client = client
-        self.jd_agent.client = client
-        self.fit_agent.client = client
-        self.qb_agent.client = client
-        self.online_test_agent.client = client
-        self.feedback_agent.client = client
-        self.company_intel_agent.client = client
-        self.curriculum_agent.client = client
+        self.resume_agent.client = GeminiClient(api_key=api_key)
+        self.jd_agent.client = GeminiClient(api_key=api_key)
+        self.fit_agent.client = GeminiClient(api_key=api_key)
+        self.qb_agent.client = GeminiClient(api_key=api_key)
+        self.online_test_agent.client = GeminiClient(api_key=api_key)
+        self.feedback_agent.client = GeminiClient(api_key=api_key)
+        self.company_intel_agent.client = GeminiClient(api_key=api_key)
+        self.curriculum_agent.client = GeminiClient(api_key=api_key)
 
     def process_onboarding(
         self, 

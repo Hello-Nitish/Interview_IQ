@@ -51,7 +51,7 @@ class Theme:
         "success_bg": "#ECFDF5",
         "success_border": "#A7F3D0",
 
-        "warning": "#F59E0B",            # Amber
+        "warning": "#B45309",            # Amber 700 (High contrast WCAG AA compliant)
         "warning_bg": "#FFFBEB",
         "warning_border": "#FDE68A",
 
@@ -204,16 +204,25 @@ class Theme:
                 margin: 28px auto 6px auto !important;
                 opacity: 0.5 !important;
             }
-            /* Force single-column stacking in mobile simulation */
-            [data-testid="stHorizontalBlock"] {
+            /* Force single-column stacking in mobile simulation except for inline checkbox rows */
+            [data-testid="stHorizontalBlock"]:not(:has([data-testid="stCheckbox"])) {
                 flex-direction: column !important;
                 gap: 12px !important;
             }
-            [data-testid="stHorizontalBlock"] > [data-testid="column"] {
+            [data-testid="stHorizontalBlock"]:not(:has([data-testid="stCheckbox"])) > [data-testid="column"] {
                 width: 100% !important;
                 min-width: 100% !important;
                 flex: 1 1 100% !important;
                 margin-bottom: 6px !important;
+            }
+            [data-testid="stHorizontalBlock"]:has([data-testid="stCheckbox"]) {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                flex-wrap: nowrap !important;
+            }
+            .stepper-label:not(.active) {
+                display: none !important;
             }
             h1, .stMarkdown h1, [data-testid="stMarkdownContainer"] h1 {
                 font-size: 1.35rem !important;
@@ -288,11 +297,11 @@ class Theme:
                 margin: 0 auto 18px auto !important;
                 width: fit-content !important;
             }
-            [data-testid="stHorizontalBlock"] {
+            [data-testid="stHorizontalBlock"]:has(> [data-testid="column"]:nth-child(4)) {
                 flex-wrap: wrap !important;
                 gap: 14px !important;
             }
-            [data-testid="stHorizontalBlock"] > [data-testid="column"] {
+            [data-testid="stHorizontalBlock"]:has(> [data-testid="column"]:nth-child(4)) > [data-testid="column"] {
                 min-width: calc(50% - 14px) !important;
                 flex: 1 1 calc(50% - 14px) !important;
             }

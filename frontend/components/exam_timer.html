@@ -201,8 +201,7 @@
     }
   }
 
-  window.addEventListener("blur", handleFocusLoss);
-  window.addEventListener("focus", handleFocusGain);
+  // Tab Visibility Proctoring Monitor (tracks actual browser tab switches without iframe focus-shift false positives)
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) handleFocusLoss();
     else handleFocusGain();

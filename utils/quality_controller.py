@@ -68,7 +68,7 @@ class MultiAgentQualityController:
         metrics["project_score"] = f"{int(proj_score)}/25"
 
         # 4. Challenge Areas / Scrutiny probes (25 pts)
-        challenges = profile.get("challenge_areas") or []
+        challenges = profile.get("challenge_areas") or profile.get("overall_interview_risk_areas") or []
         chal_count = len(challenges) if isinstance(challenges, list) else 0
         chal_score = min(25.0, chal_count * 12.5)
         score += chal_score

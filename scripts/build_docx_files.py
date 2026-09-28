@@ -303,7 +303,12 @@ def main():
         md_file = os.path.join(DOCS_DIR, f"{fname}.md")
         docx_file = os.path.join(DOCS_DIR, f"{fname}.docx")
         if os.path.exists(md_file):
-            convert_md_to_docx(md_file, docx_file)
+            try:
+                convert_md_to_docx(md_file, docx_file)
+            except PermissionError:
+                print(f"[ERROR] Cannot write to {docx_file}. Please close the file in Microsoft Word and retry.")
+            except Exception as e:
+                print(f"[ERROR] Failed converting {fname}: {e}")
         else:
             print(f"Warning: {md_file} not found!")
 

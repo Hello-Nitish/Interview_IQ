@@ -71,6 +71,12 @@ load_dotenv(dotenv_path, override=True)
 
 # Session State Initialization (Zero hardcoded fallback keys)
 raw_env_key = os.getenv("GEMINI_API_KEY", "").strip()
+if not raw_env_key and hasattr(st, "secrets"):
+    try:
+        raw_env_key = str(st.secrets.get("GEMINI_API_KEY") or "").strip()
+    except Exception:
+        pass
+
 if not raw_env_key or any(placeholder in raw_env_key.lower() for placeholder in ["your_", "placeholder", "enter_key", "dummy"]):
     active_env_key = ""
 else:
@@ -2279,9 +2285,11 @@ elif page == "06_curriculum":
                     new_val = st.checkbox("Mark as completed", value=is_checked, key=f"chk_res_d{d_num}_{rid}", label_visibility="collapsed")
                     if new_val != is_checked:
                         if new_val:
-                            checked_items.append(rid)
+                            if rid not in checked_items:
+                                checked_items.append(rid)
                         else:
-                            checked_items.remove(rid)
+                            if rid in checked_items:
+                                checked_items.remove(rid)
                         st.session_state.checked_resources = checked_items
                         DatabaseManager.update_curriculum_progress(plan_id, checked_items, days_completed=days_completed)
                         st.rerun()
@@ -2342,7 +2350,7 @@ elif page == "06_curriculum":
             with st.spinner("Re-synthesizing customized 7-day curriculum..."):
                 weak_list = feedback_data.get("unified_topic_readiness", [])
                 comp_score = feedback_data.get("composite_readiness_score", 65.0)
-                st.session_state.curriculum_plan = st.session_state.curriculum_agent.generate_curriculum(
+                st.session_state.curriculum_plan = st.session_state.orchestrator.curriculum_agent.generate_curriculum(
                     weak_topics=weak_list,
                     jd_profile=jd_profile,
                     composite_score=float(comp_score)

@@ -66,36 +66,38 @@ class BaseAgent:
         if start_bracket != -1 and end_bracket != -1 and end_bracket > start_bracket:
             candidate_slices.append((start_bracket, text[start_bracket:end_bracket + 1]))
 
-        candidate_slices.sort(key=lambda x: x[0])
-        sliced_text = text
+        # Try parsing slices directly (outermost / longest first)
+        candidate_slices.sort(key=lambda x: len(x[1]), reverse=True)
         for _, c_text in candidate_slices:
-            sliced_text = c_text
             try:
                 return json.loads(c_text)
             except (json.JSONDecodeError, TypeError):
                 pass
 
-        # Stage 4: Trailing comma sanitizer
-        sanitized = re.sub(r",\s*([\]\}])", r"\1", sliced_text)
-        try:
-            return json.loads(sanitized)
-        except (json.JSONDecodeError, TypeError):
-            pass
+        # Stage 4 & 5: Sanitizer & control-character repairs across candidate slices
+        candidates_to_sanitize = [c_text for _, c_text in candidate_slices] if candidate_slices else [text]
+        for c_text in candidates_to_sanitize:
+            # Stage 4: Trailing comma sanitizer
+            sanitized = re.sub(r",\s*([\]\}])", r"\1", c_text)
+            try:
+                return json.loads(sanitized)
+            except (json.JSONDecodeError, TypeError):
+                pass
 
-        # Stage 5: Aggressive control-character & unescaped string repair
-        try:
-            return json.loads(sanitized, strict=False)
-        except (json.JSONDecodeError, TypeError):
-            pass
+            # Stage 5: Aggressive control-character & unescaped string repair
+            try:
+                return json.loads(sanitized, strict=False)
+            except (json.JSONDecodeError, TypeError):
+                pass
 
-        # Strip single-line comments // ... or /* ... */ if present
-        without_comments = re.sub(r"//.*?\n", "\n", sanitized)
-        without_comments = re.sub(r"/\*.*?\*/", "", without_comments, flags=re.DOTALL)
-        without_comments = re.sub(r",\s*([\]\}])", r"\1", without_comments)
-        try:
-            return json.loads(without_comments, strict=False)
-        except (json.JSONDecodeError, TypeError):
-            pass
+            # Strip single-line comments // ... or /* ... */ if present
+            without_comments = re.sub(r"//.*?\n", "\n", sanitized)
+            without_comments = re.sub(r"/\*.*?\*/", "", without_comments, flags=re.DOTALL)
+            without_comments = re.sub(r",\s*([\]\}])", r"\1", without_comments)
+            try:
+                return json.loads(without_comments, strict=False)
+            except (json.JSONDecodeError, TypeError):
+                pass
 
         # Stage 6: Non-circular terminal ValueError
         preview = (raw[:300] + "...") if len(raw) > 300 else raw

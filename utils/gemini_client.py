@@ -387,6 +387,17 @@ class GeminiClient:
                         "not supported" in err_msg.lower() or
                         "unsupported" in err_msg.lower()
                     )
+                    is_transient_error = (
+                        "503" in err_msg or "500" in err_msg or "502" in err_msg or "504" in err_msg or
+                        "overloaded" in err_msg.lower() or "server error" in err_msg.lower() or
+                        "connection" in err_msg.lower() or "timeout" in err_msg.lower() or
+                        "remote disconnected" in err_msg.lower() or "try again later" in err_msg.lower()
+                    )
+                    is_safety_filtered = (
+                        "response.parts" in err_msg or
+                        "filtered" in err_msg.lower() or
+                        "safety" in err_msg.lower()
+                    )
 
                     last_error = e
                     diagnostic_errors.append({
@@ -395,11 +406,12 @@ class GeminiClient:
                         "error_type": type(e).__name__,
                         "error_message": err_msg,
                         "is_quota": is_quota_error,
-                        "is_unavailable": is_model_unavailable
+                        "is_unavailable": is_model_unavailable,
+                        "is_transient": is_transient_error
                     })
 
-                    # If not a transient quota or model-availability error, re-raise immediately
-                    if not is_quota_error and not is_model_unavailable:
+                    # If not a retryable quota, model-availability, or transient error, re-raise immediately
+                    if not is_quota_error and not is_model_unavailable and not is_transient_error and not is_safety_filtered:
                         logger.error(f"[GeminiClient] Non-retryable error on model '{current_model_name}': {err_msg}")
                         raise e
 
@@ -411,6 +423,22 @@ class GeminiClient:
                             f"Blacklisted across threads. Failing over immediately..."
                         )
                         break
+
+                    # Safety filter trigger -> Failover to next candidate in cascade
+                    if is_safety_filtered:
+                        logger.warning(f"[GeminiClient] Content filtered or empty on '{current_model_name}'. Failing over to next cascade model...")
+                        break
+
+                    # Transient server / network error (503 overloaded, 500, timeouts)
+                    if is_transient_error:
+                        if attempt == 0:
+                            wait_t = 1.5 + random.uniform(0.2, 0.8)
+                            logger.warning(f"[GeminiClient] Transient error on '{current_model_name}': {err_msg[:100]}. Backing off {wait_t:.1f}s before attempt 2...")
+                            time.sleep(wait_t)
+                            continue
+                        else:
+                            logger.warning(f"[GeminiClient] Transient error persisted on '{current_model_name}'. Failing over to next cascade model...")
+                            break
 
                     # 429 Quota Exceeded -> Rate limit backoff calculation
                     delay = extract_retry_delay(err_msg, default=15.0)
