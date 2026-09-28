@@ -183,7 +183,7 @@ class UI:
         """Renders the master top-of-page executive hero header."""
         badge_html = f"<div style='margin-bottom:8px;'>{cls.badge(badge_text, variant='primary', icon_name='sparkles')}</div>" if badge_text else ""
         return f"""
-        <div style='
+        <div class='neuro-hero-header' style='
           background:linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
           border:1px solid {Theme.COLORS['border_light']};
           border-radius:{Theme.RADII['xl']};

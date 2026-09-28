@@ -710,12 +710,57 @@ textarea::placeholder,
   border-radius: var(--radius-md);
 }
 
+.neuro-table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+
+.neuro-table-responsive::-webkit-scrollbar-track {
+  background: #F1F5F9;
+  border-radius: 9999px;
+}
+
+.neuro-table-responsive::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+
 /* Responsive Stat Deck (4 cols on desktop, 2x2 on tablet/mobile, 1 col on compact mobile) */
 .responsive-stat-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 14px;
   margin-bottom: 18px;
+}
+
+/* Voice Interview Turn Diagnostics Grid */
+.voice-turn-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+/* Candidate Profile Metadata Grid */
+.candidate-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  font-size: 0.85rem;
+}
+
+/* Master Executive Hero Header */
+.neuro-hero-header {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 24px 28px;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
 }
 
 /* Responsive Corporate Culture Radar Grid */
@@ -847,25 +892,52 @@ textarea::placeholder,
     border-left-width: 5px !important;
   }
 
-  /* Single-Column Stack for Streamlit Blocks except inline checkboxes */
-  [data-testid="stHorizontalBlock"]:not(:has([data-testid="stCheckbox"])) {
+  /* 4-Metric Decks: Wrap into an executive 2x2 grid on mobile */
+  [data-testid="stHorizontalBlock"]:has(> [data-testid="column"]:nth-child(4)) {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+
+  [data-testid="stHorizontalBlock"]:has(> [data-testid="column"]:nth-child(4)) > [data-testid="column"] {
+    width: calc(50% - 6px) !important;
+    min-width: calc(50% - 6px) !important;
+    max-width: calc(50% - 6px) !important;
+    flex: 1 1 calc(50% - 6px) !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Single-Column Stack for 2-column and 3-column asymmetric layout blocks */
+  [data-testid="stHorizontalBlock"]:not(:has([data-testid="stCheckbox"])):not(:has(> [data-testid="column"]:nth-child(4))) {
     flex-direction: column !important;
     flex-wrap: wrap !important;
     gap: 12px !important;
   }
 
-  [data-testid="stHorizontalBlock"]:not(:has([data-testid="stCheckbox"])) > [data-testid="column"] {
+  [data-testid="stHorizontalBlock"]:not(:has([data-testid="stCheckbox"])):not(:has(> [data-testid="column"]:nth-child(4))) > [data-testid="column"] {
     width: 100% !important;
     min-width: 100% !important;
     flex: 1 1 100% !important;
     margin-bottom: 6px !important;
   }
 
+  /* Inline Checkboxes in Step 6 Curriculum: keep row layout intact */
   [data-testid="stHorizontalBlock"]:has([data-testid="stCheckbox"]) {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     flex-wrap: nowrap !important;
+    gap: 8px !important;
+  }
+
+  [data-testid="stHorizontalBlock"]:has([data-testid="stCheckbox"]) > [data-testid="column"]:first-child {
+    min-width: 44px !important;
+    flex: 0 0 44px !important;
+  }
+
+  [data-testid="stHorizontalBlock"]:has([data-testid="stCheckbox"]) > [data-testid="column"]:last-child {
+    flex: 1 1 auto !important;
   }
 
   /* Grid Class Collapse */
@@ -874,8 +946,39 @@ textarea::placeholder,
     gap: 10px !important;
   }
 
+  .voice-turn-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .candidate-meta-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
   .culture-grid {
     grid-template-columns: 1fr !important;
+  }
+
+  .neuro-hero-header {
+    padding: 16px 14px !important;
+    margin-bottom: 14px !important;
+    border-radius: 14px !important;
+  }
+
+  /* Responsive Table Container with Horizontal Touch Momentum */
+  .neuro-table-responsive {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    margin-bottom: 14px !important;
+    border-radius: 12px !important;
+  }
+
+  .neuro-table-responsive .neuro-table,
+  .neuro-table {
+    min-width: 560px !important;
+    width: 100% !important;
   }
 
   /* Touch Targets (WCAG 2.5.5 >= 44px) */
@@ -886,12 +989,23 @@ textarea::placeholder,
     font-size: 0.92rem !important;
   }
 
+  /* Pill-Style Wrapping for Horizontal Radios */
+  [data-testid="stRadio"] div[role="radiogroup"] {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
   [data-testid="stRadio"] div[role="radiogroup"] label {
     min-height: 44px !important;
     display: flex !important;
     align-items: center !important;
     padding: 8px 12px !important;
-    margin: 4px 0 !important;
+    margin: 2px 0 !important;
+    border-radius: 8px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    box-sizing: border-box !important;
   }
 
   [data-testid="stCheckbox"] label {
@@ -908,7 +1022,7 @@ textarea::placeholder,
     -webkit-overflow-scrolling: touch !important;
     scrollbar-width: none !important;
     gap: 8px !important;
-    padding-bottom: 4px !important;
+    padding-bottom: 6px !important;
   }
 
   [data-baseweb="tab-list"]::-webkit-scrollbar {
@@ -921,6 +1035,21 @@ textarea::placeholder,
     min-height: 44px !important;
     padding: 8px 14px !important;
     font-size: 0.85rem !important;
+  }
+
+  /* Stepper Adaptive Label Folding (<768px) */
+  .stepper-label:not(.active) {
+    display: none !important;
+  }
+
+  .stepper-label.active {
+    display: inline-block !important;
+    font-size: 0.78rem !important;
+  }
+
+  .stepper-connector {
+    min-width: 10px !important;
+    margin: 0 4px !important;
   }
 
   /* Headings Scaling */

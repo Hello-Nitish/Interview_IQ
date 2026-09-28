@@ -158,74 +158,209 @@ class Theme:
         if "mobile" in norm_mode:
             return """
             /* === Simulated Mobile Viewport Frame (iPhone/Android ~390px) === */
-            [data-testid="stAppViewContainer"] > .main {
-                background: #E2E8F0 !important;
-                background-image: radial-gradient(#CBD5E1 1.2px, transparent 1.2px) !important;
-                background-size: 16px 16px !important;
+            @media (min-width: 601px) {
+                [data-testid="stAppViewContainer"] > .main {
+                    background: #E2E8F0 !important;
+                    background-image: radial-gradient(#CBD5E1 1.2px, transparent 1.2px) !important;
+                    background-size: 16px 16px !important;
+                }
+                .main .block-container,
+                [data-testid="stMainBlockContainer"] {
+                    max-width: min(420px, calc(100vw - 20px)) !important;
+                    width: 100% !important;
+                    margin: 20px auto 40px auto !important;
+                    padding: 20px 14px 36px 14px !important;
+                    background: #F8FAFC !important;
+                    border-radius: 36px !important;
+                    border: 3px solid #0F172A !important;
+                    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(15, 23, 42, 0.1) !important;
+                    box-sizing: border-box !important;
+                    position: relative !important;
+                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                }
+                .main .block-container::before,
+                [data-testid="stMainBlockContainer"]::before {
+                    content: "📱 Mobile Preview (390 × 844 px)" !important;
+                    display: block !important;
+                    text-align: center !important;
+                    font-size: 0.7rem !important;
+                    font-weight: 700 !important;
+                    letter-spacing: 0.04em !important;
+                    color: #475569 !important;
+                    background: #E2E8F0 !important;
+                    border: 1px solid #CBD5E1 !important;
+                    border-radius: 9999px !important;
+                    padding: 4px 14px !important;
+                    margin: 0 auto 16px auto !important;
+                    width: fit-content !important;
+                }
+                .main .block-container::after,
+                [data-testid="stMainBlockContainer"]::after {
+                    content: "" !important;
+                    display: block !important;
+                    width: 120px !important;
+                    height: 4px !important;
+                    background: #0F172A !important;
+                    border-radius: 9999px !important;
+                    margin: 28px auto 6px auto !important;
+                    opacity: 0.5 !important;
+                }
             }
-            .main .block-container,
-            [data-testid="stMainBlockContainer"] {
-                max-width: min(420px, calc(100vw - 20px)) !important;
-                width: 100% !important;
-                margin: 20px auto 40px auto !important;
-                padding: 20px 14px 36px 14px !important;
-                background: #F8FAFC !important;
-                border-radius: 36px !important;
-                border: 3px solid #0F172A !important;
-                box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(15, 23, 42, 0.1) !important;
-                box-sizing: border-box !important;
-                position: relative !important;
-                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            @media (max-width: 600px) {
+                /* Physical mobile screens render edge-to-edge naturally without artificial preview borders */
+                .main .block-container,
+                [data-testid="stMainBlockContainer"] {
+                    max-width: 100% !important;
+                    width: 100% !important;
+                    margin: 0 !important;
+                    padding: 12px 10px 30px 10px !important;
+                    border: none !important;
+                    border-radius: 0 !important;
+                    box-shadow: none !important;
+                    background: #F8FAFC !important;
+                }
+                .main .block-container::before,
+                [data-testid="stMainBlockContainer"]::before,
+                .main .block-container::after,
+                [data-testid="stMainBlockContainer"]::after {
+                    display: none !important;
+                }
             }
-            .main .block-container::before,
-            [data-testid="stMainBlockContainer"]::before {
-                content: "📱 Mobile Preview (390 × 844 px)" !important;
-                display: block !important;
-                text-align: center !important;
-                font-size: 0.7rem !important;
-                font-weight: 700 !important;
-                letter-spacing: 0.04em !important;
-                color: #475569 !important;
-                background: #E2E8F0 !important;
-                border: 1px solid #CBD5E1 !important;
-                border-radius: 9999px !important;
-                padding: 4px 14px !important;
-                margin: 0 auto 16px auto !important;
-                width: fit-content !important;
+
+            /* 4-Metric Decks: Wrap into an executive 2x2 grid instead of 4 giant single vertical stacks */
+            [data-testid="stHorizontalBlock"]:has(> [data-testid="column"]:nth-child(4)) {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                gap: 10px !important;
             }
-            .main .block-container::after,
-            [data-testid="stMainBlockContainer"]::after {
-                content: "" !important;
-                display: block !important;
-                width: 120px !important;
-                height: 4px !important;
-                background: #0F172A !important;
-                border-radius: 9999px !important;
-                margin: 28px auto 6px auto !important;
-                opacity: 0.5 !important;
+            [data-testid="stHorizontalBlock"]:has(> [data-testid="column"]:nth-child(4)) > [data-testid="column"] {
+                width: calc(50% - 6px) !important;
+                min-width: calc(50% - 6px) !important;
+                max-width: calc(50% - 6px) !important;
+                flex: 1 1 calc(50% - 6px) !important;
+                margin-bottom: 0 !important;
             }
-            /* Force single-column stacking in mobile simulation except for inline checkbox rows */
-            [data-testid="stHorizontalBlock"]:not(:has([data-testid="stCheckbox"])) {
+
+            /* Single-column stacking for 2-column and 3-column asymmetric layout blocks */
+            [data-testid="stHorizontalBlock"]:not(:has([data-testid="stCheckbox"])):not(:has(> [data-testid="column"]:nth-child(4))) {
                 flex-direction: column !important;
                 gap: 12px !important;
             }
-            [data-testid="stHorizontalBlock"]:not(:has([data-testid="stCheckbox"])) > [data-testid="column"] {
+            [data-testid="stHorizontalBlock"]:not(:has([data-testid="stCheckbox"])):not(:has(> [data-testid="column"]:nth-child(4))) > [data-testid="column"] {
                 width: 100% !important;
                 min-width: 100% !important;
                 flex: 1 1 100% !important;
                 margin-bottom: 6px !important;
             }
+
+            /* Inline Checkboxes in Step 6 Curriculum: keep row layout intact */
             [data-testid="stHorizontalBlock"]:has([data-testid="stCheckbox"]) {
                 display: flex !important;
                 flex-direction: row !important;
                 align-items: center !important;
                 flex-wrap: nowrap !important;
+                gap: 8px !important;
+            }
+            [data-testid="stHorizontalBlock"]:has([data-testid="stCheckbox"]) > [data-testid="column"]:first-child {
+                min-width: 44px !important;
+                flex: 0 0 44px !important;
+            }
+            [data-testid="stHorizontalBlock"]:has([data-testid="stCheckbox"]) > [data-testid="column"]:last-child {
+                flex: 1 1 auto !important;
+            }
+
+            /* Horizontal Touch-Scrollable Tabs */
+            [data-baseweb="tab-list"] {
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                scrollbar-width: none !important;
+                gap: 8px !important;
+                padding-bottom: 6px !important;
+            }
+            [data-baseweb="tab-list"]::-webkit-scrollbar {
+                display: none !important;
+            }
+            [data-baseweb="tab"] {
+                white-space: nowrap !important;
+                flex-shrink: 0 !important;
+                min-height: 44px !important;
+                padding: 8px 14px !important;
+                font-size: 0.85rem !important;
+            }
+
+            /* Pill-Style Wrapping for Horizontal Radios */
+            [data-testid="stRadio"] div[role="radiogroup"] {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
+            [data-testid="stRadio"] div[role="radiogroup"] label {
+                margin: 2px 0 !important;
+                padding: 8px 12px !important;
+                min-height: 44px !important;
+                border-radius: 8px !important;
+                background: #FFFFFF !important;
+                border: 1px solid #E2E8F0 !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Responsive Table Container with Horizontal Touch Momentum */
+            .neuro-table-responsive {
+                width: 100% !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                margin-bottom: 14px !important;
+                border-radius: 12px !important;
+            }
+            .neuro-table-responsive .neuro-table,
+            .neuro-table {
+                min-width: 560px !important;
+                width: 100% !important;
+            }
+
+            /* Adaptive Grids for Candidate Profile & Voice Diagnostics */
+            .responsive-stat-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+            }
+            .voice-turn-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 8px !important;
+            }
+            .candidate-meta-grid {
+                display: grid !important;
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+            .culture-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Compact Hero Headers & Stepper */
+            .neuro-hero-header {
+                padding: 16px 14px !important;
+                margin-bottom: 14px !important;
+                border-radius: 14px !important;
             }
             .stepper-label:not(.active) {
                 display: none !important;
             }
+            .stepper-label.active {
+                display: inline-block !important;
+                font-size: 0.78rem !important;
+            }
+            .stepper-connector {
+                min-width: 10px !important;
+                margin: 0 4px !important;
+            }
+
+            /* Responsive Typography & Card Spacing */
             h1, .stMarkdown h1, [data-testid="stMarkdownContainer"] h1 {
-                font-size: 1.35rem !important;
+                font-size: 1.32rem !important;
                 line-height: 1.25 !important;
             }
             h2, .stMarkdown h2, [data-testid="stMarkdownContainer"] h2 {
@@ -245,18 +380,15 @@ class Theme:
                 border-radius: 12px !important;
             }
             .neuro-inset {
-                padding: 12px 12px !important;
-                margin-bottom: 10px !important;
+                padding: 10px 12px !important;
+                margin-bottom: 8px !important;
                 border-radius: 10px !important;
             }
             .stButton > button, [data-testid="stFormSubmitButton"] button {
                 width: 100% !important;
-                min-height: 44px !important;
+                min-height: 46px !important;
                 padding: 10px 14px !important;
-                font-size: 0.88rem !important;
-            }
-            .culture-grid {
-                grid-template-columns: 1fr !important;
+                font-size: 0.9rem !important;
             }
             """
         elif "tablet" in norm_mode:

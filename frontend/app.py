@@ -610,7 +610,7 @@ elif page == "02_fit_report":
                 </div>
                 <span class='neuro-badge-partial'>{stage}</span>
               </div>
-              <div style='display:grid; grid-template-columns: 1fr 1fr; gap:12px; font-size:0.85rem;'>
+              <div class='candidate-meta-grid'>
                 <div>
                   <span style='font-size:0.7rem; text-transform:uppercase; color:#64748B; font-weight:700;'>Current Program</span>
                   <p style='margin:2px 0; font-weight:600; color:#1E293B;'>{cand_details.get('current_program', 'PGDM / MBA (Pursuing)')}</p>
@@ -745,7 +745,7 @@ elif page == "02_fit_report":
             full_matrix_html = f"""
             <div class='neuro-card'>
                 <h4 style='color:#0F172A; margin-top:0; margin-bottom:12px;'>📋 Requirements Assessment Matrix ({len(rows_html) if 'colspan' not in rows_html[0] else 0} displayed)</h4>
-                <div style='overflow-x:auto;'>
+                <div class='neuro-table-responsive'>
                     <table class='neuro-table'>
                         <thead>
                             <tr>
@@ -1240,7 +1240,7 @@ elif page == "03_question_bank":
 
             render_html(f"""
             <div class='neuro-card'>
-                <div style='overflow-x:auto;'>
+                <div class='neuro-table-responsive'>
                     <table class='neuro-table'>
                         <thead>
                             <tr>
@@ -1545,7 +1545,7 @@ elif page == "04_online_test":
                     </div>
                     <p style='margin:0 0 6px 0; font-size:0.85rem; color:#64748B;'><b>Q:</b> {t_q}</p>
                     <p style='margin:0 0 10px 0; font-size:0.85rem; color:#0F172A;'><b>Your Answer:</b> "{t_a}"</p>
-                    <div style='display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; margin-bottom:10px;'>
+                    <div class='voice-turn-grid'>
                         <div class='neuro-inset' style='padding:6px 10px; text-align:center;'>
                             <small style='color:#64748B;'>STAR Flow</small>
                             <div style='font-weight:800; color:#0F172A;'>{star_comp.get('star_score', 0)}% {'✓' if star_comp.get('chronological_flow') else '⚠'}</div>
@@ -1653,7 +1653,7 @@ elif page == "04_online_test":
 
                     render_html(f"""
                     <div class='neuro-card'>
-                        <div style='overflow-x:auto;'>
+                        <div class='neuro-table-responsive'>
                             <table class='neuro-table'>
                                 <thead>
                                     <tr>
@@ -1820,7 +1820,7 @@ elif page == "04_online_test":
 
                         render_html(f"""
                         <div class='neuro-card' style='margin-top:16px; margin-bottom:8px; padding:16px 20px;'>
-                            <div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;'>
+                            <div style='display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;'>
                                 <span style='font-weight:800; color:#2563EB; font-size:0.85rem; text-transform:uppercase;'>Question {q_num} of {len(questions)}</span>
                                 <span class='neuro-badge-mandatory'>{q_topic}</span>
                             </div>
@@ -2012,7 +2012,7 @@ elif page == "05_results":
 
             render_html(f"""
             <div class='neuro-card'>
-                <div style='overflow-x:auto;'>
+                <div class='neuro-table-responsive'>
                     <table class='neuro-table'>
                         <thead>
                             <tr>
@@ -2189,7 +2189,7 @@ elif page == "06_curriculum":
     # Top Overview Card with Progress
     render_html(f"""
     <div class='neuro-card' style='border-top: 4px solid #10B981; margin-bottom:16px;'>
-        <div style='display:flex; justify-content:space-between; align-items:center;'>
+        <div style='display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;'>
             <div>
                 <h3 style='color:#0F172A; margin:0 0 4px 0;'>{plan.get('plan_title')}</h3>
                 <p style='color:#475569; font-size:0.85rem; margin:0;'>
@@ -2197,7 +2197,7 @@ elif page == "06_curriculum":
                 </p>
             </div>
             <div style='text-align:right;'>
-                <span style='background:#DCFCE7; color:#166534; font-weight:700; font-size:0.85rem; padding:6px 12px; border-radius:6px;'>
+                <span style='background:#DCFCE7; color:#166534; font-weight:700; font-size:0.85rem; padding:6px 12px; border-radius:6px; display:inline-block;'>
                     ✅ {completed_resources} of {total_resources} Assets Completed ({progress_pct}%)
                 </span>
             </div>
