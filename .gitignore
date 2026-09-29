@@ -64,3 +64,5 @@ $RECYCLE.BIN/
 
 # Reference Evaluation Reports & Local Mocks
 reference/
+.freebuff/
+

@@ -346,15 +346,30 @@ class Theme:
                 margin-bottom: 14px !important;
                 border-radius: 14px !important;
             }
+            .neuro-stepper-container {
+                padding: 10px 12px !important;
+                gap: 4px !important;
+            }
+            .stepper-item {
+                min-width: 0 !important;
+                flex: 1 1 0 !important;
+            }
+            .stepper-item:last-child {
+                flex: 0 0 auto !important;
+            }
             .stepper-label:not(.active) {
                 display: none !important;
             }
             .stepper-label.active {
                 display: inline-block !important;
-                font-size: 0.78rem !important;
+                font-size: 0.76rem !important;
+                max-width: 85px !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                white-space: nowrap !important;
             }
             .stepper-connector {
-                min-width: 10px !important;
+                min-width: 8px !important;
                 margin: 0 4px !important;
             }
 

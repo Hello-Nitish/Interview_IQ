@@ -28,7 +28,7 @@ st.set_page_config(
     page_title="InterviewIQ — AI Placement Coach",
     page_icon="🎯",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="auto"
 )
 
 # Load Centralized Design Tokens & Neumorphic Styling
