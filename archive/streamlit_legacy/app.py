@@ -20,9 +20,14 @@ from utils.api_quota_manager import APIQuotaManager
 from utils.gemini_cache import GeminiCache
 from agents.micro_curriculum_agent import MicroCurriculumAgent
 from utils.curriculum_resources import CurriculumResourceLibrary
-from frontend.styles.theme import Theme
-from frontend.components.icons import icon
-from frontend.components.ui_kit import UI
+try:
+    from archive.streamlit_legacy.styles.theme import Theme
+    from archive.streamlit_legacy.components.icons import icon
+    from archive.streamlit_legacy.components.ui_kit import UI
+except ImportError:
+    from frontend.styles.theme import Theme
+    from frontend.components.icons import icon
+    from frontend.components.ui_kit import UI
 
 st.set_page_config(
     page_title="InterviewIQ — AI Placement Coach",

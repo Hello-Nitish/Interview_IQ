@@ -4,9 +4,14 @@ Verifies design token generation, SVG rendering integrity, and component helpers
 """
 
 import unittest
-from frontend.styles.theme import Theme
-from frontend.components.icons import IconLibrary, icon
-from frontend.components.ui_kit import UI
+try:
+    from archive.streamlit_legacy.styles.theme import Theme
+    from archive.streamlit_legacy.components.icons import IconLibrary, icon
+    from archive.streamlit_legacy.components.ui_kit import UI
+except ImportError:
+    from frontend.styles.theme import Theme
+    from frontend.components.icons import IconLibrary, icon
+    from frontend.components.ui_kit import UI
 
 
 class TestUIKitAndTheme(unittest.TestCase):

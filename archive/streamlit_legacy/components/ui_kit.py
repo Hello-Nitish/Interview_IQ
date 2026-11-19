@@ -7,8 +7,12 @@ Future style changes are made here once and instantly propagate platform-wide.
 """
 
 from typing import Optional, List, Dict, Any
-from frontend.components.icons import icon
-from frontend.styles.theme import Theme
+try:
+    from archive.streamlit_legacy.components.icons import icon
+    from archive.streamlit_legacy.styles.theme import Theme
+except ImportError:
+    from frontend.components.icons import icon
+    from frontend.styles.theme import Theme
 
 
 class UI:

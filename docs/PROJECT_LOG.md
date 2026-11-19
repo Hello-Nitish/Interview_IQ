@@ -1422,25 +1422,54 @@ Executed the complete user-mandated Multi-Agent Orchestration Framework:
 
 ---
 
+---
+
+## Session #27 — 2026-11-19
+- **Session Focus:** Complete Architectural Stack Migration to Go + Wails v2 + React 18 + TypeScript + Tailwind CSS + Python DirectML Sidecar.
+- **Accomplishments & Architecture Implemented:**
+  1. **In-Place Archival of Streamlit Legacy (`archive/streamlit_legacy/`):**
+     - Safely preserved historical Streamlit application, styles, and components for 100% rollback integrity.
+  2. **Python DirectML Sidecar Architecture (`sidecar/`):**
+     - Built `sidecar/server.py` microservice with Starlette/Uvicorn, token-bucket rate pacer, and dynamic bearer token authentication.
+     - Implemented `sidecar/directml/engine.py` probing DirectX 12 hardware adapters (AMD, Intel, NVIDIA) with resilient CPU fallback.
+     - Implemented `sidecar/directml/embeddings.py` for vectorized local semantic similarity and topic clustering.
+     - Implemented `sidecar/directml/whisper_stt.py` computing WPM, filler word density, and STAR rubric alignment.
+  3. **Go Core & Process Supervisor (`main.go`, `app.go`, `internal/sidecar/`):**
+     - Implemented `internal/sidecar/manager.go` managing Python subprocess lifecycle, cryptographic token generation, and `/health` readiness probes.
+     - Implemented `internal/sidecar/client.go` with strongly typed HTTP client methods.
+     - Implemented `app.go` exposing native file selection dialogs, pipeline executions, and PDF generation to frontend.
+     - Configured Wails v2 in `wails.json` and `main.go`.
+  4. **React 18 + TypeScript + Tailwind CSS Desktop UI (`frontend/`):**
+     - Configured Vite, TypeScript, and Tailwind CSS with executive high-contrast design tokens.
+     - Built component library: `Header.tsx`, `Sidebar.tsx`, `Stepper.tsx`, `MetricCard.tsx`, `Badge.tsx`, `AudioRecorder.tsx` (live Web Audio API waveform canvas), `ExamTimer.tsx` (30m countdown + proctor blur detection).
+     - Built 6 complete pipeline pages: `Step1Upload`, `Step2FitReport`, `Step3QuestionBank`, `Step4OnlineTest`, `Step5Results`, `Step6Curriculum`.
+     - Built `frontend/src/services/api.ts` with dual Wails bridge + HTTP fallback.
+  5. **Unit & Integration Test Expansion:**
+     - Created `tests/test_sidecar_api.py` validating 5/5 endpoints and auth rules.
+     - Test suite expanded from 108 to 113 tests, all passing with 100% exit code 0.
+     - Core 45/55 scoring and 8-agent algorithms remain 100% preserved and verified.
+
+---
+
 ## Where to Resume Next (Instructions for Next AI Session / Developer)
-1. **GitHub Remote & Streamlit Cloud Verification:**
-   - Verify GitHub Actions CI status on `Hello-Nitish/Interview_IQ` across Python 3.10, 3.11, and 3.12.
-   - Confirm application status on [share.streamlit.io](https://share.streamlit.io) for `Hello-Nitish/Interview_IQ` with `main` branch and `streamlit_app.py`.
-   - Access the live application URL (e.g. `https://interview-iq.streamlit.app`).
-2. **Test Viewport Modes Locally:**
+1. **Desktop Launch & Run:**
    - Execute:
      ```powershell
-     .\.venv\Scripts\python.exe -m streamlit run frontend/app.py
+     .\launch_desktop.bat
      ```
-   - In sidebar under "VIEWPORT MODE", toggle between `📱 Mobile View (390px)`, `📟 Tablet View (820px)`, and `🖥️ Auto (Responsive)`.
-3. **Verify Automated Test Suite Health:**
+   - Or run the environment check:
+     ```powershell
+     .\scripts\setup_environment.ps1
+     ```
+2. **Verify Automated Test Suite Health:**
    - Execute:
      ```powershell
      .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py"
      ```
-   - Confirm all 108 tests pass cleanly.
-4. **Next Implementation Milestone:**
-   - Begin **Phase 27** (University LMS Integration) or **Phase 28** (WebRTC Live Audio Streaming with Waveforms).
+   - Confirm all 113 tests pass cleanly.
+3. **Next Implementation Milestone:**
+   - Begin **Phase 28** (DirectML Local Quantized SLM Inference via ONNX GenAI).
+
 
 
 

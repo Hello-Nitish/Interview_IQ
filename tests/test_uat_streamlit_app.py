@@ -17,7 +17,9 @@ class TestRigorousUATStreamlitApp(unittest.TestCase):
     """
 
     def setUp(self):
-        self.app_path = os.path.abspath(os.path.join(project_root, "frontend", "app.py"))
+        primary_path = os.path.abspath(os.path.join(project_root, "frontend", "app.py"))
+        archive_path = os.path.abspath(os.path.join(project_root, "archive", "streamlit_legacy", "app.py"))
+        self.app_path = primary_path if os.path.exists(primary_path) else archive_path
 
     def test_uat_page_01_onboarding_initial_render(self):
         """Validates Step 1 Onboarding page initial render and sidebar widgets."""
