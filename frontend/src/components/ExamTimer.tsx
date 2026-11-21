@@ -58,12 +58,12 @@ export const ExamTimer: React.FC<ExamTimerProps> = ({
       <div
         className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border font-mono font-bold text-xs transition-colors ${
           isUrgent
-            ? 'bg-danger-light text-danger border-danger/30 animate-pulse'
+            ? 'bg-danger-light text-danger-dark border-danger/40'
             : 'bg-inset text-heading border-border'
         }`}
       >
         <Clock size={14} className={isUrgent ? 'text-danger' : 'text-primary'} />
-        <span>
+        <span className="num-tnum">
           {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
         </span>
       </div>

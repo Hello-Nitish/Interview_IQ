@@ -1,6 +1,8 @@
 import * as WailsApp from '../wailsjs/go/main/App';
 
-const SIDECAR_HTTP_URL = 'http://127.0.0.1:8000';
+const SIDECAR_HTTP_URL = typeof window !== 'undefined' && window.location?.origin?.startsWith('http') 
+  ? window.location.origin 
+  : 'http://127.0.0.1:8000';
 
 function isWailsAvailable(): boolean {
   return typeof window !== 'undefined' && (window as any).go?.main?.App !== undefined;

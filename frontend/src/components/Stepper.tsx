@@ -17,7 +17,7 @@ const STEPS = [
 
 export const Stepper: React.FC<StepperProps> = ({ currentStep, onStepClick }) => {
   return (
-    <div className="neuro-card px-4 py-3 mb-6 flex items-center justify-between overflow-x-auto gap-2">
+    <div className="ent-card px-4 py-3 mb-6 flex items-center justify-between overflow-x-auto gap-2">
       {STEPS.map((step, idx) => {
         const isCompleted = step.num < currentStep;
         const isActive = step.num === currentStep;
@@ -35,7 +35,7 @@ export const Stepper: React.FC<StepperProps> = ({ currentStep, onStepClick }) =>
                   isCompleted
                     ? 'bg-success text-white'
                     : isActive
-                    ? 'bg-primary text-white shadow-glow'
+                    ? 'bg-primary text-white shadow-sm ring-2 ring-primary/20'
                     : 'bg-inset text-muted border border-border'
                 }`}
               >

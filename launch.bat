@@ -16,6 +16,11 @@ if not exist "%PYTHON_EXE%" (
     set "PYTHON_EXE=python"
 )
 
+:: Ensure port 8000 is clean
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr :8000 ^| findstr LISTENING 2^>nul') do (
+    taskkill /f /pid %%a >nul 2>&1
+)
+
 :: 2. Launch Python DirectML Sidecar in the background
 echo [1/3] Starting Python DirectML Sidecar Microservice on port 8000...
 start "InterviewIQ DirectML Sidecar" /min "%PYTHON_EXE%" -m sidecar.server --port 8000
@@ -26,7 +31,7 @@ powershell -NoProfile -Command "for ($i=0; $i -lt 30; $i++) { try { $r = Invoke-
 
 :: 4. Launch Desktop Application Window
 echo [3/3] Launching InterviewIQ Desktop Application...
-set "APP_URL=http://127.0.0.1:8000"
+set "APP_URL=http://127.0.0.1:8000/?v=%RANDOM%"
 
 :: Priority 1: MS Edge App Mode (Standalone borderless desktop window)
 if exist "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" (

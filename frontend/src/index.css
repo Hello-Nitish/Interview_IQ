@@ -10,12 +10,17 @@
   --border-dark: #cbd5e1;
   --text-heading: #0f172a;
   --text-body: #334155;
-  --text-muted: #64748b;
+  --text-muted: #475569;
   --brand-primary: #1e40af;
   --brand-accent: #2563eb;
-  --success: #059669;
-  --warning: #d97706;
-  --danger: #dc2626;
+  --success: #065f46;
+  --success-bg: #d1fae5;
+  --warning: #78350f;
+  --warning-bg: #fef3c7;
+  --danger: #991b1b;
+  --danger-bg: #fee2e2;
+  --info: #1e3a8a;
+  --info-bg: #dbeafe;
 }
 
 body {
@@ -48,31 +53,36 @@ body {
   background: #94a3b8;
 }
 
-/* Enterprise Card Elevation */
-.ent-card {
+/* Enterprise Card Elevation & Insets */
+.ent-card, .neuro-card {
   background: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
   transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.ent-card:hover {
+.ent-card:hover, .neuro-card:hover {
   border-color: var(--border-dark);
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
-.ent-inset {
+.ent-inset, .neuro-inset {
   background: var(--bg-canvas);
   border: 1px solid var(--border-light);
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
-/* Micro-interactions */
+/* Micro-interactions & Tabular Numbers */
 .btn-action {
   transition: all 0.1s ease;
 }
 
 .btn-action:active {
   transform: scale(0.98);
+}
+
+.num-tnum {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
 }

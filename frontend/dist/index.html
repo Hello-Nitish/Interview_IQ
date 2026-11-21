@@ -52,15 +52,17 @@
       --border-dark: #cbd5e1;
       --text-heading: #0f172a;
       --text-body: #334155;
-      --text-muted: #64748b;
+      --text-muted: #475569;
       --brand-primary: #1e40af;
       --brand-accent: #2563eb;
-      --success: #059669;
-      --success-bg: #ecfdf5;
-      --warning: #d97706;
-      --warning-bg: #fffbeb;
-      --danger: #dc2626;
-      --danger-bg: #fef2f2;
+      --success: #065f46;
+      --success-bg: #d1fae5;
+      --warning: #78350f;
+      --warning-bg: #fef3c7;
+      --danger: #991b1b;
+      --danger-bg: #fee2e2;
+      --info: #1e3a8a;
+      --info-bg: #dbeafe;
     }
 
     body {
@@ -146,6 +148,66 @@
       z-index: 1;
     }
 
+    /* 5-Column Question Grid Tile */
+    .question-tile {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.12s ease;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+    }
+    .question-tile:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    .question-tile[data-state="active"] {
+      border-color: #2563eb;
+      color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+      font-weight: 700;
+    }
+    .question-tile[data-state="answered"] {
+      background-color: #059669;
+      border-color: #059669;
+      color: #ffffff;
+    }
+    .question-tile[data-flagged="true"]::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-top: 10px solid #f59e0b;
+      border-left: 10px solid transparent;
+      border-top-right-radius: 5px;
+    }
+
+    /* Command Palette Overlay */
+    .command-modal {
+      position: fixed;
+      top: 14%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 600px;
+      background: #ffffff;
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: 14px;
+      box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.04);
+      z-index: 60;
+    }
+
     /* Toast animation */
     @keyframes toastFade {
       from { transform: translateY(12px); opacity: 0; }
@@ -161,7 +223,7 @@
   <!-- ========================================================================= -->
   <!-- 1. LEFT ENTERPRISE SIDEBAR (INVERTED L-SHAPE CHROME)                      -->
   <!-- ========================================================================= -->
-  <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between h-screen sticky top-0 z-30 select-none">
+  <aside id="mainSidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between h-screen sticky top-0 z-30 select-none transition-all duration-200">
     <div class="p-5 flex flex-col h-full">
       
       <!-- Organization / Workspace Switcher -->
@@ -172,7 +234,7 @@
         <div class="flex-1 min-w-0">
           <div class="flex items-center justify-between">
             <span class="font-bold text-sm text-slate-900 truncate">InterviewIQ</span>
-            <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">HQ</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-mono">HQ</span>
           </div>
           <p class="text-[11px] text-slate-500 truncate">Enterprise Hiring Suite</p>
         </div>
@@ -228,7 +290,7 @@
             <button onclick="switchStep(5)" id="sideBtn5" class="w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
               <span class="flex items-center gap-2">
                 <span class="w-5 h-5 rounded bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-bold font-mono">5</span>
-                <span>Readiness Diagnostics</span>
+                <span>Scorecard Diagnostics</span>
               </span>
               <span id="badgeStep5" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono">--</span>
             </button>
@@ -268,7 +330,7 @@
             <div class="text-xs font-semibold text-slate-900 truncate">Senior Evaluator</div>
             <div class="text-[10px] text-slate-500 truncate flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <span>Online / Ready</span>
+              <span>Online / DirectML Ready</span>
             </div>
           </div>
         </div>
@@ -288,21 +350,39 @@
     <!-- Top Utility Bar -->
     <header class="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-20">
       
-      <!-- Breadcrumbs -->
-      <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
-        <span>Recruitment</span>
-        <span>/</span>
-        <span>Placement Evaluation</span>
-        <span>/</span>
-        <span id="breadcrumbRole" class="text-slate-900 font-semibold truncate max-w-[200px] sm:max-w-[300px]">Senior Systems Engineer</span>
+      <!-- Left: Sidebar Toggle + Breadcrumbs -->
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="p-1 rounded hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition" title="Toggle Sidebar (Ctrl+B)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+        </button>
+        <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
+          <span>Recruitment</span>
+          <span>/</span>
+          <span>Placement Evaluation</span>
+          <span>/</span>
+          <span id="breadcrumbRole" class="text-slate-900 font-semibold truncate max-w-[200px] sm:max-w-[300px]">Senior Systems Engineer</span>
+        </div>
       </div>
+
+      <!-- Center: Command Palette Trigger Button (Cmd+K) -->
+      <button onclick="openCommandPalette()" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-400 hover:text-slate-700 text-xs transition">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <span>Search actions or candidates...</span>
+        <kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-white border border-slate-200 rounded shadow-2xs text-slate-500">Ctrl K</kbd>
+      </button>
 
       <!-- Right Utility Cluster -->
       <div class="flex items-center gap-3 text-xs">
         
+        <!-- Instant 1-Click Demo Pipeline -->
+        <button onclick="runInstantDemoPipeline()" title="Run complete end-to-end evaluation pipeline with benchmark data" class="btn-action px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span class="hidden sm:inline">⚡ Instant Demo</span>
+        </button>
+
         <!-- Hardware Engine Telemetry Chip -->
         <div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-600 font-mono text-[11px]">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="topBarDmlDot" class="w-2 h-2 rounded-full bg-slate-400"></span>
           <span class="text-slate-400">DirectML:</span>
           <span id="topBarDmlDevice" class="font-semibold text-slate-700">Checking...</span>
         </div>
@@ -376,6 +456,23 @@
           </div>
         </div>
 
+        <!-- Quick Preset Chips -->
+        <div class="flex items-center gap-2 flex-wrap text-xs">
+          <span class="text-slate-400 font-mono text-[11px] font-semibold">Quick Benchmarks:</span>
+          <button onclick="document.getElementById('roleBenchmarkSelect').value='dist_sys'; applyRoleBenchmark('dist_sys');" class="px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-medium shadow-2xs hover:bg-blue-50/50 transition">
+            🎯 Senior Distributed Systems (L5)
+          </button>
+          <button onclick="document.getElementById('roleBenchmarkSelect').value='apm'; applyRoleBenchmark('apm');" class="px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-medium shadow-2xs hover:bg-blue-50/50 transition">
+            💼 Associate Product Manager (APM)
+          </button>
+          <button onclick="document.getElementById('roleBenchmarkSelect').value='ai_eng'; applyRoleBenchmark('ai_eng');" class="px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-medium shadow-2xs hover:bg-blue-50/50 transition">
+            🤖 Senior AI / ML Engineer
+          </button>
+          <button onclick="document.getElementById('roleBenchmarkSelect').value='frontend'; applyRoleBenchmark('frontend');" class="px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-medium shadow-2xs hover:bg-blue-50/50 transition">
+            🎨 Staff Frontend & Design Technologist
+          </button>
+        </div>
+
         <!-- Ingestion Split Pane -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           
@@ -429,12 +526,15 @@
             </p>
           </div>
 
-          <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-            <button onclick="runFastTrack()" id="fastTrackBtn" class="btn-action px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold border border-slate-200 transition">
-              ⚡ Fast Track (Fit & QBank)
+          <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end flex-wrap">
+            <button onclick="runInstantDemoPipeline()" id="instantDemoBtn" class="btn-action px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5">
+              <span>⚡ 1-Click Instant Demo Pipeline</span>
             </button>
-            <button onclick="runFullPipeline()" id="fullPipelineBtn" class="btn-action px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition flex items-center gap-2">
-              <span>🚀 Execute Full Assessment Pipeline</span>
+            <button onclick="runFastTrack()" id="fastTrackBtn" class="btn-action px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold border border-slate-200 transition">
+              Fast Track (Fit & QBank)
+            </button>
+            <button onclick="runFullPipeline()" id="fullPipelineBtn" class="btn-action px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition flex items-center gap-2">
+              <span>🚀 Execute Full Pipeline</span>
             </button>
           </div>
         </div>
@@ -565,7 +665,7 @@
       </section>
 
       <!-- ===================================================================== -->
-      <!-- STEP 3: 100% CHECKLIST QUESTION BANK                                  -->
+      <!-- STEP 3: 100% CHECKLIST QUESTION BANK WITH STAR TABS                   -->
       <!-- ===================================================================== -->
       <section id="step3" class="space-y-6 hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
@@ -583,11 +683,26 @@
           
           <!-- Category Pills -->
           <div class="flex items-center gap-1.5 flex-wrap">
-            <button onclick="filterQB('all')" class="qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white shadow-sm" data-cat="all">All Probes</button>
-            <button onclick="filterQB('core_technical')" class="qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900" data-cat="core_technical">Core Technical</button>
-            <button onclick="filterQB('behavioral')" class="qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900" data-cat="behavioral">Behavioral (STAR)</button>
-            <button onclick="filterQB('system_design')" class="qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900" data-cat="system_design">System Architecture</button>
-            <button onclick="filterQB('live_coding')" class="qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900" data-cat="live_coding">Live Coding</button>
+            <button onclick="filterQB('all')" class="qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white shadow-sm flex items-center gap-1.5" data-cat="all">
+              <span>All Probes</span>
+              <span id="qbCountAll" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-blue-800 text-blue-100">30</span>
+            </button>
+            <button onclick="filterQB('core_technical')" class="qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 flex items-center gap-1.5" data-cat="core_technical">
+              <span>Core Technical</span>
+              <span id="qbCountTech" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-slate-200 text-slate-700">10</span>
+            </button>
+            <button onclick="filterQB('behavioral')" class="qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 flex items-center gap-1.5" data-cat="behavioral">
+              <span>Behavioral (STAR)</span>
+              <span id="qbCountBehav" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-slate-200 text-slate-700">6</span>
+            </button>
+            <button onclick="filterQB('system_design')" class="qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 flex items-center gap-1.5" data-cat="system_design">
+              <span>System Architecture</span>
+              <span id="qbCountArch" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-slate-200 text-slate-700">8</span>
+            </button>
+            <button onclick="filterQB('live_coding')" class="qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 flex items-center gap-1.5" data-cat="live_coding">
+              <span>Live Coding</span>
+              <span id="qbCountCode" class="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-slate-200 text-slate-700">6</span>
+            </button>
           </div>
 
           <!-- Search Input -->
@@ -599,7 +714,7 @@
         </div>
 
         <!-- Question Cards Stream -->
-        <div id="qbList" class="space-y-3.5"></div>
+        <div id="qbList" class="space-y-4"></div>
       </section>
 
       <!-- ===================================================================== -->
@@ -609,7 +724,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
           <div>
             <h1 class="text-xl font-bold text-slate-900 tracking-tight">Step 4: Timed Assessment & Voice Interview Simulator</h1>
-            <p class="text-xs text-slate-500 mt-1">Formal Round 1 examination with automated proctor blur tracking and DirectML speech analytics.</p>
+            <p class="text-xs text-slate-500 mt-1">Formal Round 1 examination with spatial 30-question grid navigation and DirectML speech analytics.</p>
           </div>
 
           <!-- Live Proctor & Timer HUD -->
@@ -636,16 +751,56 @@
           </button>
         </div>
 
-        <!-- Section A: MCQ Examination -->
-        <div id="mcqContainer" class="space-y-5">
-          <div id="mcqQuestionsList" class="space-y-4"></div>
+        <!-- Section A: MCQ Examination with Spatial 30-Question Grid Navigation Rail -->
+        <div id="mcqContainer" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          <div class="flex justify-between items-center pt-2">
-            <span class="text-xs text-slate-400 font-mono">All 30 questions generated from JD competency checklist</span>
-            <button onclick="submitTestAnswers()" id="submitTestBtn" class="btn-action px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition">
-              ✔ Submit & Score Examination
-            </button>
+          <!-- Left: Active Question Presentation (8 cols) -->
+          <div class="lg:col-span-8 space-y-4">
+            <div id="activeMcqCard" class="ent-card p-6 space-y-4">
+              <!-- Rendered dynamically -->
+            </div>
+
+            <div class="flex items-center justify-between pt-2">
+              <button onclick="prevMcqQuestion()" class="btn-action px-4 py-2 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50 transition">
+                ← Previous Question
+              </button>
+              <button onclick="toggleFlagCurrentQuestion()" id="flagBtn" class="btn-action px-3 py-2 rounded-lg border border-amber-300 bg-amber-50 text-xs font-medium text-amber-800 hover:bg-amber-100 transition flex items-center gap-1.5">
+                <span>🚩 Mark for Review</span>
+              </button>
+              <button onclick="nextMcqQuestion()" class="btn-action px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
+                Next Question →
+              </button>
+            </div>
           </div>
+
+          <!-- Right: Spatial 30-Question Grid Palette (4 cols) -->
+          <div class="lg:col-span-4 space-y-4">
+            <div class="ent-card p-4 space-y-3 sticky top-20">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <span class="text-xs font-bold text-slate-900">Question Palette</span>
+                <span id="answeredRatioText" class="text-xs font-mono text-blue-700 font-semibold">0/30 Answered</span>
+              </div>
+
+              <!-- Legend -->
+              <div class="grid grid-cols-3 gap-1 text-[10px] text-slate-500 font-mono pb-2 border-b border-slate-100">
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-600 inline-block"></span> Answered</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded border border-slate-300 inline-block"></span> Remaining</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-amber-100 border border-amber-400 inline-block"></span> Flagged</span>
+              </div>
+
+              <!-- 5x6 Grid of 30 Questions -->
+              <div id="examGridPalette" class="grid grid-cols-5 gap-2 pt-1">
+                <!-- Dynamically populated 1 to 30 -->
+              </div>
+
+              <div class="pt-3">
+                <button onclick="submitTestAnswers()" id="submitTestBtn" class="btn-action w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition">
+                  ✔ Submit & Score Examination
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <!-- Section B: DirectML Voice Simulator -->
@@ -701,12 +856,12 @@
       </section>
 
       <!-- ===================================================================== -->
-      <!-- STEP 5: PLACEMENT DIAGNOSTICS & READINESS REPORT                       -->
+      <!-- STEP 5: SCORECARD DIAGNOSTICS & CANDIDATE BENCHMARKS                  -->
       <!-- ===================================================================== -->
       <section id="step5" class="space-y-6 hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
           <div>
-            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Step 5: Unified Placement Diagnostics & Readiness Matrix</h1>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Step 5: Scorecard Diagnostics & Candidate Comparison</h1>
             <p class="text-xs text-slate-500 mt-1">Composite hiring readiness synthesized via calibrated formula: 45% Fit Analysis + 55% Online Test.</p>
           </div>
           <div class="flex items-center gap-2">
@@ -763,18 +918,103 @@
           </div>
         </div>
 
-        <!-- Weakest Skill & Recommendation Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div class="ent-card p-5 border-l-4 border-l-rose-500">
-            <div class="text-[10px] font-bold uppercase tracking-wider text-rose-600 font-mono mb-1">Priority Remediation Area (Dual Weakness)</div>
-            <h4 id="weakestSkillTitle" class="text-sm font-bold text-slate-900">Advanced Concurrency & Async I/O</h4>
-            <p id="weakestSkillDesc" class="text-xs text-slate-600 mt-2 leading-relaxed">Candidate exhibited resume gaps and lower MCQ accuracy on channel contention and thread management.</p>
+        <!-- Multi-Dimensional Competency Rubric (Ashby / Greenhouse Pattern) -->
+        <div class="ent-card p-5 space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Multi-Dimensional Candidate Scorecard</h3>
+              <p class="text-xs text-slate-500">Evaluated competency dimensions with L5 benchmark guide</p>
+            </div>
+            <span class="text-xs font-mono text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 font-semibold">L5 Target Baseline: 75%</span>
           </div>
 
-          <div class="ent-card p-5 border-l-4 border-l-blue-600">
-            <div class="text-[10px] font-bold uppercase tracking-wider text-blue-700 font-mono mb-1">Recommended Placement Tier</div>
-            <h4 id="targetTierTitle" class="text-sm font-bold text-slate-900">Tier 1 Product Engineering</h4>
-            <p id="targetTierDesc" class="text-xs text-slate-600 mt-2 leading-relaxed">Candidate exhibits strong analytical foundation suitable for high-scale enterprise engineering organizations.</p>
+          <div class="space-y-3">
+            <!-- Dim 1 -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="font-medium text-slate-800">System Architecture & Concurrency</span>
+                <span class="font-mono font-bold text-blue-700">82%</span>
+              </div>
+              <div class="relative w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-600 rounded-full" style="width: 82%"></div>
+                <div class="absolute top-0 bottom-0 left-[75%] w-0.5 bg-indigo-500 z-10" title="L5 Target Benchmark"></div>
+              </div>
+            </div>
+
+            <!-- Dim 2 -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="font-medium text-slate-800">Data Modeling & Persistence Performance</span>
+                <span class="font-mono font-bold text-emerald-600">88%</span>
+              </div>
+              <div class="relative w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full bg-emerald-600 rounded-full" style="width: 88%"></div>
+                <div class="absolute top-0 bottom-0 left-[75%] w-0.5 bg-indigo-500 z-10"></div>
+              </div>
+            </div>
+
+            <!-- Dim 3 -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="font-medium text-slate-800">API Contract Design & Resiliency</span>
+                <span class="font-mono font-bold text-blue-600">92%</span>
+              </div>
+              <div class="relative w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-600 rounded-full" style="width: 92%"></div>
+                <div class="absolute top-0 bottom-0 left-[75%] w-0.5 bg-indigo-500 z-10"></div>
+              </div>
+            </div>
+
+            <!-- Dim 4 -->
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="font-medium text-slate-800">Behavioral STAR Delivery & Leadership</span>
+                <span class="font-mono font-bold text-amber-600">70%</span>
+              </div>
+              <div class="relative w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full bg-amber-500 rounded-full" style="width: 70%"></div>
+                <div class="absolute top-0 bottom-0 left-[75%] w-0.5 bg-indigo-500 z-10"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recruiter Recommendation Segmented Control & Evaluation Notes -->
+        <div class="ent-card p-5 space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">Hiring Committee Final Decision</h3>
+              <p class="text-xs text-slate-500">Record definitive panel consensus before dossier dispatch</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-semibold text-slate-500">Confidence:</span>
+              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">High (Level 3)</span>
+            </div>
+          </div>
+
+          <!-- 5-State Recommendation Pills -->
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs font-semibold">
+            <button onclick="setRecommendation('Strong Yes')" id="recStrongYes" class="btn-action p-2 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-800 text-center">
+              Strong Yes
+            </button>
+            <button onclick="setRecommendation('Yes')" id="recYes" class="btn-action p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-center">
+              Yes
+            </button>
+            <button onclick="setRecommendation('Leaning Yes')" id="recLeanYes" class="btn-action p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-center">
+              Leaning Yes
+            </button>
+            <button onclick="setRecommendation('Leaning No')" id="recLeanNo" class="btn-action p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-center">
+              Leaning No
+            </button>
+            <button onclick="setRecommendation('Strong No')" id="recStrongNo" class="btn-action p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-center">
+              Strong No
+            </button>
+          </div>
+
+          <!-- Evaluation Notes -->
+          <div class="space-y-1.5 pt-1">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-700 font-mono">Recruiter & Interviewer Synthesis Notes</label>
+            <textarea id="recruiterNotesInput" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 transition" placeholder="Add qualitative notes, debrief comments, or bar-raiser flags..."></textarea>
           </div>
         </div>
 
@@ -806,10 +1046,32 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- 3. MODALS, AUTOMATION DIALOGS & TOAST CONTAINER                           -->
+  <!-- 3. COMMAND PALETTE (CMD+K / CTRL+K)                                      -->
   <!-- ========================================================================= -->
+  <div id="commandPaletteOverlay" class="fixed inset-0 bg-slate-900/35 backdrop-blur-xs z-50 hidden" onclick="closeCommandPalette(event)">
+    <div class="command-modal" onclick="event.stopPropagation()">
+      <!-- Search Input Header -->
+      <div class="h-14 px-4 flex items-center gap-3 border-b border-slate-100">
+        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" id="commandInput" oninput="filterCommandPalette(this.value)" placeholder="Type a command or jump to step..." class="w-full text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-none bg-transparent" />
+        <kbd class="px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-slate-100 border border-slate-200 rounded">ESC</kbd>
+      </div>
 
-  <!-- Automation Modal -->
+      <!-- Action Items List -->
+      <div id="commandList" class="p-2 max-h-80 overflow-y-auto space-y-1 text-xs">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Footer Hints -->
+      <div class="h-9 px-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-mono select-none">
+        <span>↑↓ Navigate</span>
+        <span>↵ Select Action</span>
+        <span>ESC Close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Automations Modal -->
   <dialog id="automationsDialog" class="bg-white border border-slate-200 p-6 rounded-xl max-w-lg w-full mx-auto shadow-2xl text-slate-900 backdrop:bg-slate-900/40 backdrop:backdrop-blur-xs">
     <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
       <div class="flex items-center gap-2">
@@ -820,7 +1082,6 @@
     </div>
 
     <div class="space-y-4 text-xs">
-      <!-- Automation 1: Calendar Invite Generation -->
       <div class="ent-inset p-3.5 space-y-2">
         <div class="font-bold text-slate-900 flex items-center justify-between">
           <span>📅 Automated Interview Calendar (.ICS)</span>
@@ -832,7 +1093,6 @@
         </button>
       </div>
 
-      <!-- Automation 2: Candidate Email Summary Dispatch -->
       <div class="ent-inset p-3.5 space-y-2">
         <div class="font-bold text-slate-900 flex items-center justify-between">
           <span>✉ Automated Candidate Briefing Email</span>
@@ -883,7 +1143,7 @@
   <!-- 4. JAVASCRIPT CONTROLLER                                                 -->
   <!-- ========================================================================= -->
   <script>
-    const API_BASE = "http://127.0.0.1:8000";
+    const API_BASE = (typeof window !== "undefined" && window.location.origin.startsWith("http")) ? window.location.origin : "http://127.0.0.1:8000";
 
     const appState = {
       apiKey: localStorage.getItem("interviewiq_api_key") || "",
@@ -899,8 +1159,11 @@
       feedback: null,
       curriculum: null,
       userAnswers: {},
+      flaggedQuestions: {},
+      currentMcqIndex: 0,
       fitWeight: 45,
       testWeight: 55,
+      recommendation: "Strong Yes",
       examSecondsLeft: 1800,
       examTimerInterval: null,
       proctorViolations: 0,
@@ -914,7 +1177,7 @@
       dist_sys: {
         title: "Senior Distributed Systems Engineer (L5)",
         resume: `# Aarav Sharma\naarav.sharma@example.com | Bengaluru, India | LinkedIn: /in/aarav-sharma-dev\n\n## Summary\nBackend and Distributed Systems Engineer with 3+ years architecting microservices in Python, Go, and PostgreSQL. Track record optimizing Redis caches, gRPC contracts, and Docker/Kubernetes on AWS.\n\n## Technical Skills\n- Languages: Python, Go, SQL, TypeScript\n- Frameworks: FastAPI, Gin, Starlette\n- Databases: PostgreSQL, Redis, SQLite\n- Cloud: Docker, Kubernetes, AWS (EC2, S3), GitHub Actions\n\n## Experience\n**Backend Engineer | CloudScale Systems** (2023 - Present)\n- Architected high-throughput event pipelines using Go and Kafka (45k req/sec, p99 < 25ms).\n- Designed PostgreSQL database migrations reducing query latency by 40%.\n- Deployed microservices on AWS EKS with Prometheus monitoring.`,
-        jd: `# Senior Distributed Systems Engineer\n**GlobalTech Solutions — Bengaluru / Remote**\n\n## Requirements\n- 3+ years experience with Go or Python in production environments.\n- Deep expertise in relational databases (PostgreSQL) and in-memory caches (Redis).\n- Hands-on proficiency with Docker, Kubernetes, and cloud platforms (AWS or GCP).\n- Experience designing RESTful APIs and gRPC microservices with sub-50ms latency.\n- Solid understanding of distributed system architecture, concurrency patterns, and data modeling.`
+        jd: `# Senior Distributed Systems Engineer\n**GlobalTech Solutions — Bengaluru / Remote\n\n## Requirements\n- 3+ years experience with Go or Python in production environments.\n- Deep expertise in relational databases (PostgreSQL) and in-memory caches (Redis).\n- Hands-on proficiency with Docker, Kubernetes, and cloud platforms (AWS or GCP).\n- Experience designing RESTful APIs and gRPC microservices with sub-50ms latency.\n- Solid understanding of distributed system architecture, concurrency patterns, and data modeling.`
       },
       apm: {
         title: "Associate Product Manager (APM)",
@@ -933,12 +1196,34 @@
       }
     };
 
+    // Command Palette Actions
+    const COMMAND_ACTIONS = [
+      { id: "step_1", label: "Jump to Step 1: Candidate Intake", category: "Navigation", icon: "1", action: () => switchStep(1) },
+      { id: "step_2", label: "Jump to Step 2: Strategic Role Fit", category: "Navigation", icon: "2", action: () => switchStep(2) },
+      { id: "step_3", label: "Jump to Step 3: Question Bank", category: "Navigation", icon: "3", action: () => switchStep(3) },
+      { id: "step_4", label: "Jump to Step 4: 30-MCQ Exam & Voice", category: "Navigation", icon: "4", action: () => switchStep(4) },
+      { id: "step_5", label: "Jump to Step 5: Scorecard Diagnostics", category: "Navigation", icon: "5", action: () => switchStep(5) },
+      { id: "step_6", label: "Jump to Step 6: 7-Day Action Sprint", category: "Navigation", icon: "6", action: () => switchStep(6) },
+      { id: "demo_pipe", label: "⚡ 1-Click Instant Demo Pipeline", category: "Automations", icon: "⚡", action: () => runInstantDemoPipeline() },
+      { id: "fast_track", label: "Execute Fast Track Evaluation (Fit + QBank)", category: "Actions", icon: "⚡", action: () => runFastTrack() },
+      { id: "full_pipe", label: "Execute Full Multi-Agent Pipeline", category: "Actions", icon: "🚀", action: () => runFullPipeline() },
+      { id: "export_fit", label: "Export Strategic Fit Report (PDF)", category: "Export", icon: "📄", action: () => exportFitReportPDF() },
+      { id: "export_dossier", label: "Export Full Candidate Dossier (PDF)", category: "Export", icon: "📥", action: () => exportFullDossierPDF() },
+      { id: "calendar", label: "Generate Interview Calendar Event (.ICS)", category: "Automations", icon: "📅", action: () => generateCalendarInvite() },
+      { id: "email", label: "Copy Recruiter Briefing Email Draft", category: "Automations", icon: "✉", action: () => copyEmailSummary() },
+      { id: "preset_sys", label: "Load Benchmark: Senior Distributed Systems", category: "Benchmarks", icon: "🎯", action: () => applyRoleBenchmark("dist_sys") },
+      { id: "preset_apm", label: "Load Benchmark: Associate Product Manager", category: "Benchmarks", icon: "🎯", action: () => applyRoleBenchmark("apm") },
+      { id: "settings", label: "System Configuration & API Key", category: "System", icon: "⚙", action: () => openSettingsModal() },
+    ];
+
     window.addEventListener("DOMContentLoaded", () => {
       checkHealth();
       setupWordCounters();
       setupProctorWatcher();
       loadPastSessionsList();
       loadCurrentPreset();
+      setupKeyboardShortcuts();
+      initCommandPalette();
     });
 
     function checkHealth() {
@@ -946,12 +1231,21 @@
         .then(r => r.json())
         .then(data => {
           if (data.status === "ok") {
-            const dev = data.directml?.device_name || "DirectML / High-Perf CPU";
-            document.getElementById("topBarDmlDevice").textContent = dev;
+            const dml = data.directml;
+            const isAvail = dml?.directml_available;
+            const devName = dml?.device_name || "Host CPU";
+            const devText = isAvail ? `${devName} (DirectML Active)` : `${devName} (DirectML Inactive)`;
+            const el = document.getElementById("topBarDmlDevice");
+            if (el) el.textContent = devText;
+            const dot = document.getElementById("topBarDmlDot");
+            if (dot) {
+              dot.className = isAvail ? "w-2 h-2 rounded-full bg-emerald-500" : "w-2 h-2 rounded-full bg-slate-400";
+            }
           }
         })
         .catch(() => {
-          document.getElementById("topBarDmlDevice").textContent = "DirectML Standby";
+          const el = document.getElementById("topBarDmlDevice");
+          if (el) el.textContent = "DirectML Standby";
         });
     }
 
@@ -961,7 +1255,7 @@
           appState.proctorViolations++;
           const alertBadge = document.getElementById("proctorAlert");
           const alertText = document.getElementById("proctorAlertText");
-          alertBadge.className = "px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-300 text-rose-800 text-xs font-mono font-medium flex items-center gap-1.5 animate-pulse";
+          alertBadge.className = "px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-300 text-rose-900 text-xs font-mono font-medium flex items-center gap-1.5";
           alertText.textContent = `⚠ Focus Lost (${appState.proctorViolations} Violations)`;
           showToast(`Proctor Notice: Window unfocused (${appState.proctorViolations})`, "danger");
         }
@@ -1051,6 +1345,11 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
+    function toggleSidebar() {
+      const sb = document.getElementById("mainSidebar");
+      sb.classList.toggle("-ml-64");
+    }
+
     function showLoading(msg) {
       document.getElementById("loadingText").textContent = msg;
       document.getElementById("loadingOverlay").classList.remove("hidden");
@@ -1058,6 +1357,284 @@
 
     function hideLoading() {
       document.getElementById("loadingOverlay").classList.add("hidden");
+    }
+
+    // 1-Click Instant Demo Pipeline
+    async function runInstantDemoPipeline() {
+      showLoading("⚡ [1/5] Initializing Multi-Agent Swarm with DirectML...");
+      applyRoleBenchmark("dist_sys");
+
+      try {
+        const resume = document.getElementById("resumeInput").value;
+        const jd = document.getElementById("jdInput").value;
+
+        showLoading("⚡ [2/5] Synthesizing Strategic Fit & 4-Column Requirements Matrix...");
+        let onboardRes = null;
+        try {
+          onboardRes = await fetch(`${API_BASE}/api/pipeline/onboard`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ resume_text: resume, jd_text: jd, api_key: appState.apiKey }),
+          }).then(r => r.json());
+        } catch (e) {}
+
+        if (onboardRes && onboardRes.profile) {
+          appState.profile = onboardRes.profile;
+          appState.jdAnalysis = onboardRes.jd_analysis;
+          appState.cultureFit = onboardRes.culture_fit;
+          appState.sessionId = onboardRes.session_id || appState.sessionId;
+        } else {
+          appState.profile = {
+            name: "Aarav Sharma",
+            title: "Senior Backend & Distributed Systems Engineer",
+            email: "aarav.sharma@example.com",
+            experience_years: 4,
+            key_skills: ["Go", "Python", "PostgreSQL", "Redis", "Docker", "Kubernetes", "gRPC", "Kafka", "AWS"],
+          };
+          appState.jdAnalysis = {
+            role_title: "Senior Distributed Systems Engineer (L5)",
+            company_name: "GlobalTech CloudScale Systems",
+            required_skills: ["Go", "PostgreSQL", "Redis", "Docker", "Kubernetes", "gRPC", "Distributed Systems", "Concurrency"],
+          };
+          appState.cultureFit = { culture_fit_score: 92, verdict: "High Culture & Ownership Alignment" };
+        }
+
+        let fitRes = null;
+        try {
+          fitRes = await fetch(`${API_BASE}/api/pipeline/fit-analysis`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ profile: appState.profile, jd_analysis: appState.jdAnalysis }),
+          }).then(r => r.json());
+        } catch (e) {}
+
+        if (fitRes && fitRes.fit_report) {
+          appState.fitReport = fitRes.fit_report;
+        } else {
+          appState.fitReport = {
+            technical_match_pct: 88,
+            total_required_skills: 8,
+            matched_skills: [
+              { skill: "Go Concurrency & Goroutines", depth: "Expert", evidence: "Built 45k req/sec pipeline" },
+              { skill: "PostgreSQL Database Architecture", depth: "Advanced", evidence: "Optimized complex queries by 40%" },
+              { skill: "Redis Distributed In-Memory Caching", depth: "Advanced", evidence: "Implemented cache-aside pattern" },
+              { skill: "Docker & Containerization", depth: "Advanced", evidence: "Multi-stage builds in production" },
+              { skill: "Kubernetes Orchestration", depth: "Proficient", evidence: "Managed EKS deployments" },
+              { skill: "gRPC & Protocol Buffers", depth: "Advanced", evidence: "Sub-25ms microservice contracts" },
+              { skill: "Distributed Event Streaming (Kafka)", depth: "Advanced", evidence: "Event-driven high-throughput ingest" }
+            ],
+            adjacent_skills: [
+              { skill: "Python FastAPI", relevance: "High backend synergy" },
+              { skill: "AWS Cloud Infrastructure", relevance: "Direct cloud parity" }
+            ],
+            missing_skills: [
+              { skill: "eBPF Linux Kernel Tracing", importance: "Desired for deep observability" }
+            ],
+            foundational_skills: [
+              { skill: "Data Structures & Concurrency Primitives", strength: "Strong" },
+              { skill: "REST API Design Standards", strength: "Mastery" }
+            ]
+          };
+        }
+
+        showLoading("⚡ [3/5] Generating 30 Probes with STAR Rubric Models...");
+        let qbRes = null;
+        try {
+          qbRes = await fetch(`${API_BASE}/api/pipeline/question-bank`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ jd_analysis: appState.jdAnalysis, profile: appState.profile, fit_report: appState.fitReport }),
+          }).then(r => r.json());
+        } catch (e) {}
+
+        if (qbRes && qbRes.question_bank && qbRes.question_bank.questions) {
+          appState.questionBank = qbRes.question_bank;
+        } else {
+          appState.questionBank = {
+            questions: [
+              {
+                category: "core_technical",
+                question: "Explain how Go's runtime scheduler (GMP model) handles blocking syscalls versus channel communication, and how you prevent goroutine leaks in high-throughput pipelines.",
+                situation: "In high-throughput microservices, unmonitored goroutines waiting on unbuffered channels cause heap leaks and latency spikes.",
+                task: "Architect an event processing engine that isolates worker goroutines and respects context cancellation.",
+                action: "Leveraged context.WithTimeout, worker pools with bounded channels, and runtime.NumGoroutine telemetry.",
+                result: "Sustained 45,000 req/sec with flat 42MB memory usage and zero leak occurrences over 90 days.",
+                model_answer: "The candidate should detail the Goroutine-Machine-Processor (GMP) work-stealing algorithm, explain network poller integration, and describe context cancellation patterns.",
+              },
+              {
+                category: "system_design",
+                question: "Design a globally distributed idempotency service for high-volume financial payments handling 100k writes/sec with p99 latency < 20ms under network partition conditions.",
+                situation: "Payment gateways often retry requests on timeout, risking double-debiting user accounts.",
+                task: "Ensure strict exactly-once execution semantics using distributed locking and transactional outbox.",
+                action: "Implemented Redis Redlock with Raft replication, short TTL leases, and PostgreSQL unique idempotency keys.",
+                result: "Zero duplicate transactions recorded across 12M monthly transactions with p99 latency of 14ms.",
+                model_answer: "Evaluates consensus trade-offs (CAP theorem), distributed lease management, and optimistic locking in database transactions.",
+              },
+              {
+                category: "behavioral",
+                question: "Describe a high-stakes production outage where your microservice experienced cascading database connection pool exhaustion. How did you triage, resolve, and prevent recurrence?",
+                situation: "During Black Friday surge, slow unindexed queries exhausted PostgreSQL max_connections, bringing down checkout.",
+                task: "Restore service availability within 15 minutes and establish permanent circuit-breaker safeguards.",
+                action: "Terminated idle connections, deployed PgBouncer connection pooling, and introduced client-side exponential backoff.",
+                result: "Outage mitigated in 11 minutes; subsequent peak loads absorbed with 35% headroom.",
+                model_answer: "Evaluates incident command, root-cause methodology (Five Whys), and blameless post-mortem execution.",
+              },
+              {
+                category: "live_coding",
+                question: "Implement a thread-safe in-memory cache with LRU eviction policy, TTL expiration, and atomic O(1) read/write operations in Go.",
+                situation: "Hot-key reads overwhelming database layer requiring low-latency in-process caching.",
+                task: "Build concurrent-safe LRU with sync.RWMutex, doubly-linked list, and hash map.",
+                action: "Decoupled mutex locks, implemented fine-grained sharding to reduce lock contention.",
+                result: "Sub-microsecond cache access with zero race conditions validated under Go test -race.",
+                model_answer: "Checks concurrency safety, data structure mastery, and lock contention avoidance.",
+              }
+            ]
+          };
+        }
+
+        showLoading("⚡ [4/5] Populating 30-MCQ Exam Grid Palette & Simulating Responses...");
+        const testQuestions = [];
+        for (let i = 0; i < 30; i++) {
+          testQuestions.push({
+            id: i + 1,
+            question: `[Q${i+1}] Which mechanism in distributed consensus protocols ensures state machine safety during network partitions?`,
+            topic: i < 10 ? "Distributed Concurrency" : i < 20 ? "Database Internals" : "Cloud Reliability",
+            options: [
+              "A) Two-Phase Commit with synchronous blocking locks",
+              "B) Quorum-based leader election with term monotonicity (Raft / Paxos)",
+              "C) Eventual consistency with Last-Write-Wins timestamps",
+              "D) Client-side read-repair without version vectors"
+            ],
+            correct_answer: "B",
+          });
+        }
+        appState.onlineTest = { questions: testQuestions };
+
+        // Pre-fill 26 answers, 2 flagged
+        appState.userAnswers = {};
+        for (let i = 0; i < 30; i++) {
+          if (i === 4 || i === 11 || i === 19 || i === 27) {
+            appState.userAnswers[i] = "A"; // 4 wrong
+          } else {
+            appState.userAnswers[i] = "B"; // 26 correct
+          }
+        }
+        appState.flaggedQuestions = { 4: true, 19: true };
+
+        showLoading("⚡ [5/5] Scoring Assessment & Generating 7-Day Sprint Action Plan...");
+        appState.testResults = {
+          score: 26,
+          total: 30,
+          percentage: 87,
+          passed: true,
+          benchmark_tier: "Senior L5 Ready (Top 12th Percentile)"
+        };
+
+        appState.feedback = {
+          composite_readiness: 87,
+          strongest_skill: "Distributed Systems & Go Concurrency",
+          weakest_skill: "eBPF Kernel Observability",
+          verdict: "Strong Hire — High-Velocity Execution Profile",
+          strengths: [
+            "Demonstrated deep mastery of Go concurrency primitives and memory safety",
+            "Strong understanding of relational database indexing and cache invalidation",
+            "Articulates quantifiable outcomes using structured STAR framework"
+          ],
+          gap_remediations: [
+            "Recommended 7-day drill on Linux kernel performance tracing with BCC / bpftrace",
+            "Deepen exposure to multi-region consensus failover drills"
+          ]
+        };
+
+        appState.curriculum = {
+          daily_plan: [
+            {
+              day: 1,
+              duration_hours: 2,
+              theme: "Go Concurrency Deep-Dive & GMP Internals",
+              tasks: [
+                { description: "Analyze Go runtime source (runtime/proc.go) and implement custom worker pool", resource_title: "Go Scheduler Internals (Ardan Labs)", resource_url: "https://www.ardanlabs.com" },
+                { description: "Audit channel deadlock edge cases using go vet and test -race", resource_title: "Go Race Detector Guide", resource_url: "https://go.dev" }
+              ]
+            },
+            {
+              day: 2,
+              duration_hours: 2,
+              theme: "PostgreSQL Query Optimization & Connection Management",
+              tasks: [
+                { description: "Analyze EXPLAIN ANALYZE execution plans and B-Tree vs GIN index selection", resource_title: "Use The Index, Luke!", resource_url: "https://use-the-index-luke.com" },
+                { description: "Configure PgBouncer transaction pooling under simulated 5,000 connection spike", resource_title: "PgBouncer Architecture", resource_url: "https://www.pgbouncer.org" }
+              ]
+            },
+            {
+              day: 3,
+              duration_hours: 3,
+              theme: "Distributed Caching & Invalidation Patterns",
+              tasks: [
+                { description: "Implement Cache-Aside and Write-Through patterns with Redis cluster", resource_title: "Redis Distributed Caching Best Practices", resource_url: "https://redis.io" },
+                { description: "Mitigate cache stampede using probabilistic early expiration (XFetch algorithm)", resource_title: "VLDB Cache Stampede Paper", resource_url: "https://www.vldb.org" }
+              ]
+            },
+            {
+              day: 4,
+              duration_hours: 2.5,
+              theme: "gRPC Microservices & Protocol Buffers",
+              tasks: [
+                { description: "Define strict Protobuf schemas with field masking and backward compatibility", resource_title: "Google API Design Guide", resource_url: "https://cloud.google.com" },
+                { description: "Implement gRPC interceptors for distributed tracing with OpenTelemetry", resource_title: "OpenTelemetry Go Instrumentation", resource_url: "https://opentelemetry.io" }
+              ]
+            },
+            {
+              day: 5,
+              duration_hours: 2,
+              theme: "Distributed Consensus & Raft Replication",
+              tasks: [
+                { description: "Simulate network partitions in a 3-node Raft cluster", resource_title: "The Raft Consensus Algorithm", resource_url: "https://raft.github.io" },
+                { description: "Implement distributed idempotency key service with Redis leases", resource_title: "Stripe Idempotent API Design", resource_url: "https://stripe.com" }
+              ]
+            },
+            {
+              day: 6,
+              duration_hours: 3,
+              theme: "eBPF & Linux Kernel Observability (Target Remediation)",
+              tasks: [
+                { description: "Write custom bpftrace script to profile socket latency and TCP retransmits", resource_title: "Brendan Gregg BPF Performance Tools", resource_url: "https://www.brendangregg.com" },
+                { description: "Build Prometheus alerting rule for p99 latency SLA breach detection", resource_title: "Prometheus Alerting Best Practices", resource_url: "https://prometheus.io" }
+              ]
+            },
+            {
+              day: 7,
+              duration_hours: 2,
+              theme: "Full System Mock Bar-Raiser & Executive Synthesis",
+              tasks: [
+                { description: "Conduct 45-minute timed mock architecture defense on 100k req/sec system", resource_title: "System Design Primer", resource_url: "https://github.com/donnemartin/system-design-primer" },
+                { description: "Review and export 360° Candidate Placement Dossier PDF", resource_title: "InterviewIQ Dossier Exporter", resource_url: "#" }
+              ]
+            }
+          ]
+        };
+
+        renderFitReport();
+        renderQuestionBank();
+        renderOnlineTest();
+        renderDiagnostics();
+        renderCurriculum();
+
+        document.getElementById("badgeStep1").textContent = "Done";
+        document.getElementById("badgeStep2").textContent = "88% Fit";
+        document.getElementById("badgeStep3").textContent = "30 Qs";
+        document.getElementById("badgeStep4").textContent = "26/30";
+        document.getElementById("badgeStep5").textContent = "87% Hire";
+        document.getElementById("badgeStep6").textContent = "100% Ready";
+
+        hideLoading();
+        switchStep(2);
+        showToast("⚡ 1-Click Instant Demo Pipeline Active! Steps 1 to 6 Loaded.", "success");
+        loadPastSessionsList();
+      } catch (err) {
+        hideLoading();
+        showToast("Instant demo error: " + err.message, "danger");
+      }
     }
 
     // Fast Track
@@ -1181,7 +1758,7 @@
       renderTags(fit.foundational_skills, document.getElementById("listFoundational"), document.getElementById("countFoundational"), "text-amber-800");
     }
 
-    // Render Question Bank
+    // Render Question Bank with STAR Framework Tabs
     function renderQuestionBank() {
       const qb = appState.questionBank;
       if (!qb) return;
@@ -1189,35 +1766,81 @@
       listEl.innerHTML = "";
 
       const questions = qb.questions || [];
+      const counts = { all: questions.length, core_technical: 0, behavioral: 0, system_design: 0, live_coding: 0 };
+
       questions.forEach((q, idx) => {
+        const cat = q.category || "core_technical";
+        if (counts[cat] !== undefined) counts[cat]++;
+
         const card = document.createElement("div");
-        card.className = "ent-card p-4 space-y-2 qb-card";
-        card.dataset.category = q.category || "core_technical";
+        card.className = "ent-card p-5 space-y-3 qb-card";
+        card.dataset.category = cat;
         card.dataset.text = (q.question || "").toLowerCase();
+
+        // Difficulty badge mapping
+        const diffPips = idx % 3 === 0 ? "●●●○ Hard" : idx % 2 === 0 ? "●●○○ Medium" : "●○○○ Easy";
+        const diffCls = idx % 3 === 0 ? "bg-rose-50 text-rose-700 border-rose-200" : idx % 2 === 0 ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-emerald-50 text-emerald-700 border-emerald-200";
 
         card.innerHTML = `
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wider">${q.category || 'Technical'}</span>
-            <span class="text-xs text-slate-400 font-mono">Question ${idx + 1}</span>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wider">${cat}</span>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded border ${diffCls}">${diffPips}</span>
+              <span class="text-[10px] text-slate-400 font-mono">⏱ 10 min</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="copyQuestionText(${idx})" class="text-xs text-slate-400 hover:text-slate-600 transition" title="Copy Question">📋</button>
+              <span class="text-xs text-slate-400 font-mono">Q${idx + 1}</span>
+            </div>
           </div>
-          <div class="text-xs font-semibold text-slate-900 leading-relaxed">${q.question}</div>
-          ${q.model_answer ? `
-            <details class="text-xs text-slate-500 pt-1">
-              <summary class="cursor-pointer text-blue-600 hover:text-blue-700 font-medium font-mono text-[11px]">View STAR Model Answer Breakdown</summary>
-              <div class="mt-2 p-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 font-sans leading-relaxed text-xs">${q.model_answer}</div>
-            </details>
-          ` : ''}
+
+          <div class="text-sm font-semibold text-slate-900 leading-snug">${q.question}</div>
+
+          <!-- Tabbed STAR Framework Accordion -->
+          <details class="text-xs text-slate-600 pt-1" open>
+            <summary class="cursor-pointer text-blue-600 hover:text-blue-700 font-medium font-mono text-xs flex items-center gap-1 select-none">
+              <span>Structured STAR Evaluation Rubric</span>
+            </summary>
+            
+            <div class="mt-3 p-3.5 rounded-lg bg-slate-50 border border-slate-200 space-y-3">
+              <!-- STAR Tabs -->
+              <div class="flex items-center gap-1.5 border-b border-slate-200 pb-2 text-[11px] font-semibold font-mono text-slate-500">
+                <button type="button" onclick="switchStarTab(${idx}, 'situation')" id="starTab_${idx}_situation" class="px-2.5 py-1 rounded bg-blue-600 text-white font-bold transition">1. Situation</button>
+                <button type="button" onclick="switchStarTab(${idx}, 'task')" id="starTab_${idx}_task" class="px-2.5 py-1 rounded bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">2. Task</button>
+                <button type="button" onclick="switchStarTab(${idx}, 'action')" id="starTab_${idx}_action" class="px-2.5 py-1 rounded bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">3. Action</button>
+                <button type="button" onclick="switchStarTab(${idx}, 'result')" id="starTab_${idx}_result" class="px-2.5 py-1 rounded bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition">4. Result</button>
+              </div>
+
+              <!-- STAR Model Content -->
+              <div id="starContent_${idx}" class="text-xs text-slate-800 font-sans leading-relaxed bg-white p-3 rounded border border-slate-200 shadow-2xs">
+                ${q.situation || q.model_answer || 'Candidate should articulate system context, architectural constraints, key trade-offs evaluated, and measurable performance results achieved.'}
+              </div>
+              
+              <!-- Follow-up Probing Questions -->
+              <div class="p-2.5 rounded bg-blue-50/60 border-l-4 border-blue-600 text-slate-700 text-xs">
+                <span class="font-bold font-mono text-blue-900 text-[10px] uppercase block mb-0.5">Interviewer Probing Probes:</span>
+                "What alternatives did you reject and why? How would this architecture scale if throughput increased 10x?"
+              </div>
+            </div>
+          </details>
         `;
         listEl.appendChild(card);
       });
+
+      // Update pill count badges
+      document.getElementById("qbCountAll").textContent = counts.all;
+      document.getElementById("qbCountTech").textContent = counts.core_technical;
+      document.getElementById("qbCountBehav").textContent = counts.behavioral;
+      document.getElementById("qbCountArch").textContent = counts.system_design;
+      document.getElementById("qbCountCode").textContent = counts.live_coding;
     }
 
     function filterQB(cat) {
       document.querySelectorAll(".qb-tab").forEach(tab => {
         if (tab.dataset.cat === cat) {
-          tab.className = "qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white shadow-sm";
+          tab.className = "qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white shadow-sm flex items-center gap-1.5";
         } else {
-          tab.className = "qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900";
+          tab.className = "qb-tab btn-action px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 flex items-center gap-1.5";
         }
       });
       document.querySelectorAll(".qb-card").forEach(card => {
@@ -1241,52 +1864,158 @@
       });
     }
 
-    // Render Online Test
+    function copyQuestionText(idx) {
+      const q = appState.questionBank?.questions?.[idx];
+      if (q) {
+        navigator.clipboard.writeText(`${q.question}\n\nModel Answer: ${q.model_answer}`);
+        showToast("Question copied to clipboard", "success");
+      }
+    }
+
+    function switchStarTab(qIdx, aspect) {
+      const q = appState.questionBank?.questions?.[qIdx];
+      if (!q) return;
+
+      const aspects = ["situation", "task", "action", "result"];
+      aspects.forEach(asp => {
+        const btn = document.getElementById(`starTab_${qIdx}_${asp}`);
+        if (btn) {
+          if (asp === aspect) {
+            btn.className = "px-2.5 py-1 rounded bg-blue-600 text-white font-bold transition";
+          } else {
+            btn.className = "px-2.5 py-1 rounded bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition";
+          }
+        }
+      });
+
+      const el = document.getElementById(`starContent_${qIdx}`);
+      if (el) {
+        let text = "";
+        if (aspect === "situation") {
+          text = q.situation || "Context & Challenge: Candidate should describe the production architectural problem, latency constraints, and operational stakes.";
+        } else if (aspect === "task") {
+          text = q.task || "Engineering Responsibility: Candidate should state explicit performance SLA goals, ownership boundaries, and requirements.";
+        } else if (aspect === "action") {
+          text = q.action || "Technical Implementation: Concrete algorithms, concurrency patterns, cache invalidation strategies, and rejected alternatives.";
+        } else if (aspect === "result") {
+          text = q.result || "Quantifiable ROI: Measurable throughput gain (e.g. 45k req/sec), latency reduction, zero data loss, or business impact.";
+        }
+        el.textContent = text;
+      }
+    }
+
+    // Render Online Test with Spatial 30-Question Grid Palette
     function renderOnlineTest() {
       const test = appState.onlineTest;
       if (!test || !test.questions) return;
 
-      const container = document.getElementById("mcqQuestionsList");
-      container.innerHTML = "";
-
-      test.questions.forEach((q, idx) => {
-        const qCard = document.createElement("div");
-        qCard.className = "ent-card p-5 space-y-3";
-        qCard.innerHTML = `
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-mono font-bold text-blue-700">Question ${idx + 1} of ${test.questions.length}</span>
-            <span class="text-[11px] text-slate-500 font-mono px-2 py-0.5 rounded bg-slate-100">${q.topic || 'General'}</span>
-          </div>
-          <p class="text-xs font-medium text-slate-900 leading-relaxed">${q.question}</p>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-1">
-            ${(q.options || []).map((opt, oIdx) => {
-              const optLetter = String.fromCharCode(65 + oIdx);
-              return `
-                <button type="button" onclick="selectAnswer(${idx}, '${optLetter}')" id="opt_${idx}_${optLetter}" class="mcq-opt-${idx} text-left p-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs text-slate-700 transition flex items-center gap-2.5">
-                  <span class="w-5 h-5 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-mono font-bold text-[10px] border border-slate-200">${optLetter}</span>
-                  <span class="leading-tight">${opt}</span>
-                </button>
-              `;
-            }).join("")}
-          </div>
-        `;
-        container.appendChild(qCard);
-      });
-
+      renderActiveMcqCard();
+      renderExamGridPalette();
       startExamTimer();
+    }
+
+    function renderActiveMcqCard() {
+      const test = appState.onlineTest;
+      if (!test || !test.questions) return;
+      const q = test.questions[appState.currentMcqIndex];
+      const idx = appState.currentMcqIndex;
+      const container = document.getElementById("activeMcqCard");
+
+      container.innerHTML = `
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono font-bold text-blue-700">Question ${idx + 1} of 30</span>
+            <span class="text-[10px] text-slate-500 font-mono px-2 py-0.5 rounded bg-slate-100">${q.topic || 'General'}</span>
+          </div>
+          ${appState.flaggedQuestions[idx] ? '<span class="text-xs font-mono font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">🚩 Flagged</span>' : ''}
+        </div>
+
+        <p class="text-sm font-medium text-slate-900 leading-relaxed">${q.question}</p>
+
+        <div class="space-y-2.5 pt-2">
+          ${(q.options || []).map((opt, oIdx) => {
+            const letter = String.fromCharCode(65 + oIdx);
+            const isSelected = appState.userAnswers[idx] === letter;
+            return `
+              <button type="button" onclick="selectAnswer(${idx}, '${letter}')" class="w-full text-left p-3.5 rounded-lg border transition flex items-center justify-between ${isSelected ? 'border-blue-600 bg-blue-50/60 text-blue-900 shadow-xs' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'}">
+                <span class="flex items-center gap-3">
+                  <span class="w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold text-xs border ${isSelected ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-100 text-slate-600 border-slate-200'}">${letter}</span>
+                  <span class="text-xs font-medium leading-normal">${opt}</span>
+                </span>
+                <span class="text-[11px] font-mono text-slate-400">Key [${letter}]</span>
+              </button>
+            `;
+          }).join("")}
+        </div>
+      `;
+
+      updateAnsweredRatio();
+    }
+
+    function renderExamGridPalette() {
+      const palette = document.getElementById("examGridPalette");
+      palette.innerHTML = "";
+
+      for (let i = 0; i < 30; i++) {
+        const tile = document.createElement("div");
+        tile.className = "question-tile";
+        tile.textContent = i + 1;
+        tile.onclick = () => jumpToQuestion(i);
+
+        if (i === appState.currentMcqIndex) {
+          tile.dataset.state = "active";
+        } else if (appState.userAnswers[i]) {
+          tile.dataset.state = "answered";
+        } else {
+          tile.dataset.state = "unanswered";
+        }
+
+        if (appState.flaggedQuestions[i]) {
+          tile.dataset.flagged = "true";
+        }
+
+        palette.appendChild(tile);
+      }
+    }
+
+    function jumpToQuestion(idx) {
+      appState.currentMcqIndex = idx;
+      renderActiveMcqCard();
+      renderExamGridPalette();
+    }
+
+    function nextMcqQuestion() {
+      if (appState.currentMcqIndex < 29) {
+        jumpToQuestion(appState.currentMcqIndex + 1);
+      }
+    }
+
+    function prevMcqQuestion() {
+      if (appState.currentMcqIndex > 0) {
+        jumpToQuestion(appState.currentMcqIndex - 1);
+      }
+    }
+
+    function toggleFlagCurrentQuestion() {
+      const idx = appState.currentMcqIndex;
+      appState.flaggedQuestions[idx] = !appState.flaggedQuestions[idx];
+      renderActiveMcqCard();
+      renderExamGridPalette();
+      showToast(appState.flaggedQuestions[idx] ? `Flagged Question ${idx + 1}` : `Unflagged Question ${idx + 1}`, "info");
     }
 
     function selectAnswer(qIdx, optLetter) {
       appState.userAnswers[qIdx] = optLetter;
-      document.querySelectorAll(`.mcq-opt-${qIdx}`).forEach(btn => {
-        btn.classList.remove("border-blue-600", "bg-blue-50/50", "text-blue-900");
-        btn.classList.add("border-slate-200", "bg-white", "text-slate-700");
-      });
-      const selected = document.getElementById(`opt_${qIdx}_${optLetter}`);
-      if (selected) {
-        selected.classList.remove("border-slate-200", "bg-white", "text-slate-700");
-        selected.classList.add("border-blue-600", "bg-blue-50/50", "text-blue-900");
-      }
+      renderActiveMcqCard();
+      renderExamGridPalette();
+    }
+
+    function updateAnsweredRatio() {
+      const answered = Object.keys(appState.userAnswers).length;
+      const flagged = Object.keys(appState.flaggedQuestions).filter(k => appState.flaggedQuestions[k]).length;
+      const remaining = 30 - answered;
+      const el = document.getElementById("answeredRatioText");
+      if (el) el.textContent = `${answered}/30 Answered · ${flagged} Flagged · ${remaining} Left`;
     }
 
     function startExamTimer() {
@@ -1301,7 +2030,13 @@
         }
         const mins = Math.floor(appState.examSecondsLeft / 60);
         const secs = appState.examSecondsLeft % 60;
-        document.getElementById("examTimer").textContent = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+        const timerEl = document.getElementById("examTimer");
+        if (timerEl) {
+          timerEl.textContent = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+          if (appState.examSecondsLeft < 300) {
+            timerEl.parentElement.className = "flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-rose-50 border border-rose-300 font-mono text-sm font-bold text-rose-900 shadow-sm num-tnum";
+          }
+        }
       }, 1000);
     }
 
@@ -1356,31 +2091,52 @@
       }
     }
 
-    // Render Diagnostics & Dynamic Weight Adjustment
+    // Diagnostics & Dynamic Weight Adjustment
     function renderDiagnostics() {
       const fb = appState.feedback;
       const test = appState.testResults;
       const fit = appState.fitReport;
 
-      const fitScore = fit?.technical_match_pct || 80;
-      const testScore = test?.percentage || 75;
+      const fitScore = fit?.technical_match_pct || 85;
+      const testScore = test?.percentage || 78;
 
       const wFit = appState.fitWeight / 100;
       const wTest = appState.testWeight / 100;
       const composite = Math.round((wFit * fitScore) + (wTest * testScore));
 
-      document.getElementById("compositeScore").textContent = `${composite}%`;
-      document.getElementById("compositeRing").style.setProperty("--value", composite);
-      document.getElementById("compositeVerdict").textContent = composite >= 75 ? "High Placement Probability (Offer Track)" : "Conditional Placement (Sprint Required)";
-      document.getElementById("metricFitComponent").textContent = `${fitScore}%`;
-      document.getElementById("metricTestComponent").textContent = `${testScore}%`;
+      const compScoreEl = document.getElementById("compositeScore");
+      if (compScoreEl) compScoreEl.textContent = `${composite}%`;
+      const ringEl = document.getElementById("compositeRing");
+      if (ringEl) ringEl.style.setProperty("--value", composite);
 
-      document.getElementById("weakestSkillTitle").textContent = fb?.weakest_skill || "Advanced Concurrency & Async I/O";
-      document.getElementById("weakestSkillDesc").textContent = fb?.priority_remediation || "Focus practice on channel contention, thread synchronization, and database query optimization.";
-
-      if (fb?.target_tier) {
-        document.getElementById("targetTierTitle").textContent = fb.target_tier;
+      let verdict = "Conditional Placement (Sprint Required)";
+      let recType = "Leaning Yes";
+      if (composite >= 85) {
+        verdict = "Exceptional Capability — Offer Recommended (Top Tier Alignment)";
+        recType = "Strong Yes";
+      } else if (composite >= 75) {
+        verdict = "Strong Technical Alignment — Standard Offer Pipeline";
+        recType = "Yes";
+      } else if (composite >= 65) {
+        verdict = "Promising Candidate — Targeted 7-Day Sprint Required Before Final Round";
+        recType = "Leaning Yes";
+      } else if (composite >= 50) {
+        verdict = "Marginal Alignment — Substantial Remediation Required";
+        recType = "Leaning No";
+      } else {
+        verdict = "Does Not Meet Bar — Candidate Below Core Competency Floor";
+        recType = "Strong No";
       }
+
+      const verdictEl = document.getElementById("compositeVerdict");
+      if (verdictEl) verdictEl.textContent = verdict;
+
+      const fitCompEl = document.getElementById("metricFitComponent");
+      if (fitCompEl) fitCompEl.textContent = `${fitScore}%`;
+      const testCompEl = document.getElementById("metricTestComponent");
+      if (testCompEl) testCompEl.textContent = `${testScore}%`;
+
+      setRecommendation(recType, false);
     }
 
     function adjustWeights(val) {
@@ -1391,6 +2147,34 @@
       document.getElementById("labelFitWeight").textContent = fitW;
       document.getElementById("labelTestWeight").textContent = testW;
       renderDiagnostics();
+    }
+
+    function setRecommendation(rec, showToastMsg = true) {
+      appState.recommendation = rec;
+      const buttons = ["StrongYes", "Yes", "LeanYes", "LeanNo", "StrongNo"];
+      buttons.forEach(b => {
+        const btn = document.getElementById(`rec${b}`);
+        if (btn) {
+          btn.className = "btn-action p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-center text-xs font-medium";
+        }
+      });
+
+      const styleMap = {
+        "Strong Yes": { id: "recStrongYes", cls: "btn-action p-2 rounded-lg border border-emerald-500 bg-emerald-50 text-emerald-900 font-bold text-center text-xs shadow-xs" },
+        "Yes": { id: "recYes", cls: "btn-action p-2 rounded-lg border border-blue-500 bg-blue-50 text-blue-900 font-bold text-center text-xs shadow-xs" },
+        "Leaning Yes": { id: "recLeanYes", cls: "btn-action p-2 rounded-lg border border-sky-500 bg-sky-50 text-sky-900 font-bold text-center text-xs shadow-xs" },
+        "Leaning No": { id: "recLeanNo", cls: "btn-action p-2 rounded-lg border border-amber-500 bg-amber-50 text-amber-900 font-bold text-center text-xs shadow-xs" },
+        "Strong No": { id: "recStrongNo", cls: "btn-action p-2 rounded-lg border border-rose-500 bg-rose-50 text-rose-900 font-bold text-center text-xs shadow-xs" },
+      };
+
+      const sel = styleMap[rec];
+      if (sel) {
+        const selBtn = document.getElementById(sel.id);
+        if (selBtn) selBtn.className = sel.cls;
+      }
+      if (showToastMsg) {
+        showToast(`Hiring committee decision: ${rec}`, "info");
+      }
     }
 
     // Render 7-Day Sprint
@@ -1463,7 +2247,7 @@
       document.getElementById("badgeStep6").textContent = `${pct}%`;
     }
 
-    // DirectML Voice Simulator Controls
+    // DirectML Voice Simulator
     function toggleTestView(view) {
       const mcqSec = document.getElementById("mcqContainer");
       const voiceSec = document.getElementById("voiceContainer");
@@ -1555,6 +2339,87 @@
           showToast("Speech transcription error: " + e.message, "danger");
         }
       };
+    }
+
+    // Command Palette Implementation (Cmd+K / Ctrl+K)
+    function openCommandPalette() {
+      document.getElementById("commandPaletteOverlay").classList.remove("hidden");
+      const input = document.getElementById("commandInput");
+      input.value = "";
+      input.focus();
+      renderCommandList(COMMAND_ACTIONS);
+    }
+
+    function closeCommandPalette(e) {
+      document.getElementById("commandPaletteOverlay").classList.add("hidden");
+    }
+
+    function filterCommandPalette(val) {
+      const v = (val || "").toLowerCase();
+      const filtered = COMMAND_ACTIONS.filter(a => a.label.toLowerCase().includes(v) || a.category.toLowerCase().includes(v));
+      renderCommandList(filtered);
+    }
+
+    function renderCommandList(items) {
+      const cont = document.getElementById("commandList");
+      cont.innerHTML = "";
+
+      if (items.length === 0) {
+        cont.innerHTML = `<div class="p-4 text-center text-slate-400 text-xs">No matching commands found</div>`;
+        return;
+      }
+
+      items.forEach((item, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-700 transition";
+        btn.onclick = () => {
+          closeCommandPalette();
+          item.action();
+        };
+        btn.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <span class="w-5 h-5 rounded bg-slate-100 text-slate-600 flex items-center justify-center font-mono text-xs">${item.icon}</span>
+            <span class="font-medium text-xs text-slate-800">${item.label}</span>
+          </div>
+          <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-semibold">${item.category}</span>
+        `;
+        cont.appendChild(btn);
+      });
+    }
+
+    function setupKeyboardShortcuts() {
+      window.addEventListener("keydown", (e) => {
+        const tag = (e.target.tagName || "").toLowerCase();
+        if (tag === "input" || tag === "textarea") {
+          if (e.key === "Escape") closeCommandPalette();
+          return;
+        }
+
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+          e.preventDefault();
+          openCommandPalette();
+        } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {
+          e.preventDefault();
+          toggleSidebar();
+        } else if (e.key === "Escape") {
+          closeCommandPalette();
+        } else if (appState.currentStep === 4 && appState.onlineTest) {
+          const k = e.key.toUpperCase();
+          if (["A", "B", "C", "D"].includes(k) && !e.ctrlKey && !e.metaKey) {
+            e.preventDefault();
+            selectAnswer(appState.currentMcqIndex, k);
+          } else if (k === "N" || e.key === "ArrowRight") {
+            e.preventDefault();
+            nextMcqQuestion();
+          } else if (k === "P" || e.key === "ArrowLeft") {
+            e.preventDefault();
+            prevMcqQuestion();
+          } else if (k === "F") {
+            e.preventDefault();
+            toggleFlagCurrentQuestion();
+          }
+        }
+      });
     }
 
     // PDF Exports
@@ -1690,6 +2555,7 @@
         appState.feedback = null;
         appState.curriculum = null;
         appState.userAnswers = {};
+        appState.flaggedQuestions = {};
         for (let i = 1; i <= 6; i++) {
           const b = document.getElementById(`badgeStep${i}`);
           if (b) b.textContent = i === 1 ? "Active" : "--";
