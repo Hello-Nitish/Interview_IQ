@@ -3,28 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --bg-base: #070A12;
-  --bg-surface: #0B0F19;
-  --bg-card: #111827;
-  --bg-inset: #0E1424;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(59, 130, 246, 0.5);
-  --text-main: #F8FAFC;
-  --text-muted: #94A3B8;
-  --text-dim: #64748B;
-  --primary: #2563EB;
-  --primary-hover: #1D4ED8;
-  --emerald: #10B981;
-  --crimson: #EF4444;
-  --amber: #F59E0B;
-  --cyan: #06B6D4;
+  --bg-canvas: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-inset: #f1f5f9;
+  --border-light: #e2e8f0;
+  --border-dark: #cbd5e1;
+  --text-heading: #0f172a;
+  --text-body: #334155;
+  --text-muted: #64748b;
+  --brand-primary: #1e40af;
+  --brand-accent: #2563eb;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-base);
-  color: var(--text-main);
+  background-color: var(--bg-canvas);
+  color: var(--text-body);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -38,42 +36,43 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-base);
+  background: var(--bg-canvas);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
+  background: #cbd5e1;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #94a3b8;
 }
 
-/* Corporate Card Elevation */
-.corp-panel {
+/* Enterprise Card Elevation */
+.ent-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35), 0 2px 6px -1px rgba(0, 0, 0, 0.2);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.corp-panel:hover {
-  border-color: rgba(255, 255, 255, 0.12);
+.ent-card:hover {
+  border-color: var(--border-dark);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
-.corp-inset {
-  background: var(--bg-inset);
-  border: 1px solid var(--border-subtle);
+.ent-inset {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-light);
   border-radius: 8px;
 }
 
-/* Emil Kowalski Press Micro-Interaction */
-.btn-press {
-  transition: transform 0.08s ease, filter 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+/* Micro-interactions */
+.btn-action {
+  transition: all 0.1s ease;
 }
 
-.btn-press:active {
+.btn-action:active {
   transform: scale(0.98);
 }
