@@ -109,6 +109,13 @@ class TestDirectMLSidecar(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn("session_calls", data)
 
+    def test_root_serves_static_frontend(self):
+        """Verify root / endpoint serves the desktop frontend HTML."""
+        status, data = self._call_asgi("GET", "/")
+        self.assertEqual(status, 200)
+        raw_text = data.get("raw", "")
+        self.assertIn("InterviewIQ", raw_text)
+
     def test_directml_engine_hardware_reporting(self):
         """Verify DirectMLEngine returns well-formed hardware telemetry."""
         engine = get_directml_engine()

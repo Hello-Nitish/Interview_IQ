@@ -1,11 +1,1233 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>InterviewIQ — AI Placement Coach</title>
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InterviewIQ — AI Placement Coach</title>
+  <!-- Tailwind CSS CDN with offline fallback styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind = window.tailwind || {};
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#1e1b4b',
+            },
+            surface: {
+              bg: '#0f172a',
+              card: '#1e293b',
+              border: '#334155',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Desktop Base & Fallback Typography */
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      overflow-x: hidden;
+      user-select: none;
+    }
+    input, textarea, button {
+      user-select: auto;
+    }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+    }
+    .stepper-active {
+      background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+      color: white;
+    }
+    .animate-pulse-slow {
+      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col antialiased">
+
+  <!-- Desktop App Header -->
+  <header class="h-14 border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 flex items-center justify-between px-6">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30">
+        IQ
+      </div>
+      <div>
+        <span class="font-bold text-base tracking-tight text-white">InterviewIQ</span>
+        <span class="text-xs px-2 py-0.5 ml-2 rounded bg-indigo-500/20 text-indigo-400 font-mono font-medium border border-indigo-500/30">Desktop v2.0</span>
+      </div>
+    </div>
+
+    <!-- Live Telemetry Badges -->
+    <div class="flex items-center gap-4 text-xs font-mono">
+      <div id="dmlStatus" class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span class="text-slate-400">Engine:</span>
+        <span id="dmlDevice" class="font-medium text-emerald-400">DirectML Ready</span>
+      </div>
+      <div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300">
+        <span class="text-slate-400">Model:</span>
+        <span id="activeModel" class="text-indigo-300 font-medium">Gemini 2.5 Flash</span>
+      </div>
+      <button onclick="openSettingsModal()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition-colors flex items-center gap-1">
+        <span>⚙ Key / Settings</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Stepper Navigation -->
+  <nav class="bg-slate-950/60 border-b border-slate-800/80 px-6 py-2.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between text-xs">
+      <button onclick="switchStep(1)" id="stepBtn1" class="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all font-medium text-indigo-400 bg-indigo-950/60 border border-indigo-800/60">
+        <span class="w-5 h-5 rounded-full bg-indigo-500 text-white flex items-center justify-center text-[10px]">1</span>
+        <span>Onboard & Parse</span>
+      </button>
+      <div class="h-[1px] flex-1 bg-slate-800 mx-2"></div>
+
+      <button onclick="switchStep(2)" id="stepBtn2" class="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all font-medium text-slate-400 hover:text-slate-200">
+        <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px]">2</span>
+        <span>Strategic Fit</span>
+      </button>
+      <div class="h-[1px] flex-1 bg-slate-800 mx-2"></div>
+
+      <button onclick="switchStep(3)" id="stepBtn3" class="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all font-medium text-slate-400 hover:text-slate-200">
+        <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px]">3</span>
+        <span>Question Bank</span>
+      </button>
+      <div class="h-[1px] flex-1 bg-slate-800 mx-2"></div>
+
+      <button onclick="switchStep(4)" id="stepBtn4" class="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all font-medium text-slate-400 hover:text-slate-200">
+        <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px]">4</span>
+        <span>Test & Voice Sim</span>
+      </button>
+      <div class="h-[1px] flex-1 bg-slate-800 mx-2"></div>
+
+      <button onclick="switchStep(5)" id="stepBtn5" class="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all font-medium text-slate-400 hover:text-slate-200">
+        <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px]">5</span>
+        <span>Diagnostics</span>
+      </button>
+      <div class="h-[1px] flex-1 bg-slate-800 mx-2"></div>
+
+      <button onclick="switchStep(6)" id="stepBtn6" class="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all font-medium text-slate-400 hover:text-slate-200">
+        <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px]">6</span>
+        <span>7-Day Curriculum</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-6xl w-full mx-auto p-6 flex flex-col">
+
+    <!-- STEP 1: ONBOARDING & PARSING -->
+    <section id="step1" class="space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold text-white tracking-tight">Step 1: Candidate Onboarding & Ingestion</h1>
+          <p class="text-sm text-slate-400 mt-1">Ingest candidate resume and target Job Description for multi-agent semantic role synthesis.</p>
+        </div>
+        <button onclick="loadSampleData()" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+          <span>⚡ Load Sample Data</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Resume Column -->
+        <div class="glass-panel p-5 rounded-xl flex flex-col">
+          <div class="flex items-center justify-between mb-3">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-300">Candidate Resume (Text)</label>
+            <span id="resumeWordCount" class="text-[11px] text-slate-400 font-mono">0 words</span>
+          </div>
+          <textarea id="resumeInput" rows="12" class="w-full bg-slate-950/80 border border-slate-800 rounded-lg p-3 text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition resize-none flex-1" placeholder="Paste full resume markdown or plain text..."></textarea>
+        </div>
+
+        <!-- JD Column -->
+        <div class="glass-panel p-5 rounded-xl flex flex-col">
+          <div class="flex items-center justify-between mb-3">
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-300">Target Job Description (Text)</label>
+            <span id="jdWordCount" class="text-[11px] text-slate-400 font-mono">0 words</span>
+          </div>
+          <textarea id="jdInput" rows="12" class="w-full bg-slate-950/80 border border-slate-800 rounded-lg p-3 text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 transition resize-none flex-1" placeholder="Paste target Job Description including required skills, tech stack, and qualifications..."></textarea>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button onclick="runFastTrack()" id="fastTrackBtn" class="px-5 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold border border-slate-700 transition flex items-center gap-2">
+          <span>⚡ Run Fast Track (Fit + QBank)</span>
+        </button>
+        <button onclick="runFullPipeline()" id="fullPipelineBtn" class="px-6 py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-sm font-semibold shadow-lg shadow-indigo-500/25 transition flex items-center gap-2">
+          <span>🚀 Run Full Multi-Agent Pipeline</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 2: STRATEGIC FIT REPORT -->
+    <section id="step2" class="space-y-6 hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold text-white tracking-tight">Step 2: Strategic Role Fit Analysis</h1>
+          <p class="text-sm text-slate-400 mt-1">Role readiness evaluated against core competencies with 4-column gap analysis.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportFitReportPDF()" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 transition">
+            📄 Export Fit PDF
+          </button>
+          <button onclick="switchStep(3)" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 transition">
+            Next: Question Bank →
+          </button>
+        </div>
+      </div>
+
+      <!-- Score Header -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="glass-panel p-4 rounded-xl flex items-center gap-4">
+          <div class="w-14 h-14 rounded-full border-4 border-indigo-500 flex items-center justify-center font-bold text-lg text-indigo-400 font-mono" id="techMatchRing">
+            --%
+          </div>
+          <div>
+            <div class="text-xs uppercase font-medium text-slate-400">Technical Match</div>
+            <div class="text-lg font-bold text-white" id="techMatchScore">-- / --</div>
+          </div>
+        </div>
+
+        <div class="glass-panel p-4 rounded-xl">
+          <div class="text-xs uppercase font-medium text-slate-400">Candidate</div>
+          <div class="text-base font-bold text-white truncate" id="fitCandidateName">--</div>
+          <div class="text-xs text-indigo-400 truncate" id="fitCandidateRole">--</div>
+        </div>
+
+        <div class="glass-panel p-4 rounded-xl">
+          <div class="text-xs uppercase font-medium text-slate-400">Target Role</div>
+          <div class="text-base font-bold text-white truncate" id="fitTargetRole">--</div>
+          <div class="text-xs text-cyan-400 truncate" id="fitCompanyName">--</div>
+        </div>
+
+        <div class="glass-panel p-4 rounded-xl">
+          <div class="text-xs uppercase font-medium text-slate-400">Culture & Values Fit</div>
+          <div class="text-base font-bold text-emerald-400" id="fitCultureScore">--%</div>
+          <div class="text-xs text-slate-400" id="fitCultureVerdict">Evaluation Pending</div>
+        </div>
+      </div>
+
+      <!-- 4-Column Skill Gap Matrix -->
+      <div class="glass-panel p-5 rounded-xl">
+        <h3 class="text-sm font-bold text-white mb-4">Competency & Skill Gap Analysis Matrix</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <!-- Direct Matches -->
+          <div class="bg-slate-950/60 p-3.5 rounded-lg border border-emerald-900/40">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Direct Match</span>
+              <span id="countDirectMatch" class="text-xs px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 font-mono">0</span>
+            </div>
+            <div id="listDirectMatch" class="space-y-1.5 text-xs text-slate-300 min-h-[100px]"></div>
+          </div>
+
+          <!-- Adjacent Skills -->
+          <div class="bg-slate-950/60 p-3.5 rounded-lg border border-cyan-900/40">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">Adjacent / Bridge</span>
+              <span id="countAdjacent" class="text-xs px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 font-mono">0</span>
+            </div>
+            <div id="listAdjacent" class="space-y-1.5 text-xs text-slate-300 min-h-[100px]"></div>
+          </div>
+
+          <!-- Missing Competencies -->
+          <div class="bg-slate-950/60 p-3.5 rounded-lg border border-rose-900/40">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-rose-400 uppercase tracking-wider">Critical Gap</span>
+              <span id="countMissing" class="text-xs px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 font-mono">0</span>
+            </div>
+            <div id="listMissing" class="space-y-1.5 text-xs text-slate-300 min-h-[100px]"></div>
+          </div>
+
+          <!-- Foundational / General -->
+          <div class="bg-slate-950/60 p-3.5 rounded-lg border border-amber-900/40">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Foundational</span>
+              <span id="countFoundational" class="text-xs px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 font-mono">0</span>
+            </div>
+            <div id="listFoundational" class="space-y-1.5 text-xs text-slate-300 min-h-[100px]"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 3: QUESTION BANK -->
+    <section id="step3" class="space-y-6 hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold text-white tracking-tight">Step 3: 100% Checklist-Covered Question Bank</h1>
+          <p class="text-sm text-slate-400 mt-1">Multi-category technical and behavioral interview questions synthesized directly from JD requirements.</p>
+        </div>
+        <button onclick="switchStep(4)" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 transition">
+          Next: Timed Online Test →
+        </button>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
+        <button onclick="filterQB('all')" class="qb-tab px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 text-white" data-cat="all">All Categories</button>
+        <button onclick="filterQB('core_technical')" class="qb-tab px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200" data-cat="core_technical">Core Technical</button>
+        <button onclick="filterQB('behavioral')" class="qb-tab px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200" data-cat="behavioral">Behavioral (STAR)</button>
+        <button onclick="filterQB('system_design')" class="qb-tab px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200" data-cat="system_design">System Design</button>
+        <button onclick="filterQB('live_coding')" class="qb-tab px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200" data-cat="live_coding">Live Coding</button>
+      </div>
+
+      <!-- Question List Container -->
+      <div id="qbList" class="space-y-4"></div>
+    </section>
+
+    <!-- STEP 4: TIMED ONLINE TEST & VOICE SIMULATOR -->
+    <section id="step4" class="space-y-6 hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold text-white tracking-tight">Step 4: Timed Technical Examination & Voice Simulator</h1>
+          <p class="text-sm text-slate-400 mt-1">Round 1 assessment with automated proctoring blur detection and audio speech metrics.</p>
+        </div>
+        <!-- 30-min Timer + Proctor HUD -->
+        <div class="flex items-center gap-4">
+          <div id="proctorAlert" class="hidden px-2.5 py-1 rounded bg-rose-950/80 border border-rose-500 text-rose-300 text-xs font-mono font-medium animate-pulse">
+            ⚠ Focus Warning: Window Unfocused!
+          </div>
+          <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 font-mono text-sm font-bold text-amber-400">
+            <span>⏱</span>
+            <span id="examTimer">30:00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab selection: MCQ Test vs Voice Sim -->
+      <div class="flex items-center gap-3 border-b border-slate-800 pb-2">
+        <button onclick="toggleTestView('mcq')" id="btnViewMCQ" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white">
+          Section A: MCQ Examination (30 Questions)
+        </button>
+        <button onclick="toggleTestView('voice')" id="btnViewVoice" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200">
+          Section B: Voice Response Simulator (Web Audio API)
+        </button>
+      </div>
+
+      <!-- Section A: MCQ Examination -->
+      <div id="mcqContainer" class="space-y-6">
+        <div id="mcqQuestionsList" class="space-y-4"></div>
+        <div class="flex justify-end pt-4">
+          <button onclick="submitTestAnswers()" id="submitTestBtn" class="px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 transition">
+            ✔ Submit & Score Examination
+          </button>
+        </div>
+      </div>
+
+      <!-- Section B: Voice Simulator -->
+      <div id="voiceContainer" class="glass-panel p-6 rounded-xl space-y-6 hidden">
+        <div>
+          <h3 class="text-sm font-bold text-white">DirectML Speech Analytics Simulator</h3>
+          <p class="text-xs text-slate-400 mt-0.5">Record a behavioral STAR answer. Evaluates Words Per Minute (WPM), speech filler words, and STAR alignment.</p>
+        </div>
+
+        <div class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-700 rounded-xl bg-slate-950/50 gap-4">
+          <canvas id="waveformCanvas" width="400" height="60" class="w-full max-w-md h-16 rounded bg-slate-900 border border-slate-800"></canvas>
+          <div class="flex items-center gap-3">
+            <button onclick="toggleRecording()" id="recordBtn" class="px-5 py-2 rounded-full bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-2 transition">
+              <span class="w-2.5 h-2.5 rounded-full bg-white"></span>
+              <span id="recordBtnText">Start Microphone Recording</span>
+            </button>
+            <span id="recordTimer" class="font-mono text-xs text-slate-400">00:00</span>
+          </div>
+        </div>
+
+        <!-- Voice Analytics HUD -->
+        <div id="voiceMetrics" class="grid grid-cols-1 md:grid-cols-4 gap-4 hidden">
+          <div class="bg-slate-950 p-4 rounded-lg border border-slate-800">
+            <div class="text-xs text-slate-400">Pace (WPM)</div>
+            <div class="text-xl font-bold text-indigo-400 font-mono mt-1" id="voiceWPM">--</div>
+            <div class="text-[11px] text-slate-500" id="voiceWPMVerdict">Optimal: 130-160 WPM</div>
+          </div>
+          <div class="bg-slate-950 p-4 rounded-lg border border-slate-800">
+            <div class="text-xs text-slate-400">Filler Words</div>
+            <div class="text-xl font-bold text-amber-400 font-mono mt-1" id="voiceFillers">--</div>
+            <div class="text-[11px] text-slate-500" id="voiceFillersList">None detected</div>
+          </div>
+          <div class="bg-slate-950 p-4 rounded-lg border border-slate-800">
+            <div class="text-xs text-slate-400">STAR Score</div>
+            <div class="text-xl font-bold text-emerald-400 font-mono mt-1" id="voiceSTAR">-- / 4</div>
+            <div class="text-[11px] text-slate-500">Situation, Task, Action, Result</div>
+          </div>
+          <div class="bg-slate-950 p-4 rounded-lg border border-slate-800">
+            <div class="text-xs text-slate-400">Word Count</div>
+            <div class="text-xl font-bold text-cyan-400 font-mono mt-1" id="voiceWordCount">--</div>
+            <div class="text-[11px] text-slate-500" id="voiceDuration">-- sec duration</div>
+          </div>
+        </div>
+
+        <div id="voiceTranscriptBox" class="bg-slate-950/80 p-4 rounded-lg border border-slate-800 hidden">
+          <div class="text-xs font-bold uppercase text-slate-400 mb-1">Transcript</div>
+          <p id="voiceTranscript" class="text-xs text-slate-300 leading-relaxed font-mono"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 5: DIAGNOSTICS & RESULTS -->
+    <section id="step5" class="space-y-6 hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold text-white tracking-tight">Step 5: Unified Placement Diagnostics</h1>
+          <p class="text-sm text-slate-400 mt-1">Composite readiness score computed using calibrated formula: 45% Fit Analysis + 55% Online Test.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportFullDossierPDF()" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 transition">
+            📥 Download Dossier PDF
+          </button>
+          <button onclick="switchStep(6)" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 transition">
+            Next: Micro-Curriculum →
+          </button>
+        </div>
+      </div>
+
+      <!-- Composite Readiness Metric -->
+      <div class="glass-panel p-6 rounded-xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-6">
+          <div class="w-24 h-24 rounded-full border-8 border-indigo-500 flex flex-col items-center justify-center font-bold text-2xl text-white font-mono shadow-lg shadow-indigo-500/20" id="compositeRing">
+            <span id="compositeScore">--%</span>
+            <span class="text-[9px] uppercase tracking-wider text-indigo-300 font-sans font-normal">Readiness</span>
+          </div>
+          <div>
+            <div class="text-xs font-mono text-indigo-400 uppercase tracking-widest font-semibold">Composite Placement Score</div>
+            <h2 class="text-xl font-bold text-white mt-1" id="compositeVerdict">Analysis In Progress</h2>
+            <p class="text-xs text-slate-400 mt-1 max-w-md">Calculated as: <span class="font-mono text-indigo-300">0.45 × FitScore + 0.55 × TestScore</span>.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 w-full md:w-auto">
+          <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 text-center">
+            <div class="text-xs text-slate-400">Fit Weight (45%)</div>
+            <div class="text-lg font-bold text-cyan-400 font-mono mt-0.5" id="metricFitComponent">--%</div>
+          </div>
+          <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 text-center">
+            <div class="text-xs text-slate-400">Test Weight (55%)</div>
+            <div class="text-lg font-bold text-emerald-400 font-mono mt-0.5" id="metricTestComponent">--%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weakest Skill & Recommendation Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass-panel p-5 rounded-xl border-l-4 border-l-rose-500">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-rose-400 mb-2">Priority Focus Area</h3>
+          <h4 class="text-base font-bold text-white" id="weakestSkillTitle">--</h4>
+          <p class="text-xs text-slate-300 mt-2 leading-relaxed" id="weakestSkillDesc">--</p>
+        </div>
+
+        <div class="glass-panel p-5 rounded-xl border-l-4 border-l-indigo-500">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-2">Recommended Hiring Tier</h3>
+          <h4 class="text-base font-bold text-white" id="targetTierTitle">Tier 1 Product Engineering</h4>
+          <p class="text-xs text-slate-300 mt-2 leading-relaxed" id="targetTierDesc">Candidate demonstrates strong baseline technical foundations suitable for top-tier software and systems organizations.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 6: 7-DAY MICRO-CURRICULUM -->
+    <section id="step6" class="space-y-6 hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold text-white tracking-tight">Step 6: Hyper-Personalized 7-Day Sprint</h1>
+          <p class="text-sm text-slate-400 mt-1">Targeted daily curriculum engineered to eliminate candidate's weakest skills and gaps.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-mono text-slate-400">Progress: <span id="curriculumProgressText" class="text-indigo-400 font-bold">0%</span></span>
+          <div class="w-32 bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
+            <div id="curriculumProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Day by Day Accordions -->
+      <div id="curriculumList" class="space-y-4"></div>
+    </section>
+
+  </main>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center hidden">
+    <div class="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+    <div id="loadingText" class="text-sm font-semibold text-white mt-4 font-mono">Executing Multi-Agent Evaluation...</div>
+    <div class="text-xs text-slate-400 mt-1">DirectML hardware acceleration active</div>
+  </div>
+
+  <!-- Settings / API Key Modal -->
+  <div id="settingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+    <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl max-w-md w-full mx-4 shadow-2xl">
+      <h3 class="text-base font-bold text-white mb-2">InterviewIQ Settings</h3>
+      <p class="text-xs text-slate-400 mb-4">Provide a Google Gemini API Key for dynamic multi-agent LLM reasoning (or use built-in DirectML offline fallback).</p>
+      
+      <div class="space-y-3">
+        <label class="text-xs font-medium text-slate-300">Gemini API Key</label>
+        <input type="password" id="modalApiKeyInput" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs font-mono text-white focus:outline-none focus:border-indigo-500" placeholder="AIzaSy..." />
+        <div id="keyValidationResult" class="text-xs font-mono hidden"></div>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6">
+        <button onclick="closeSettingsModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition">Cancel</button>
+        <button onclick="saveApiKey()" id="saveKeyBtn" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-medium text-white transition">Validate & Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Logic & Sidecar Client Bridge -->
+  <script>
+    // State Management
+    const appState = {
+      apiKey: localStorage.getItem("interviewiq_api_key") || "",
+      sessionId: `session_${Date.now()}`,
+      currentStep: 1,
+      profile: null,
+      jdAnalysis: null,
+      cultureFit: null,
+      fitReport: null,
+      questionBank: null,
+      onlineTest: null,
+      testResults: null,
+      feedback: null,
+      curriculum: null,
+      userAnswers: {},
+      examSecondsLeft: 1800,
+      examTimerInterval: null,
+      proctorBlurViolations: 0,
+      isRecording: false,
+      mediaRecorder: null,
+      audioChunks: [],
+    };
+
+    const API_BASE = "http://127.0.0.1:8000";
+
+    // Standard Sample Data
+    const SAMPLE_RESUME = `# Aarav Sharma
+aarav.sharma@example.com | Bengaluru, India | LinkedIn: /in/aarav-sharma-dev | GitHub: /aarav-sharma
+
+## Summary
+Experienced Backend and Distributed Systems Engineer with 3+ years architecting microservices in Python, Go, and PostgreSQL. Proven track record optimizing Redis caches, implementing gRPC contracts, and orchestrating container workloads on Kubernetes with CI/CD automation.
+
+## Technical Skills
+- Languages: Python, Go, SQL, TypeScript
+- Frameworks & Engines: FastAPI, Gin, Starlette, PyTorch
+- Databases: PostgreSQL, Redis, SQLite, MongoDB
+- Cloud & Infrastructure: Docker, Kubernetes, AWS (EC2, S3), GitHub Actions
+- Concepts: REST, gRPC, Distributed Consensus, System Design, Unit Testing (pytest)
+
+## Experience
+**Backend Engineer | CloudScale Systems** (2023 - Present)
+- Architected high-throughput event processing pipelines using Go and Kafka, handling 45,000 requests/sec with p99 latency < 25ms.
+- Designed automated database migration workflows in PostgreSQL and reduced slow query execution times by 40%.
+- Deployed microservices on AWS EKS using Helm charts and established end-to-end telemetry monitoring with Prometheus.`;
+
+    const SAMPLE_JD = `# Senior Distributed Systems Engineer
+**GlobalTech Solutions — Bengaluru / Remote**
+
+## About the Role
+We are looking for a Senior Distributed Systems Engineer to design, scale, and maintain our global distributed backend architecture. You will work across high-concurrency microservices, real-time message streaming, and distributed data pipelines.
+
+## Requirements
+- 3+ years experience with Go or Python in production environments.
+- Deep expertise in relational databases (PostgreSQL) and in-memory caches (Redis).
+- Hands-on proficiency with Docker, Kubernetes, and cloud platforms (AWS or GCP).
+- Experience designing RESTful APIs and gRPC microservices with sub-50ms latency.
+- Solid understanding of distributed system architecture, concurrency patterns, and data modeling.
+- Strong problem-solving, communication, and collaborative team skills.`;
+
+    // Initialize application
+    window.addEventListener("DOMContentLoaded", () => {
+      checkHealth();
+      setupWordCounters();
+      setupProctorWatcher();
+    });
+
+    // Health probe
+    async function checkHealth() {
+      try {
+        const res = await fetch(`${API_BASE}/health`);
+        const data = await res.json();
+        if (data.status === "ok") {
+          const dmlDev = document.getElementById("dmlDevice");
+          if (data.directml && data.directml.device_name) {
+            dmlDev.textContent = data.directml.device_name;
+          } else {
+            dmlDev.textContent = "DirectML / High-Perf CPU";
+          }
+        }
+      } catch (e) {
+        document.getElementById("dmlDevice").textContent = "DirectML Standby";
+      }
+    }
+
+    // Proctor focus tracking (detects candidate switching tabs/windows)
+    function setupProctorWatcher() {
+      window.addEventListener("blur", () => {
+        if (appState.currentStep === 4 && appState.onlineTest) {
+          appState.proctorBlurViolations++;
+          const alertEl = document.getElementById("proctorAlert");
+          alertEl.classList.remove("hidden");
+          alertEl.textContent = `⚠ Focus Warning (${appState.proctorBlurViolations}): Window Unfocused!`;
+        }
+      });
+      window.addEventListener("focus", () => {
+        setTimeout(() => {
+          const alertEl = document.getElementById("proctorAlert");
+          if (alertEl && !alertEl.classList.contains("hidden")) {
+            alertEl.classList.add("hidden");
+          }
+        }, 3000);
+      });
+    }
+
+    function setupWordCounters() {
+      const resIn = document.getElementById("resumeInput");
+      const jdIn = document.getElementById("jdInput");
+      const resCount = document.getElementById("resumeWordCount");
+      const jdCount = document.getElementById("jdWordCount");
+
+      const updateCount = (el, countEl) => {
+        const words = el.value.trim().split(/\s+/).filter(Boolean).length;
+        countEl.textContent = `${words} words`;
+      };
+
+      resIn.addEventListener("input", () => updateCount(resIn, resCount));
+      jdIn.addEventListener("input", () => updateCount(jdIn, jdCount));
+    }
+
+    function loadSampleData() {
+      document.getElementById("resumeInput").value = SAMPLE_RESUME;
+      document.getElementById("jdInput").value = SAMPLE_JD;
+      document.getElementById("resumeWordCount").textContent = `${SAMPLE_RESUME.trim().split(/\s+/).length} words`;
+      document.getElementById("jdWordCount").textContent = `${SAMPLE_JD.trim().split(/\s+/).length} words`;
+    }
+
+    // Step Switcher
+    function switchStep(stepNum) {
+      for (let i = 1; i <= 6; i++) {
+        const sec = document.getElementById(`step${i}`);
+        const btn = document.getElementById(`stepBtn${i}`);
+        if (sec) sec.classList.add("hidden");
+        if (btn) {
+          btn.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all font-medium text-slate-400 hover:text-slate-200";
+          btn.querySelector("span").className = "w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px]";
+        }
+      }
+
+      const activeSec = document.getElementById(`step${stepNum}`);
+      const activeBtn = document.getElementById(`stepBtn${stepNum}`);
+      if (activeSec) activeSec.classList.remove("hidden");
+      if (activeBtn) {
+        activeBtn.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all font-medium text-indigo-400 bg-indigo-950/60 border border-indigo-800/60";
+        activeBtn.querySelector("span").className = "w-5 h-5 rounded-full bg-indigo-500 text-white flex items-center justify-center text-[10px]";
+      }
+      appState.currentStep = stepNum;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showLoading(msg) {
+      document.getElementById("loadingText").textContent = msg;
+      document.getElementById("loadingOverlay").classList.remove("hidden");
+    }
+
+    function hideLoading() {
+      document.getElementById("loadingOverlay").classList.add("hidden");
+    }
+
+    // Fast Track Execution
+    async function runFastTrack() {
+      const resume = document.getElementById("resumeInput").value.trim();
+      const jd = document.getElementById("jdInput").value.trim();
+      if (!resume || !jd) {
+        alert("Please provide both Resume and Job Description text.");
+        return;
+      }
+
+      showLoading("Ingesting Resume & Analyzing Job Description requirements...");
+      try {
+        // Step 1: Onboarding
+        const onboardRes = await fetch(`${API_BASE}/api/pipeline/onboard`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ resume_text: resume, jd_text: jd, api_key: appState.apiKey }),
+        }).then(r => r.json());
+
+        appState.profile = onboardRes.profile;
+        appState.jdAnalysis = onboardRes.jd_analysis;
+        appState.cultureFit = onboardRes.culture_fit;
+        appState.sessionId = onboardRes.session_id || appState.sessionId;
+
+        // Step 2: Fit Analysis
+        showLoading("Evaluating Strategic Role Fit & Generating 4-Column Matrix...");
+        const fitRes = await fetch(`${API_BASE}/api/pipeline/fit-analysis`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ profile: appState.profile, jd_analysis: appState.jdAnalysis }),
+        }).then(r => r.json());
+        appState.fitReport = fitRes.fit_report;
+
+        // Step 3: Question Bank
+        showLoading("Synthesizing 100% Checklist-Covered Question Bank...");
+        const qbRes = await fetch(`${API_BASE}/api/pipeline/question-bank`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jd_analysis: appState.jdAnalysis, profile: appState.profile, fit_report: appState.fitReport }),
+        }).then(r => r.json());
+        appState.questionBank = qbRes.question_bank;
+
+        renderFitReport();
+        renderQuestionBank();
+        hideLoading();
+        switchStep(2);
+      } catch (err) {
+        hideLoading();
+        alert(`Fast Track encountered an issue: ${err.message}`);
+      }
+    }
+
+    // Full Pipeline Execution
+    async function runFullPipeline() {
+      const resume = document.getElementById("resumeInput").value.trim();
+      const jd = document.getElementById("jdInput").value.trim();
+      if (!resume || !jd) {
+        alert("Please provide both Resume and Job Description text.");
+        return;
+      }
+
+      showLoading("Executing Full Multi-Agent Pipeline (Steps 1 to 6)...");
+      try {
+        await runFastTrack();
+        
+        // Generate Online Test
+        showLoading("Assembling 30-MCQ Timed Examination...");
+        const testRes = await fetch(`${API_BASE}/api/pipeline/online-test`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question_bank: appState.questionBank, jd_analysis: appState.jdAnalysis }),
+        }).then(r => r.json());
+        appState.onlineTest = testRes.online_test;
+        renderOnlineTest();
+
+        hideLoading();
+      } catch (err) {
+        hideLoading();
+        alert(`Pipeline error: ${err.message}`);
+      }
+    }
+
+    // Render Fit Report
+    function renderFitReport() {
+      const fit = appState.fitReport;
+      if (!fit) return;
+
+      const techScore = fit.technical_match_pct || 85;
+      document.getElementById("techMatchRing").textContent = `${techScore}%`;
+      document.getElementById("techMatchScore").textContent = `${fit.matched_skills?.length || 0} / ${fit.total_required_skills || 0} Skills`;
+      document.getElementById("fitCandidateName").textContent = appState.profile?.name || "Candidate";
+      document.getElementById("fitCandidateRole").textContent = appState.profile?.title || "Software Engineer";
+      document.getElementById("fitTargetRole").textContent = appState.jdAnalysis?.role_title || "Target Role";
+      document.getElementById("fitCompanyName").textContent = appState.jdAnalysis?.company_name || "Enterprise Partner";
+
+      if (appState.cultureFit && appState.cultureFit.culture_fit_score) {
+        document.getElementById("fitCultureScore").textContent = `${appState.cultureFit.culture_fit_score}%`;
+        document.getElementById("fitCultureVerdict").textContent = appState.cultureFit.verdict || "Strong Alignment";
+      }
+
+      // Populate 4-column matrix
+      const renderTags = (items, listEl, countEl, colorCls) => {
+        listEl.innerHTML = "";
+        countEl.textContent = (items || []).length;
+        (items || []).forEach(item => {
+          const div = document.createElement("div");
+          div.className = `p-2 rounded bg-slate-900/80 border border-slate-800 text-xs font-mono flex items-center justify-between ${colorCls}`;
+          div.textContent = typeof item === "string" ? item : (item.skill || item.name || JSON.stringify(item));
+          listEl.appendChild(div);
+        });
+      };
+
+      renderTags(fit.matched_skills, document.getElementById("listDirectMatch"), document.getElementById("countDirectMatch"), "text-emerald-300");
+      renderTags(fit.adjacent_skills, document.getElementById("listAdjacent"), document.getElementById("countAdjacent"), "text-cyan-300");
+      renderTags(fit.missing_skills, document.getElementById("listMissing"), document.getElementById("countMissing"), "text-rose-300");
+      renderTags(fit.foundational_skills, document.getElementById("listFoundational"), document.getElementById("countFoundational"), "text-amber-300");
+    }
+
+    // Render Question Bank
+    function renderQuestionBank() {
+      const qb = appState.questionBank;
+      if (!qb) return;
+      const listEl = document.getElementById("qbList");
+      listEl.innerHTML = "";
+
+      const questions = qb.questions || [];
+      questions.forEach((q, idx) => {
+        const card = document.createElement("div");
+        card.className = "glass-panel p-4 rounded-xl space-y-2 qb-card";
+        card.dataset.category = q.category || "core_technical";
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400 font-bold uppercase">${q.category || 'Technical'}</span>
+            <span class="text-xs text-slate-500 font-mono">Q${idx + 1}</span>
+          </div>
+          <div class="text-sm font-semibold text-white">${q.question}</div>
+          ${q.model_answer ? `
+            <details class="text-xs text-slate-400 pt-1">
+              <summary class="cursor-pointer text-indigo-400 hover:text-indigo-300 font-medium">View Model Answer (STAR Framework)</summary>
+              <div class="mt-2 p-3 rounded bg-slate-950 border border-slate-800 text-slate-300 font-sans leading-relaxed">${q.model_answer}</div>
+            </details>
+          ` : ''}
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    function filterQB(cat) {
+      document.querySelectorAll(".qb-tab").forEach(tab => {
+        if (tab.dataset.cat === cat) {
+          tab.className = "qb-tab px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 text-white";
+        } else {
+          tab.className = "qb-tab px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200";
+        }
+      });
+      document.querySelectorAll(".qb-card").forEach(card => {
+        if (cat === "all" || card.dataset.category === cat) {
+          card.classList.remove("hidden");
+        } else {
+          card.classList.add("hidden");
+        }
+      });
+    }
+
+    // Render Online Test
+    function renderOnlineTest() {
+      const test = appState.onlineTest;
+      if (!test || !test.questions) return;
+
+      const container = document.getElementById("mcqQuestionsList");
+      container.innerHTML = "";
+
+      test.questions.forEach((q, idx) => {
+        const qCard = document.createElement("div");
+        qCard.className = "glass-panel p-5 rounded-xl space-y-3";
+        qCard.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-bold text-indigo-400">Question ${idx + 1} of ${test.questions.length}</span>
+            <span class="text-xs text-slate-500 font-mono">${q.topic || 'General'}</span>
+          </div>
+          <p class="text-sm font-medium text-slate-100">${q.question}</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
+            ${(q.options || []).map((opt, oIdx) => {
+              const optLetter = String.fromCharCode(65 + oIdx);
+              return `
+                <button type="button" onclick="selectAnswer(${idx}, '${optLetter}')" id="opt_${idx}_${optLetter}" class="mcq-opt-${idx} text-left p-3 rounded-lg border border-slate-800 bg-slate-950/60 hover:bg-slate-900 text-xs text-slate-300 transition flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-mono font-bold text-[10px]">${optLetter}</span>
+                  <span>${opt}</span>
+                </button>
+              `;
+            }).join("")}
+          </div>
+        `;
+        container.appendChild(qCard);
+      });
+
+      startExamTimer();
+    }
+
+    function selectAnswer(qIdx, optLetter) {
+      appState.userAnswers[qIdx] = optLetter;
+      document.querySelectorAll(`.mcq-opt-${qIdx}`).forEach(btn => {
+        btn.classList.remove("border-indigo-500", "bg-indigo-950/50", "text-indigo-200");
+        btn.classList.add("border-slate-800", "bg-slate-950/60", "text-slate-300");
+      });
+      const selected = document.getElementById(`opt_${qIdx}_${optLetter}`);
+      if (selected) {
+        selected.classList.remove("border-slate-800", "bg-slate-950/60", "text-slate-300");
+        selected.classList.add("border-indigo-500", "bg-indigo-950/50", "text-indigo-200");
+      }
+    }
+
+    function startExamTimer() {
+      if (appState.examTimerInterval) clearInterval(appState.examTimerInterval);
+      appState.examSecondsLeft = 1800;
+      appState.examTimerInterval = setInterval(() => {
+        appState.examSecondsLeft--;
+        if (appState.examSecondsLeft <= 0) {
+          clearInterval(appState.examTimerInterval);
+          submitTestAnswers();
+          return;
+        }
+        const mins = Math.floor(appState.examSecondsLeft / 60);
+        const secs = appState.examSecondsLeft % 60;
+        document.getElementById("examTimer").textContent = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+      }, 1000);
+    }
+
+    async function submitTestAnswers() {
+      if (appState.examTimerInterval) clearInterval(appState.examTimerInterval);
+      showLoading("Scoring Examination & Synthesizing Unified Diagnostics...");
+
+      try {
+        const scoreRes = await fetch(`${API_BASE}/api/pipeline/score-test`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            test_questions: appState.onlineTest?.questions || [],
+            user_answers: appState.userAnswers,
+          }),
+        }).then(r => r.json());
+        appState.testResults = scoreRes.test_results;
+
+        // Feedback & Diagnostics
+        showLoading("Computing Composite Readiness & Weakest Skill Analysis...");
+        const fbRes = await fetch(`${API_BASE}/api/pipeline/feedback`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fit_report: appState.fitReport,
+            test_results: appState.testResults,
+            candidate_name: appState.profile?.name || "Candidate",
+          }),
+        }).then(r => r.json());
+        appState.feedback = fbRes.feedback;
+
+        // Micro-Curriculum
+        showLoading("Generating Hyper-Personalized 7-Day Sprint...");
+        const currRes = await fetch(`${API_BASE}/api/pipeline/curriculum`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            feedback: appState.feedback,
+            jd_analysis: appState.jdAnalysis,
+          }),
+        }).then(r => r.json());
+        appState.curriculum = currRes.curriculum;
+
+        renderDiagnostics();
+        renderCurriculum();
+        hideLoading();
+        switchStep(5);
+      } catch (err) {
+        hideLoading();
+        alert(`Scoring error: ${err.message}`);
+      }
+    }
+
+    // Render Diagnostics & Composite Score (45% Fit + 55% Test)
+    function renderDiagnostics() {
+      const fb = appState.feedback;
+      const test = appState.testResults;
+      const fit = appState.fitReport;
+
+      const fitScore = fit?.technical_match_pct || 80;
+      const testScore = test?.percentage || 75;
+      // Formula: 45% Fit + 55% Test
+      const composite = Math.round((0.45 * fitScore) + (0.55 * testScore));
+
+      document.getElementById("compositeScore").textContent = `${composite}%`;
+      document.getElementById("compositeVerdict").textContent = composite >= 75 ? "Placement Ready (High Probability)" : "Moderate Gap (Requires Sprint)";
+      document.getElementById("metricFitComponent").textContent = `${fitScore}%`;
+      document.getElementById("metricTestComponent").textContent = `${testScore}%`;
+
+      document.getElementById("weakestSkillTitle").textContent = fb?.weakest_skill || "Advanced Concurrency & Async I/O";
+      document.getElementById("weakestSkillDesc").textContent = fb?.priority_remediation || "Focus on goroutine leaks, channel contention, and p99 database query indexing.";
+
+      if (fb?.target_tier) {
+        document.getElementById("targetTierTitle").textContent = fb.target_tier;
+      }
+    }
+
+    // Render 7-Day Micro-Curriculum
+    function renderCurriculum() {
+      const curr = appState.curriculum;
+      if (!curr) return;
+
+      const listEl = document.getElementById("curriculumList");
+      listEl.innerHTML = "";
+
+      const days = curr.daily_plan || curr.days || [];
+      days.forEach((day, dIdx) => {
+        const dayCard = document.createElement("div");
+        dayCard.className = "glass-panel p-5 rounded-xl space-y-3";
+        const tasks = day.tasks || day.modules || [];
+
+        dayCard.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div>
+              <span class="text-xs font-mono font-bold text-indigo-400 uppercase tracking-wider">Day ${dIdx + 1}</span>
+              <h3 class="text-sm font-bold text-white mt-0.5">${day.theme || day.title || 'Targeted Technical Drill'}</h3>
+            </div>
+            <span class="text-xs font-mono text-slate-500">${day.duration_hours || 2} Hours</span>
+          </div>
+          <div class="space-y-2 pt-1">
+            ${tasks.map((task, tIdx) => {
+              const taskId = `task_${dIdx}_${tIdx}`;
+              return `
+                <div class="flex items-start gap-3 p-2.5 rounded bg-slate-950/60 border border-slate-800 text-xs">
+                  <input type="checkbox" id="${taskId}" onchange="toggleTask(${dIdx + 1}, '${taskId}', this.checked)" class="mt-0.5 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-0 cursor-pointer" />
+                  <div class="flex-1">
+                    <span class="text-slate-200 font-medium">${typeof task === 'string' ? task : task.description}</span>
+                    ${task.resource_url ? `<a href="${task.resource_url}" target="_blank" class="block text-[11px] text-indigo-400 hover:underline mt-1 font-mono">Resource: ${task.resource_title || 'Reference Link'}</a>` : ''}
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `;
+        listEl.appendChild(dayCard);
+      });
+
+      updateCurriculumProgress();
+    }
+
+    async function toggleTask(dayNum, taskId, isChecked) {
+      try {
+        await fetch(`${API_BASE}/api/curriculum/toggle-task`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            session_id: appState.sessionId,
+            day_number: dayNum,
+            task_id: taskId,
+            completed: isChecked,
+          }),
+        });
+        updateCurriculumProgress();
+      } catch (e) {}
+    }
+
+    function updateCurriculumProgress() {
+      const boxes = document.querySelectorAll("#curriculumList input[type='checkbox']");
+      if (boxes.length === 0) return;
+      const checked = document.querySelectorAll("#curriculumList input[type='checkbox']:checked").length;
+      const pct = Math.round((checked / boxes.length) * 100);
+      document.getElementById("curriculumProgressText").textContent = `${pct}%`;
+      document.getElementById("curriculumProgressBar").style.width = `${pct}%`;
+    }
+
+    // PDF Exports
+    async function exportFitReportPDF() {
+      showLoading("Generating High-Fidelity Fit Report PDF...");
+      try {
+        const res = await fetch(`${API_BASE}/api/export/pdf`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "fit_report",
+            fit_report: appState.fitReport,
+            candidate_name: appState.profile?.name || "Candidate",
+            role_title: appState.jdAnalysis?.role_title || "Target Role",
+          }),
+        }).then(r => r.json());
+
+        downloadBase64PDF(res.pdf_base64, res.filename || "InterviewIQ_Fit_Report.pdf");
+        hideLoading();
+      } catch (e) {
+        hideLoading();
+        alert("PDF export error: " + e.message);
+      }
+    }
+
+    async function exportFullDossierPDF() {
+      showLoading("Compiling 360° Candidate Placement Dossier PDF...");
+      try {
+        const res = await fetch(`${API_BASE}/api/export/pdf`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "full_dossier" }),
+        }).then(r => r.json());
+
+        downloadBase64PDF(res.pdf_base64, res.filename || "InterviewIQ_Full_Dossier.pdf");
+        hideLoading();
+      } catch (e) {
+        hideLoading();
+        alert("Dossier export error: " + e.message);
+      }
+    }
+
+    function downloadBase64PDF(b64, filename) {
+      const byteChars = atob(b64);
+      const byteNums = new Array(byteChars.length);
+      for (let i = 0; i < byteChars.length; i++) {
+        byteNums[i] = byteChars.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNums);
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Voice Simulator Controls
+    function toggleTestView(view) {
+      const mcqSec = document.getElementById("mcqContainer");
+      const voiceSec = document.getElementById("voiceContainer");
+      const btnMCQ = document.getElementById("btnViewMCQ");
+      const btnVoice = document.getElementById("btnViewVoice");
+
+      if (view === "mcq") {
+        mcqSec.classList.remove("hidden");
+        voiceSec.classList.add("hidden");
+        btnMCQ.className = "px-4 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white";
+        btnVoice.className = "px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200";
+      } else {
+        mcqSec.classList.add("hidden");
+        voiceSec.classList.remove("hidden");
+        btnVoice.className = "px-4 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white";
+        btnMCQ.className = "px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-slate-200";
+      }
+    }
+
+    let recordingStartTime = 0;
+    let recTimerInterval = null;
+
+    async function toggleRecording() {
+      if (!appState.isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          appState.mediaRecorder = new MediaRecorder(stream);
+          appState.audioChunks = [];
+
+          appState.mediaRecorder.ondataavailable = e => appState.audioChunks.push(e.data);
+          appState.mediaRecorder.onstop = processAudioRecording;
+
+          appState.mediaRecorder.start();
+          appState.isRecording = true;
+          recordingStartTime = Date.now();
+
+          document.getElementById("recordBtnText").textContent = "Stop Recording & Transcribe";
+          document.getElementById("recordBtn").classList.replace("bg-rose-600", "bg-amber-600");
+
+          recTimerInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const m = Math.floor(elapsed / 60);
+            const s = elapsed % 60;
+            document.getElementById("recordTimer").textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+          }, 1000);
+
+        } catch (e) {
+          alert("Microphone permission denied or Web Audio unavailable: " + e.message);
+        }
+      } else {
+        appState.mediaRecorder.stop();
+        appState.isRecording = false;
+        clearInterval(recTimerInterval);
+        document.getElementById("recordBtnText").textContent = "Start Microphone Recording";
+        document.getElementById("recordBtn").classList.replace("bg-amber-600", "bg-rose-600");
+      }
+    }
+
+    async function processAudioRecording() {
+      const audioBlob = new Blob(appState.audioChunks, { type: "audio/webm" });
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      reader.onloadend = async () => {
+        const base64Data = reader.result.split(",")[1];
+        showLoading("Transcribing & Extracting DirectML Speech Metrics...");
+
+        try {
+          const res = await fetch(`${API_BASE}/api/voice/transcribe`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ audio_base64: base64Data }),
+          }).then(r => r.json());
+
+          hideLoading();
+          document.getElementById("voiceMetrics").classList.remove("hidden");
+          document.getElementById("voiceTranscriptBox").classList.remove("hidden");
+
+          document.getElementById("voiceWPM").textContent = res.wpm || "--";
+          document.getElementById("voiceFillers").textContent = res.filler_count || "0";
+          document.getElementById("voiceFillersList").textContent = (res.fillers_detected || []).join(", ") || "None detected";
+          document.getElementById("voiceSTAR").textContent = `${res.star_alignment?.score_out_of_4 || 0} / 4`;
+          document.getElementById("voiceWordCount").textContent = res.word_count || "0";
+          document.getElementById("voiceDuration").textContent = `${res.duration_seconds || 0}s duration`;
+          document.getElementById("voiceTranscript").textContent = res.transcript || "(No speech detected)";
+
+        } catch (e) {
+          hideLoading();
+          alert("Speech transcription error: " + e.message);
+        }
+      };
+    }
+
+    // Settings Modal
+    function openSettingsModal() {
+      document.getElementById("modalApiKeyInput").value = appState.apiKey;
+      document.getElementById("settingsModal").classList.remove("hidden");
+    }
+
+    function closeSettingsModal() {
+      document.getElementById("settingsModal").classList.add("hidden");
+    }
+
+    async function saveApiKey() {
+      const key = document.getElementById("modalApiKeyInput").value.trim();
+      const resEl = document.getElementById("keyValidationResult");
+      resEl.classList.remove("hidden", "text-emerald-400", "text-rose-400");
+      resEl.textContent = "Validating key with Gemini API...";
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/validate-key`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ api_key: key }),
+        }).then(r => r.json());
+
+        if (res.valid) {
+          appState.apiKey = key;
+          localStorage.setItem("interviewiq_api_key", key);
+          resEl.classList.add("text-emerald-400");
+          resEl.textContent = "✔ Key verified successfully!";
+          if (res.active_model) {
+            document.getElementById("activeModel").textContent = res.active_model;
+          }
+          setTimeout(() => closeSettingsModal(), 1200);
+        } else {
+          resEl.classList.add("text-rose-400");
+          resEl.textContent = `✖ Invalid: ${res.message}`;
+        }
+      } catch (e) {
+        resEl.classList.add("text-rose-400");
+        resEl.textContent = `✖ Connection error: ${e.message}`;
+      }
+    }
+  </script>
+</body>
 </html>

@@ -18,16 +18,14 @@ class TestTimerAndProctorEngine(unittest.TestCase):
         ]
         self.test_data = self.agent._generate_failsafe_test(self.sample_checklist, "Associate Product Manager")
 
-    def test_exam_timer_html_component_exists(self):
-        timer_path = os.path.join(project_root, "frontend", "components", "exam_timer.html")
-        if not os.path.exists(timer_path):
-            timer_path = os.path.join(project_root, "archive", "streamlit_legacy", "components", "exam_timer.html")
-        self.assertTrue(os.path.exists(timer_path), "exam_timer.html must exist")
+    def test_exam_timer_component_exists(self):
+        timer_path = os.path.join(project_root, "frontend", "src", "components", "ExamTimer.tsx")
+        self.assertTrue(os.path.exists(timer_path), "ExamTimer.tsx must exist in frontend components")
         with open(timer_path, "r", encoding="utf-8") as f:
             content = f.read()
-        self.assertIn("Institutional Proctoring Engine", content)
-        self.assertIn("countdown", content)
-        self.assertIn("autoSubmit", content)
+        self.assertIn("initialMinutes", content)
+        self.assertIn("onTimeExpired", content)
+        self.assertIn("blurViolations", content)
 
     def test_shuffle_preserves_question_count_and_options(self):
         original_count = len(self.test_data["questions"])

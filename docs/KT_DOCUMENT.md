@@ -1,9 +1,9 @@
 # InterviewIQ — Comprehensive Knowledge Transfer (KT) Guide
 
-**Current Date:** 2026-11-19  
-**Sprint Status:** Desktop Stack Architecture Complete (Go + Wails + React + TypeScript + DirectML Sidecar, 113/113 Tests Passing in 100% Reliability)  
-**Active Models:** Google Gemini Modern Tiered Cascade (`gemini-2.5-flash` -> `gemini-flash-latest` -> `gemini-3.8-flash` -> `gemini-3.7-flash` -> `gemini-3.6-flash` -> `gemini-3.5-flash` -> `gemini-2.0-flash` -> Tier 2 Lite -> Tier 3 Pro)  
-**Test Suite Health:** 113 of 113 unit, integration, and sidecar API tests passing cleanly (100% OK)  
+**Current Date:** 2026-11-22  
+**Sprint Status:** Desktop Stack Architecture Complete (Go + Wails + React 18 + TypeScript + Tailwind CSS + Python DirectML Sidecar, 87/87 Tests Passing in 100% Reliability)  
+**Active Models:** Google Gemini Modern Tiered Cascade (`gemini-2.5-flash` -> `gemini-flash-latest` -> `gemini-2.0-flash` -> Tier 2 Lite -> Tier 3 Pro)  
+**Test Suite Health:** 87 of 87 unit, integration, and desktop sidecar API tests passing cleanly (100% OK in 3.3s)  
 **API Key Governance:** User-Supplied & Verified via Real-Time Cloud Probe (Zero Hardcoded Keys)  
 **Rate Safety:** Atomic Reservation Token-Bucket Rate Pacer (<=12 RPM) & Two-Tier SHA-256 Cache (RAM + SQLite)  
 

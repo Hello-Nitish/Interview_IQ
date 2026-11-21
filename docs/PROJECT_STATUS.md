@@ -1,9 +1,9 @@
 # InterviewIQ — Project Status Tracker
 
-**Current Date:** 2026-11-19  
-**Sprint Status:** Desktop Stack Architecture Complete (Go + Wails + React + TypeScript + DirectML Sidecar, 113/113 Tests Passing in 100% Reliability)  
-**Active Models:** Google Gemini Modern Tiered Cascade (`gemini-2.5-flash` -> `gemini-flash-latest` -> `gemini-3.8-flash` -> `gemini-3.7-flash` -> `gemini-3.6-flash` -> `gemini-3.5-flash` -> `gemini-2.0-flash` -> `gemini-2.0-flash-001` -> Tier 2 Lite -> Tier 3 Pro)  
-**Demo Readiness:** 100% Zero-Crash Resilient for Local Testing via `launch.bat`, Docker deployment via `deploy.bat`, and Streamlit Community Cloud  
+**Current Date:** 2026-11-22  
+**Sprint Status:** Desktop Stack Architecture Complete (Go + Wails + React 18 + TypeScript + Tailwind CSS + Python DirectML Sidecar, 87/87 Tests Passing in 100% Reliability)  
+**Active Models:** Google Gemini Modern Tiered Cascade (`gemini-2.5-flash` -> `gemini-flash-latest` -> `gemini-2.0-flash` -> Tier 2 Lite -> Tier 3 Pro)  
+**Demo Readiness:** 100% Zero-Crash Resilient for Local Desktop Testing via direct double-click on `launch.bat` (MS Edge `--app` mode, Chrome, or default browser)  
 **API Key Governance:** User-Supplied & Verified via Real-Time Cloud Probe (Zero Hardcoded Secrets in Repository)  
 **Rate Safety:** Atomic Reservation Token-Bucket Rate Pacer (<=12 RPM) & Two-Tier SHA-256 Cache (0 ms, 0 Tokens on Repeat Runs)  
 

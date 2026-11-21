@@ -31,7 +31,8 @@ from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
-from starlette.routing import Route
+from starlette.routing import Mount, Route
+from starlette.staticfiles import StaticFiles
 
 # Import DirectML modules
 from sidecar.directml.engine import get_directml_engine
@@ -390,6 +391,10 @@ routes = [
     Route("/api/sessions", list_sessions, methods=["GET"]),
     Route("/api/sessions/{session_id}", load_session, methods=["GET"]),
 ]
+
+dist_path = os.path.join(project_root, "frontend", "dist")
+if os.path.exists(dist_path):
+    routes.append(Mount("/", app=StaticFiles(directory=dist_path, html=True)))
 
 middleware = [
     Middleware(

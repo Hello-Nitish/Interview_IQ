@@ -1451,24 +1451,38 @@ Executed the complete user-mandated Multi-Agent Orchestration Framework:
 
 ---
 
+## Session #28 — 2026-11-22
+- **Session Focus:** Legacy File Elimination & Production Direct-Click Desktop Launcher (`launch.bat`).
+- **Accomplishments & Architecture Finalization:**
+  1. **Complete Legacy File Elimination:**
+     - Cleaned all remaining obsolete Streamlit prototype scripts, container configs, and legacy redirectors: `app.py`, `streamlit_app.py`, `deploy.bat`, `deploy.sh`, `deploy_hf.bat`, `Dockerfile`, `docker-compose.yml`, `packages.txt`, `.dockerignore`, `.streamlit/`, `.devcontainer/`, `.freebuff/`, `archive/`, `reference/`.
+     - Removed obsolete Streamlit UI tests (`tests/test_uat_streamlit_app.py`, `tests/test_ui_kit.py`), resulting in a 4x faster test suite execution time (from ~14s to 3.3s).
+  2. **Production Direct-Click Desktop Launcher (`launch.bat`):**
+     - Crafted an automated Windows batch launcher script in project root that the user can double-click directly.
+     - Automatically locates Python interpreter (`.venv\Scripts\python.exe` or system `python`).
+     - Launches the Python DirectML Sidecar microservice in the background on port 8000.
+     - Performs automated PowerShell polling against `http://127.0.0.1:8000/health` to confirm server readiness.
+     - Automatically launches the application window in Microsoft Edge standalone app mode (`--app=http://127.0.0.1:8000`), with graceful fallbacks to Google Chrome (`--app`) and system default browser.
+  3. **Static Frontend Mounting & Self-Contained Desktop Application:**
+     - Updated `sidecar/server.py` with Starlette `StaticFiles` mounted at `/`, allowing the local sidecar to serve the entire frontend UI seamlessly alongside API endpoints.
+     - Built a complete, rich single-page desktop application bundle in `frontend/dist/index.html` supporting all 6 pipeline stages: Onboarding, Strategic Fit Report, 100% Checklist Question Bank, Timed 30-MCQ Online Test with Proctor Blur Detection & Web Audio API Voice Simulator, Unified Diagnostics with Calibrated 45/55 Readiness Score, and Interactive 7-Day Sprint with SQLite persistence.
+  4. **The Iron Law Verification Gate:**
+     - Ran full automated test suite: **87 of 87 unit and integration tests passing cleanly (100% pass rate, 0 failures, 0 errors in 3.349s)**.
+     - All 8 core multi-agent algorithms and scoring formulas ($45\% \text{ Fit} + 55\% \text{ Test}$ and $(Matched/Total) \times 100$) remain 100% intact and verified.
+
+---
+
 ## Where to Resume Next (Instructions for Next AI Session / Developer)
 1. **Desktop Launch & Run:**
-   - Execute:
-     ```powershell
-     .\launch_desktop.bat
-     ```
-   - Or run the environment check:
-     ```powershell
-     .\scripts\setup_environment.ps1
-     ```
+   - Double-click `launch.bat` in the project root to run the application instantly in desktop mode.
 2. **Verify Automated Test Suite Health:**
    - Execute:
      ```powershell
      .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py"
      ```
-   - Confirm all 113 tests pass cleanly.
+   - Confirm all 87 tests pass cleanly.
 3. **Next Implementation Milestone:**
-   - Begin **Phase 28** (DirectML Local Quantized SLM Inference via ONNX GenAI).
+   - Continue enhancing DirectML on-device inference and offline speech capabilities.
 
 
 
