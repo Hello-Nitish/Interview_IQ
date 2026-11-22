@@ -64,6 +64,16 @@
       --danger-bg: #fee2e2;
       --info: #1e3a8a;
       --info-bg: #dbeafe;
+
+      /* Emil Kowalski Motion Design Tokens */
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+      --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+      --duration-instant: 90ms;
+      --duration-snappy: 160ms;
+      --duration-normal: 220ms;
+      --duration-modal: 260ms;
     }
 
     body {
@@ -98,10 +108,12 @@
       border: 1px solid #e2e8f0;
       border-radius: 10px;
       box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
-      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform var(--duration-snappy) var(--ease-spring), box-shadow var(--duration-snappy) var(--ease-spring), border-color var(--duration-snappy) ease;
+      will-change: transform;
     }
     .ent-card:hover {
       border-color: #cbd5e1;
+      transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
     }
 
@@ -109,14 +121,44 @@
       background: #f8fafc;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
+      transition: border-color var(--duration-snappy) ease, background-color var(--duration-snappy) ease;
     }
 
-    /* Micro-interactions */
+    /* Micro-interactions: Tactile Physical Buttons */
     .btn-action {
-      transition: all 0.1s ease;
+      transition: transform var(--duration-snappy) var(--ease-spring), box-shadow var(--duration-snappy) var(--ease-spring), background-color var(--duration-snappy) ease, border-color var(--duration-snappy) ease, color var(--duration-snappy) ease;
+      will-change: transform;
+      user-select: none;
+    }
+    .btn-action:hover {
+      transform: translateY(-1px);
     }
     .btn-action:active {
-      transform: scale(0.98);
+      transform: scale(0.98) translateY(0);
+      transition-duration: 80ms;
+    }
+
+    /* Left Sidebar Navigation Micro-Interactions */
+    .sidebar-nav-btn {
+      transition: background-color var(--duration-snappy) ease, color var(--duration-snappy) ease, transform var(--duration-snappy) var(--ease-spring), border-color var(--duration-snappy) ease;
+      will-change: transform;
+    }
+    .sidebar-nav-btn:hover {
+      transform: translateX(2px);
+    }
+    .sidebar-nav-btn:active {
+      transform: scale(0.99);
+      transition-duration: 80ms;
+    }
+
+    /* Candidate Ingestion Dropzones */
+    .upload-dropzone {
+      transition: border-color var(--duration-snappy) ease, background-color var(--duration-snappy) ease, transform var(--duration-snappy) var(--ease-spring), box-shadow var(--duration-snappy) var(--ease-spring);
+      will-change: transform;
+    }
+    .upload-dropzone:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.06);
     }
 
     /* OpenType Tabular Figures */
@@ -136,6 +178,11 @@
       align-items: center;
       justify-content: center;
       background: conic-gradient(#2563eb calc(var(--value, 0) * 1%), #e2e8f0 0);
+      transition: background 400ms var(--ease-out), transform var(--duration-snappy) var(--ease-spring);
+      will-change: transform;
+    }
+    .score-dial:hover {
+      transform: scale(1.04);
     }
     .score-dial::before {
       content: '';
@@ -162,20 +209,32 @@
       border-radius: 6px;
       cursor: pointer;
       user-select: none;
-      transition: all 0.12s ease;
+      transition: transform var(--duration-snappy) var(--ease-spring), box-shadow var(--duration-snappy) var(--ease-spring), background-color var(--duration-snappy) ease, border-color var(--duration-snappy) ease, color var(--duration-snappy) ease;
       background: #ffffff;
       border: 1px solid #cbd5e1;
       color: #334155;
+      will-change: transform;
     }
     .question-tile:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transform: translateY(-2px) scale(1.06);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+      z-index: 2;
+    }
+    .question-tile:active {
+      transform: scale(0.94);
+      transition-duration: 70ms;
     }
     .question-tile[data-state="active"] {
       border-color: #2563eb;
       color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
       font-weight: 700;
+      animation: tilePulse 220ms var(--ease-spring);
+    }
+    @keyframes tilePulse {
+      0% { transform: scale(0.92); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
     }
     .question-tile[data-state="answered"] {
       background-color: #059669;
@@ -194,6 +253,141 @@
       border-top-right-radius: 5px;
     }
 
+    /* Multiple-Choice Option Buttons */
+    .mcq-option-btn {
+      transition: border-color var(--duration-snappy) ease, background-color var(--duration-snappy) ease, transform var(--duration-snappy) var(--ease-spring), box-shadow var(--duration-snappy) var(--ease-spring);
+      will-change: transform;
+    }
+    .mcq-option-btn:hover {
+      border-color: #93c5fd;
+      transform: translateX(2px);
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.05);
+    }
+    .mcq-option-btn:active {
+      transform: scale(0.99);
+      transition-duration: 70ms;
+    }
+
+    /* Step Page Fluid Transition */
+    @keyframes stepPageEnter {
+      0% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.995);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .step-page-active {
+      animation: stepPageEnter var(--duration-normal) var(--ease-out) both;
+      will-change: transform, opacity;
+    }
+
+    /* Organic Non-Uniform Cascading Section Delays */
+    .step-page-active > *:nth-child(1) {
+      animation: cardCascadeIn var(--duration-normal) var(--ease-out) both;
+      animation-delay: 0ms;
+    }
+    .step-page-active > *:nth-child(2) {
+      animation: cardCascadeIn var(--duration-normal) var(--ease-out) both;
+      animation-delay: 35ms;
+    }
+    .step-page-active > *:nth-child(3) {
+      animation: cardCascadeIn var(--duration-normal) var(--ease-out) both;
+      animation-delay: 70ms;
+    }
+    .step-page-active > *:nth-child(4) {
+      animation: cardCascadeIn var(--duration-normal) var(--ease-out) both;
+      animation-delay: 105ms;
+    }
+    .step-page-active > *:nth-child(5) {
+      animation: cardCascadeIn var(--duration-normal) var(--ease-out) both;
+      animation-delay: 140ms;
+    }
+    .step-page-active > *:nth-child(6) {
+      animation: cardCascadeIn var(--duration-normal) var(--ease-out) both;
+      animation-delay: 175ms;
+    }
+
+    @keyframes cardCascadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* STAR Framework Tab Transition */
+    .star-content-fade {
+      animation: starFadeIn 160ms var(--ease-out) both;
+    }
+    @keyframes starFadeIn {
+      from { opacity: 0; transform: translateY(2px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 7-Day Sprint Task Micro-Interactions */
+    @keyframes checkPop {
+      0% { transform: scale(0.85); }
+      50% { transform: scale(1.22); }
+      100% { transform: scale(1); }
+    }
+    .checkbox-pop {
+      animation: checkPop 180ms var(--ease-spring) forwards;
+    }
+    .task-row {
+      transition: background-color var(--duration-snappy) ease, opacity var(--duration-snappy) ease, border-color var(--duration-snappy) ease, transform var(--duration-snappy) var(--ease-spring);
+    }
+    .task-row:hover {
+      border-color: #cbd5e1;
+      transform: translateX(1px);
+    }
+    .task-row.task-completed {
+      opacity: 0.65;
+      background-color: #f8fafc;
+    }
+    .task-row.task-completed .task-title {
+      text-decoration: line-through;
+      color: #64748b;
+    }
+
+    /* Progress Fill Transition */
+    .progress-bar-fill {
+      transition: width 350ms var(--ease-out);
+    }
+
+    /* Modals & Dialogs Animation */
+    dialog {
+      border: 1px solid #e2e8f0;
+      outline: none;
+    }
+    dialog[open] {
+      animation: modalScaleIn var(--duration-normal) var(--ease-out) both;
+    }
+    dialog::backdrop {
+      background-color: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(2px);
+      animation: backdropFadeIn 200ms var(--ease-out) both;
+    }
+    @keyframes modalScaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.96) translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+    @keyframes backdropFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
     /* Command Palette Overlay */
     .command-modal {
       position: fixed;
@@ -209,13 +403,39 @@
       z-index: 60;
     }
 
+    /* Dropdown Menus */
+    #exportMenu:not(.hidden) {
+      transform-origin: top right;
+      animation: dropdownFadeIn 160ms var(--ease-out) both;
+    }
+    @keyframes dropdownFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.96) translateY(-4px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
     /* Toast animation */
     @keyframes toastFade {
-      from { transform: translateY(12px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from { transform: translateY(12px) scale(0.96); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
     }
     .toast-slide {
-      animation: toastFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: toastFade 200ms var(--ease-spring) forwards;
+    }
+
+    /* Reduced Motion Accessibility Guardrail */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
   </style>
 </head>
@@ -256,7 +476,7 @@
         <div>
           <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider font-mono px-2 block mb-1.5">Evaluation Workflow</span>
           <div class="space-y-1 text-xs font-medium">
-            <button onclick="switchStep(1)" id="sideBtn1" class="w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between bg-blue-50 text-blue-700 font-semibold transition group">
+            <button onclick="switchStep(1)" id="sideBtn1" class="w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between bg-blue-50 text-blue-700 font-semibold sidebar-nav-btn transition group">
               <span class="flex items-center gap-2 min-w-0">
                 <span class="w-5 h-5 rounded bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold font-mono shrink-0 shadow-2xs">1</span>
                 <span class="truncate">Candidate Intake</span>
@@ -264,7 +484,7 @@
               <span id="badgeStep1" class="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 font-mono shrink-0 ml-1.5 font-semibold">Active</span>
             </button>
 
-            <button onclick="switchStep(2)" id="sideBtn2" class="w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition group">
+            <button onclick="switchStep(2)" id="sideBtn2" class="w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 sidebar-nav-btn transition group">
               <span class="flex items-center gap-2 min-w-0">
                 <span class="w-5 h-5 rounded bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-bold font-mono shrink-0">2</span>
                 <span class="truncate">Strategic Fit Report</span>
@@ -272,7 +492,7 @@
               <span id="badgeStep2" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono shrink-0 ml-1.5">--</span>
             </button>
 
-            <button onclick="switchStep(3)" id="sideBtn3" class="w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition group">
+            <button onclick="switchStep(3)" id="sideBtn3" class="w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 sidebar-nav-btn transition group">
               <span class="flex items-center gap-2 min-w-0">
                 <span class="w-5 h-5 rounded bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-bold font-mono shrink-0">3</span>
                 <span class="truncate">Question Bank</span>
@@ -280,7 +500,7 @@
               <span id="badgeStep3" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono shrink-0 ml-1.5">--</span>
             </button>
 
-            <button onclick="switchStep(4)" id="sideBtn4" class="w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition group">
+            <button onclick="switchStep(4)" id="sideBtn4" class="w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 sidebar-nav-btn transition group">
               <span class="flex items-center gap-2 min-w-0">
                 <span class="w-5 h-5 rounded bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-bold font-mono shrink-0">4</span>
                 <span class="truncate">30-MCQ & Voice Exam</span>
@@ -288,7 +508,7 @@
               <span id="badgeStep4" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono shrink-0 ml-1.5">--</span>
             </button>
 
-            <button onclick="switchStep(5)" id="sideBtn5" class="w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition group">
+            <button onclick="switchStep(5)" id="sideBtn5" class="w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 sidebar-nav-btn transition group">
               <span class="flex items-center gap-2 min-w-0">
                 <span class="w-5 h-5 rounded bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-bold font-mono shrink-0">5</span>
                 <span class="truncate">Diagnostics Scorecard</span>
@@ -296,7 +516,7 @@
               <span id="badgeStep5" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono shrink-0 ml-1.5">--</span>
             </button>
 
-            <button onclick="switchStep(6)" id="sideBtn6" class="w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition group">
+            <button onclick="switchStep(6)" id="sideBtn6" class="w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 sidebar-nav-btn transition group">
               <span class="flex items-center gap-2 min-w-0">
                 <span class="w-5 h-5 rounded bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-bold font-mono shrink-0">6</span>
                 <span class="truncate">7-Day Action Sprint</span>
@@ -430,7 +650,7 @@
       <!-- ===================================================================== -->
       <!-- STEP 1: CANDIDATE INTAKE & AUTOMATED ROLE EXTRACTION                  -->
       <!-- ===================================================================== -->
-      <section id="step1" class="space-y-6">
+      <section id="step1" class="space-y-6 step-page-active">
         
         <!-- Header & Benchmark Preset Bar -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
@@ -458,16 +678,16 @@
         <!-- Quick Preset Chips -->
         <div class="flex items-center gap-2 flex-wrap text-xs">
           <span class="text-slate-400 font-mono text-[11px] font-semibold">Quick Benchmarks:</span>
-          <button onclick="document.getElementById('roleBenchmarkSelect').value='dist_sys'; applyRoleBenchmark('dist_sys');" class="px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-medium shadow-2xs hover:bg-blue-50/50 transition">
+          <button onclick="document.getElementById('roleBenchmarkSelect').value='dist_sys'; applyRoleBenchmark('dist_sys');" class="btn-action px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-medium shadow-2xs hover:bg-blue-50/50 transition">
             🎯 Senior Distributed Systems (L5)
           </button>
-          <button onclick="document.getElementById('roleBenchmarkSelect').value='apm'; applyRoleBenchmark('apm');" class="px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-medium shadow-2xs hover:bg-blue-50/50 transition">
+          <button onclick="document.getElementById('roleBenchmarkSelect').value='apm'; applyRoleBenchmark('apm');" class="btn-action px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-medium shadow-2xs hover:bg-blue-50/50 transition">
             💼 Associate Product Manager (APM)
           </button>
-          <button onclick="document.getElementById('roleBenchmarkSelect').value='ai_eng'; applyRoleBenchmark('ai_eng');" class="px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-medium shadow-2xs hover:bg-blue-50/50 transition">
+          <button onclick="document.getElementById('roleBenchmarkSelect').value='ai_eng'; applyRoleBenchmark('ai_eng');" class="btn-action px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-medium shadow-2xs hover:bg-blue-50/50 transition">
             🤖 Senior AI / ML Engineer
           </button>
-          <button onclick="document.getElementById('roleBenchmarkSelect').value='frontend'; applyRoleBenchmark('frontend');" class="px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-medium shadow-2xs hover:bg-blue-50/50 transition">
+          <button onclick="document.getElementById('roleBenchmarkSelect').value='frontend'; applyRoleBenchmark('frontend');" class="btn-action px-2.5 py-1 rounded-md bg-white border border-slate-200 hover:border-blue-400 text-slate-700 font-medium shadow-2xs hover:bg-blue-50/50 transition">
             🎨 Staff Frontend & Design Technologist
           </button>
         </div>
@@ -486,7 +706,7 @@
             </div>
 
             <!-- Drag & Drop Zone -->
-            <div id="resumeDropzone" onclick="document.getElementById('resumeFileInput').click()" class="border-2 border-dashed border-slate-200 hover:border-blue-400 rounded-lg p-3 bg-slate-50/50 hover:bg-blue-50/20 text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5 group">
+            <div id="resumeDropzone" onclick="document.getElementById('resumeFileInput').click()" class="upload-dropzone border-2 border-dashed border-slate-200 hover:border-blue-400 rounded-lg p-3 bg-slate-50/50 hover:bg-blue-50/20 text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5 group">
               <div class="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
               </div>
@@ -522,7 +742,7 @@
             </div>
 
             <!-- Drag & Drop Zone for JD -->
-            <div id="jdDropzone" onclick="document.getElementById('jdFileInput').click()" class="border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-lg p-3 bg-slate-50/50 hover:bg-indigo-50/20 text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5 group">
+            <div id="jdDropzone" onclick="document.getElementById('jdFileInput').click()" class="upload-dropzone border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-lg p-3 bg-slate-50/50 hover:bg-indigo-50/20 text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5 group">
               <div class="w-7 h-7 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:scale-110 transition shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
               </div>
@@ -539,6 +759,10 @@
                 <span id="jdFileName" class="font-medium truncate">jd.pdf</span>
                 <span id="jdFileMeta" class="text-indigo-500 text-[11px] font-mono shrink-0">(1 page, 240 words)</span>
               </div>
+              <button onclick="clearUploadedDocument('jd')" class="p-1 hover:bg-indigo-100 rounded text-indigo-600 transition shrink-0" title="Clear uploaded JD">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
               <button onclick="clearUploadedDocument('jd')" class="p-1 hover:bg-indigo-100 rounded text-indigo-600 transition shrink-0" title="Clear uploaded JD">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
@@ -1512,21 +1736,29 @@
       for (let i = 1; i <= 6; i++) {
         const sec = document.getElementById(`step${i}`);
         const sideBtn = document.getElementById(`sideBtn${i}`);
-        if (sec) sec.classList.add("hidden");
+        if (sec) {
+          sec.classList.add("hidden");
+          sec.classList.remove("step-page-active");
+        }
         if (sideBtn) {
-          sideBtn.className = "w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition";
+          sideBtn.className = "w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-slate-600 hover:bg-slate-50 hover:text-slate-900 sidebar-nav-btn transition group";
           const numSpan = sideBtn.querySelector("span span");
-          if (numSpan) numSpan.className = "w-5 h-5 rounded bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-bold font-mono";
+          if (numSpan) numSpan.className = "w-5 h-5 rounded bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-bold font-mono transition";
         }
       }
 
       const activeSec = document.getElementById(`step${stepNum}`);
       const activeSide = document.getElementById(`sideBtn${stepNum}`);
-      if (activeSec) activeSec.classList.remove("hidden");
+      if (activeSec) {
+        activeSec.classList.remove("hidden");
+        // Force reflow for silky smooth restart of entrance animation
+        void activeSec.offsetWidth;
+        activeSec.classList.add("step-page-active");
+      }
       if (activeSide) {
-        activeSide.className = "w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between bg-blue-50 text-blue-700 font-semibold transition";
+        activeSide.className = "w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between bg-blue-50 text-blue-700 font-semibold sidebar-nav-btn transition group";
         const numSpan = activeSide.querySelector("span span");
-        if (numSpan) numSpan.className = "w-5 h-5 rounded bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold font-mono";
+        if (numSpan) numSpan.className = "w-5 h-5 rounded bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold font-mono shadow-2xs transition";
       }
 
       appState.currentStep = stepNum;
@@ -2389,6 +2621,9 @@
           text = q.result || "Quantifiable ROI: Measurable throughput gain (e.g. 45k req/sec), latency reduction, zero data loss, or business impact.";
         }
         el.textContent = text;
+        el.classList.remove("star-content-fade");
+        void el.offsetWidth;
+        el.classList.add("star-content-fade");
       }
     }
 
@@ -2426,7 +2661,7 @@
             const isSelected = appState.userAnswers[idx] === letter;
             const cleanOpt = (opt || "").replace(/^[A-D]\)\s*/i, "");
             return `
-              <button type="button" onclick="selectAnswer(${idx}, '${letter}')" class="w-full text-left p-3 rounded-lg border transition flex items-center justify-between gap-3 ${isSelected ? 'border-blue-600 bg-blue-50/70 text-blue-900 shadow-xs ring-1 ring-blue-600' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700 hover:border-slate-300'}">
+              <button type="button" onclick="selectAnswer(${idx}, '${letter}')" class="mcq-option-btn w-full text-left p-3 rounded-lg border transition flex items-center justify-between gap-3 ${isSelected ? 'border-blue-600 bg-blue-50/70 text-blue-900 shadow-xs ring-1 ring-blue-600' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700 hover:border-slate-300'}">
                 <span class="flex items-center gap-3 min-w-0 flex-1">
                   <span class="w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold text-xs border shrink-0 ${isSelected ? 'bg-blue-600 text-white border-blue-600 shadow-2xs' : 'bg-slate-100 text-slate-600 border-slate-200'}">${letter}</span>
                   <span class="text-xs font-medium leading-normal">${cleanOpt}</span>
@@ -2470,6 +2705,12 @@
     function jumpToQuestion(idx) {
       appState.currentMcqIndex = idx;
       renderActiveMcqCard();
+      const card = document.getElementById("activeMcqCard");
+      if (card) {
+        card.classList.remove("star-content-fade");
+        void card.offsetWidth;
+        card.classList.add("star-content-fade");
+      }
       renderExamGridPalette();
     }
 
@@ -2690,11 +2931,12 @@
           <div class="space-y-2 pt-1">
             ${tasks.map((task, tIdx) => {
               const taskId = `task_${dIdx}_${tIdx}`;
+              const isDone = (typeof task === 'object' && task.completed);
               return `
-                <div class="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs hover:border-slate-300 transition">
-                  <input type="checkbox" id="${taskId}" onchange="toggleTask(${dIdx + 1}, '${taskId}', this.checked)" class="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-0 cursor-pointer shrink-0" />
+                <div id="row_${taskId}" class="task-row flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs hover:border-slate-300 transition ${isDone ? 'task-completed' : ''}">
+                  <input type="checkbox" id="${taskId}" onchange="toggleTask(${dIdx + 1}, '${taskId}', this.checked)" ${isDone ? 'checked' : ''} class="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-0 cursor-pointer shrink-0" />
                   <div class="flex-1 min-w-0">
-                    <span class="text-slate-800 font-medium block leading-relaxed">${typeof task === 'string' ? task : task.description}</span>
+                    <span class="task-title text-slate-800 font-medium block leading-relaxed">${typeof task === 'string' ? task : task.description}</span>
                     ${task.resource_url ? `
                       <a href="${task.resource_url}" target="_blank" class="inline-flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-800 hover:underline mt-1.5 font-mono font-medium">
                         <span>Resource: ${task.resource_title || 'Reference Link'}</span>
@@ -2713,6 +2955,21 @@
     }
 
     async function toggleTask(dayNum, taskId, isChecked) {
+      const row = document.getElementById(`row_${taskId}`);
+      const chk = document.getElementById(taskId);
+      if (row) {
+        if (isChecked) {
+          row.classList.add("task-completed");
+        } else {
+          row.classList.remove("task-completed");
+        }
+      }
+      if (chk) {
+        chk.classList.remove("checkbox-pop");
+        void chk.offsetWidth;
+        chk.classList.add("checkbox-pop");
+      }
+
       try {
         await fetch(`${API_BASE}/api/curriculum/toggle-task`, {
           method: "POST",
@@ -3202,8 +3459,9 @@
       container.appendChild(toast);
       setTimeout(() => {
         toast.style.opacity = "0";
-        toast.style.transition = "opacity 0.2s ease";
-        setTimeout(() => toast.remove(), 200);
+        toast.style.transform = "translateY(12px) scale(0.96)";
+        toast.style.transition = "opacity 0.18s var(--ease-out), transform 0.18s var(--ease-out)";
+        setTimeout(() => toast.remove(), 190);
       }, 3500);
     }
   </script>
