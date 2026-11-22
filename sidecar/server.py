@@ -54,6 +54,7 @@ from agents.company_intel_agent import CompanyIntelAgent
 from utils.api_quota_manager import APIQuotaManager
 from utils.database import DatabaseManager
 from utils.pdf_exporter import PDFDossierExporter
+from utils.document_parser import DocumentParser
 
 # Global token storage
 EXPECTED_BEARER_TOKEN: Optional[str] = None
@@ -389,6 +390,57 @@ async def load_session(request: Request) -> JSONResponse:
     return JSONResponse({"error": "Session not found"}, status_code=404)
 
 
+async def parse_document(request: Request) -> JSONResponse:
+    """
+    Extracts structured clean text from uploaded PDF, DOCX, TXT, or Markdown documents.
+    Supports JSON with base64 payload or multipart/form-data.
+    """
+    auth_err = verify_bearer_auth(request)
+    if auth_err:
+        return auth_err
+
+    content_type = request.headers.get("content-type", "")
+    filename = "document.pdf"
+    file_bytes = b""
+    doc_type = "resume"
+
+    if "multipart/form-data" in content_type:
+        form = await request.form()
+        uploaded_file = form.get("file")
+        if uploaded_file and hasattr(uploaded_file, "read"):
+            file_bytes = await uploaded_file.read()
+            filename = getattr(uploaded_file, "filename", "document.pdf")
+        doc_type = str(form.get("doc_type", "resume"))
+    else:
+        try:
+            body = await request.json()
+        except Exception:
+            body = {}
+        filename = body.get("filename", "document.pdf")
+        doc_type = body.get("doc_type", "resume")
+        raw_b64 = body.get("file_base64", "")
+        if not raw_b64:
+            return JSONResponse({"error": "file_base64 or uploaded file is required"}, status_code=400)
+        # Strip data URL prefix if present (e.g. data:application/pdf;base64,...)
+        if "," in raw_b64:
+            raw_b64 = raw_b64.split(",", 1)[1]
+        try:
+            file_bytes = base64.b64decode(raw_b64)
+        except Exception as e:
+            return JSONResponse({"error": f"Invalid base64 payload: {str(e)}"}, status_code=400)
+
+    if not file_bytes:
+        return JSONResponse({"error": "No file content detected"}, status_code=400)
+
+    parsed = DocumentParser.extract_text_from_bytes(file_bytes, filename=filename)
+    parsed["doc_type"] = doc_type
+
+    if not parsed.get("success"):
+        return JSONResponse(parsed, status_code=422)
+
+    return JSONResponse(parsed)
+
+
 async def favicon(request: Request) -> Response:
     return Response(status_code=204)
 
@@ -413,6 +465,7 @@ routes = [
     Route("/api/voice/transcribe", transcribe_voice, methods=["POST"]),
     Route("/api/semantic/similarity", semantic_similarity, methods=["POST"]),
     Route("/api/export/pdf", export_pdf, methods=["POST"]),
+    Route("/api/parse/document", parse_document, methods=["POST"]),
     Route("/api/sessions", list_sessions, methods=["GET"]),
     Route("/api/sessions/{session_id}", load_session, methods=["GET"]),
 ]

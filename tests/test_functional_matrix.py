@@ -390,6 +390,123 @@ class TestFunctionalMatrix(unittest.TestCase):
         self.assertEqual(status, 404)
         self.assertIn("error", data)
 
+    # -------------------------------------------------------------------------
+    # F13: PDF & Document Parsing Endpoint
+    # -------------------------------------------------------------------------
+    def test_f13_parse_document_pdf_endpoint(self):
+        import io
+        from reportlab.pdfgen import canvas
+        buf = io.BytesIO()
+        c = canvas.Canvas(buf)
+        c.drawString(100, 750, "Aarav Sharma - Staff Systems Architect")
+        c.drawString(100, 730, "Expertise: Go, Kubernetes, Distributed Consensus, High-Scale Microservices")
+        c.drawString(100, 710, "Built distributed telemetry engine processing 100k events/sec.")
+        c.save()
+
+        b64_pdf = base64.b64encode(buf.getvalue()).decode("utf-8")
+        status, data = self._call("POST", "/api/parse/document", {
+            "filename": "candidate_resume.pdf",
+            "file_base64": f"data:application/pdf;base64,{b64_pdf}",
+            "doc_type": "resume"
+        })
+        self.assertEqual(status, 200)
+        self.assertTrue(data.get("success"))
+        self.assertIn("Aarav Sharma", data.get("text", ""))
+        self.assertIn("Kubernetes", data.get("text", ""))
+        self.assertGreater(data.get("word_count", 0), 10)
+        self.assertEqual(data.get("file_type"), ".pdf")
+
+    def test_f13_parse_document_docx_endpoint(self):
+        import io, docx
+        doc = docx.Document()
+        doc.add_heading("Target Role: Senior Systems Engineer", level=1)
+        doc.add_paragraph("Mandatory requirements: Go, Microservices, and Redis.")
+        buf = io.BytesIO()
+        doc.save(buf)
+
+        b64_docx = base64.b64encode(buf.getvalue()).decode("utf-8")
+        status, data = self._call("POST", "/api/parse/document", {
+            "filename": "job_description.docx",
+            "file_base64": b64_docx,
+            "doc_type": "jd"
+        })
+        self.assertEqual(status, 200)
+        self.assertTrue(data.get("success"))
+        self.assertIn("Senior Systems Engineer", data.get("text", ""))
+        self.assertIn("Redis", data.get("text", ""))
+
+    def test_f13_parse_document_validation(self):
+        # Empty payload
+        status, data = self._call("POST", "/api/parse/document", {"file_base64": ""})
+        self.assertEqual(status, 400)
+
+        # Corrupted base64
+        status, data = self._call("POST", "/api/parse/document", {"filename": "doc.pdf", "file_base64": "!!!not_base64!!!"})
+        self.assertEqual(status, 400)
+
+    # -------------------------------------------------------------------------
+    # F14: End-to-End PDF Resume & JD Ingestion through AI Multi-Agent Pipeline
+    # -------------------------------------------------------------------------
+    def test_f14_e2e_pdf_resume_and_jd_ai_pipeline(self):
+        import io
+        from reportlab.pdfgen import canvas
+
+        # 1. Generate Resume PDF
+        resume_buf = io.BytesIO()
+        rc = canvas.Canvas(resume_buf)
+        rc.drawString(50, 750, "Priya Nair - Senior Backend Engineer")
+        rc.drawString(50, 730, "Skills: Python, PostgreSQL, Docker, AWS, FastAPI, gRPC")
+        rc.drawString(50, 710, "Experience: 6 years building distributed financial platforms.")
+        rc.save()
+
+        # 2. Generate JD PDF
+        jd_buf = io.BytesIO()
+        jc = canvas.Canvas(jd_buf)
+        jc.drawString(50, 750, "FinTech Global - Senior Python Infrastructure Engineer")
+        jc.drawString(50, 730, "Requirements: 4+ years Python, PostgreSQL, Docker, and AWS.")
+        jc.drawString(50, 710, "Culture: High ownership, metric rigor, customer obsession.")
+        jc.save()
+
+        # 3. Extract text from Resume PDF via API
+        r_b64 = base64.b64encode(resume_buf.getvalue()).decode()
+        s_r, r_data = self._call("POST", "/api/parse/document", {
+            "filename": "resume.pdf", "file_base64": r_b64, "doc_type": "resume"
+        })
+        self.assertEqual(s_r, 200)
+        extracted_resume = r_data["text"]
+        self.assertIn("Priya Nair", extracted_resume)
+
+        # 4. Extract text from JD PDF via API
+        j_b64 = base64.b64encode(jd_buf.getvalue()).decode()
+        s_j, j_data = self._call("POST", "/api/parse/document", {
+            "filename": "jd.pdf", "file_base64": j_b64, "doc_type": "jd"
+        })
+        self.assertEqual(s_j, 200)
+        extracted_jd = j_data["text"]
+        self.assertIn("FinTech Global", extracted_jd)
+
+        # 5. Execute Onboard Pipeline with PDF-extracted contents
+        s_onboard, onboard_res = self._call("POST", "/api/pipeline/onboard", {
+            "resume_text": extracted_resume,
+            "jd_text": extracted_jd
+        })
+        self.assertEqual(s_onboard, 200)
+        self.assertIn("profile", onboard_res)
+        self.assertIn("jd_analysis", onboard_res)
+
+        # 6. Execute Strategic Fit Analysis
+        s_fit, fit_res = self._call("POST", "/api/pipeline/fit-analysis", {
+            "profile": onboard_res["profile"],
+            "jd_analysis": onboard_res["jd_analysis"]
+        })
+        self.assertEqual(s_fit, 200)
+        fit_report = fit_res.get("fit_report", {})
+        self.assertIn("technical_match_pct", fit_report)
+        self.assertGreater(fit_report["technical_match_pct"], 0.0)
+        # Verify mandatory Python/PostgreSQL/Docker skills matched
+        req_matrix = fit_report.get("requirements_matrix", [])
+        self.assertGreater(len(req_matrix), 0)
+
 
 if __name__ == "__main__":
     unittest.main()
