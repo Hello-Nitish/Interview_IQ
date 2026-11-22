@@ -1,8 +1,9 @@
 import os
 import sqlite3
 import json
+import contextlib
 from datetime import datetime
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 
 class DatabaseManager:
     """
@@ -14,9 +15,10 @@ class DatabaseManager:
     _initialized_paths: set = set()
 
     @classmethod
-    def get_connection(cls) -> sqlite3.Connection:
+    @contextlib.contextmanager
+    def get_connection(cls):
         os.makedirs(os.path.dirname(cls.DB_PATH), exist_ok=True)
-        conn = sqlite3.connect(cls.DB_PATH, timeout=10.0)
+        conn = sqlite3.connect(cls.DB_PATH, timeout=15.0)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON;")
         conn.execute("PRAGMA journal_mode = WAL;")
@@ -24,7 +26,14 @@ class DatabaseManager:
         conn.execute("PRAGMA cache_size = -64000;")
         conn.execute("PRAGMA temp_store = MEMORY;")
         conn.execute("PRAGMA mmap_size = 268435456;")
-        return conn
+        try:
+            yield conn
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
 
     @classmethod
     def init_db(cls, force: bool = False):
@@ -507,22 +516,86 @@ class DatabaseManager:
             return None
 
     @classmethod
-    def update_curriculum_progress(
+    def toggle_curriculum_task(
         cls,
-        plan_id: str,
-        checked_items: List[str],
-        days_completed: int = 0
-    ):
-        """Updates progress tracking checkboxes for an active curriculum plan."""
+        session_id: str,
+        day_number: int,
+        task_id: str,
+        completed: bool
+    ) -> Dict[str, Any]:
+        """Toggles a task in the curriculum checklist for a given session."""
         cls.init_db()
         now = datetime.now().isoformat()
+        with cls.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT plan_id, plan_json, checked_items FROM curriculum_plans WHERE session_id = ? ORDER BY updated_at DESC LIMIT 1",
+                (session_id,)
+            )
+            row = cursor.fetchone()
+            if not row:
+                return {"success": False, "checked_items": [], "days_completed": 0}
+
+            plan_id = row["plan_id"]
+            checked_items = json.loads(row["checked_items"]) if row["checked_items"] else []
+            checked_set = set(checked_items)
+
+            if completed:
+                checked_set.add(task_id)
+            else:
+                checked_set.discard(task_id)
+
+            updated_checked = sorted(list(checked_set))
+
+            days_completed = 0
+            if row["plan_json"]:
+                try:
+                    plan_data = json.loads(row["plan_json"])
+                    days = plan_data.get("days", [])
+                    for day in days:
+                        d_tasks = [t.get("task_id") for t in day.get("tasks", []) if t.get("task_id")]
+                        if d_tasks and all(t_id in checked_set for t_id in d_tasks):
+                            days_completed += 1
+                except Exception:
+                    pass
+
+            cursor.execute("""
+            UPDATE curriculum_plans
+            SET checked_items = ?, days_completed = ?, updated_at = ?
+            WHERE plan_id = ?
+            """, (json.dumps(updated_checked), days_completed, now, plan_id))
+
+            return {
+                "success": True,
+                "plan_id": plan_id,
+                "checked_items": updated_checked,
+                "days_completed": days_completed
+            }
+
+    @classmethod
+    def update_curriculum_progress(
+        cls,
+        plan_id: Optional[str] = None,
+        checked_items: Optional[List[str]] = None,
+        days_completed: int = 0,
+        session_id: Optional[str] = None,
+        **kwargs
+    ):
+        """Flexible update supporting both plan_id and session_id parameter formats."""
+        target_id = session_id or plan_id or kwargs.get("plan_or_session_id")
+        if not target_id:
+            return
+
+        cls.init_db()
+        now = datetime.now().isoformat()
+        items_json = json.dumps(checked_items if isinstance(checked_items, list) else [])
+
         with cls.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
             UPDATE curriculum_plans
             SET checked_items = ?, days_completed = ?, updated_at = ?
-            WHERE plan_id = ?
-            """, (json.dumps(checked_items), days_completed, now, plan_id))
-            conn.commit()
+            WHERE plan_id = ? OR session_id = ?
+            """, (items_json, int(days_completed or 0), now, str(target_id), str(target_id)))
 
 

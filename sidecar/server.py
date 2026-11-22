@@ -147,7 +147,7 @@ async def run_onboarding(request: Request) -> JSONResponse:
     culture_fit = {}
     if company_name:
         company_agent = CompanyIntelAgent(api_key=GLOBAL_ORCHESTRATOR.api_key)
-        culture_fit = company_agent.analyze_culture_fit(company_name, profile.get("summary", ""))
+        culture_fit = company_agent.get_company_intelligence(company_name, jd_analysis.get("role_title", "Candidate"))
 
     return JSONResponse({
         "status": "success",
@@ -248,12 +248,17 @@ async def run_feedback(request: Request) -> JSONResponse:
         return auth_err
 
     body = await request.json()
-    fit_report = body.get("fit_report") or GLOBAL_ORCHESTRATOR.state.get("fit_report")
+    fit_report = body.get("fit_report") or GLOBAL_ORCHESTRATOR.state.get("fit_report") or GLOBAL_ORCHESTRATOR.state.get("fit_data")
     test_results = body.get("test_results") or GLOBAL_ORCHESTRATOR.state.get("test_results")
     name = body.get("candidate_name") or GLOBAL_ORCHESTRATOR.state.get("profile", {}).get("name", "Candidate")
 
     if not fit_report:
         return JSONResponse({"error": "fit_report is required"}, status_code=400)
+
+    GLOBAL_ORCHESTRATOR.state["fit_report"] = fit_report
+    GLOBAL_ORCHESTRATOR.state["fit_data"] = fit_report
+    if test_results:
+        GLOBAL_ORCHESTRATOR.state["test_results"] = test_results
 
     feedback = GLOBAL_ORCHESTRATOR.run_feedback(candidate_name=name)
     return JSONResponse({"status": "success", "feedback": feedback})
@@ -266,10 +271,15 @@ async def run_curriculum(request: Request) -> JSONResponse:
 
     body = await request.json()
     feedback = body.get("feedback") or GLOBAL_ORCHESTRATOR.state.get("feedback")
-    jd_analysis = body.get("jd_analysis") or GLOBAL_ORCHESTRATOR.state.get("jd_analysis")
+    jd_analysis = body.get("jd_analysis") or GLOBAL_ORCHESTRATOR.state.get("jd_analysis") or GLOBAL_ORCHESTRATOR.state.get("jd_data")
 
     if not feedback or not jd_analysis:
         return JSONResponse({"error": "feedback and jd_analysis are required"}, status_code=400)
+
+    GLOBAL_ORCHESTRATOR.state["feedback"] = feedback
+    GLOBAL_ORCHESTRATOR.state["jd_analysis"] = jd_analysis
+    if "jd_data" not in GLOBAL_ORCHESTRATOR.state:
+        GLOBAL_ORCHESTRATOR.state["jd_data"] = jd_analysis
 
     curriculum = GLOBAL_ORCHESTRATOR.generate_micro_curriculum()
     return JSONResponse({"status": "success", "curriculum": curriculum})
@@ -286,8 +296,8 @@ async def toggle_curriculum_task(request: Request) -> JSONResponse:
     task_id = str(body.get("task_id", ""))
     completed = bool(body.get("completed", False))
 
-    DatabaseManager.update_curriculum_progress(sess_id, day_num, task_id, completed)
-    return JSONResponse({"status": "success", "completed": completed})
+    res = DatabaseManager.toggle_curriculum_task(sess_id, day_num, task_id, completed)
+    return JSONResponse({"status": "success", "completed": completed, "progress": res})
 
 
 async def transcribe_voice(request: Request) -> JSONResponse:
@@ -328,14 +338,24 @@ async def export_pdf(request: Request) -> JSONResponse:
     doc_type = body.get("type", "fit_report")
 
     if doc_type == "fit_report":
-        fit_report = body.get("fit_report") or GLOBAL_ORCHESTRATOR.state.get("fit_report", {})
+        fit_report = body.get("fit_report") or GLOBAL_ORCHESTRATOR.state.get("fit_report") or GLOBAL_ORCHESTRATOR.state.get("fit_data", {})
+        cand_name = body.get("candidate_name") or (GLOBAL_ORCHESTRATOR.state.get("profile") or {}).get("name") or "Candidate"
+        role_t = body.get("role_title") or (GLOBAL_ORCHESTRATOR.state.get("jd_analysis") or {}).get("role_title") or "Target Role"
         pdf_bytes = PDFDossierExporter.generate_fit_report_pdf(
             fit_data=fit_report,
-            candidate_name=body.get("candidate_name", "Candidate"),
-            role_title=body.get("role_title", "Target Role"),
+            candidate_name=cand_name,
+            role_title=role_t,
         )
     else:
-        pdf_bytes = PDFDossierExporter.generate_dossier_pdf(GLOBAL_ORCHESTRATOR.state)
+        combined_state = dict(GLOBAL_ORCHESTRATOR.state)
+        if "fit_report" in combined_state and "fit_data" not in combined_state:
+            combined_state["fit_data"] = combined_state["fit_report"]
+        if "profile" in combined_state:
+            combined_state["resume_data"] = combined_state["profile"]
+            combined_state["candidate_name"] = combined_state["profile"].get("name", "Candidate")
+        if "jd_analysis" in combined_state:
+            combined_state["jd_data"] = combined_state["jd_analysis"]
+        pdf_bytes = PDFDossierExporter.generate_dossier_pdf(combined_state)
 
     b64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
     return JSONResponse({

@@ -183,12 +183,24 @@ class PDFDossierExporter:
         elements = []
 
         # Data extraction
-        candidate_name = session_state.get("candidate_name") or (session_state.get("resume_data") or {}).get("candidate_name") or "Candidate"
-        role_title = (session_state.get("jd_data") or {}).get("role_title") or (session_state.get("jd_profile") or {}).get("role_title") or "Placement Assessment"
-        fit_data = session_state.get("fit_data") or {}
+        candidate_name = (
+            session_state.get("candidate_name")
+            or (session_state.get("profile") or {}).get("name")
+            or (session_state.get("resume_data") or {}).get("candidate_name")
+            or (session_state.get("resume_data") or {}).get("name")
+            or "Candidate"
+        )
+        role_title = (
+            session_state.get("role_title")
+            or (session_state.get("jd_analysis") or {}).get("role_title")
+            or (session_state.get("jd_data") or {}).get("role_title")
+            or (session_state.get("jd_profile") or {}).get("role_title")
+            or "Placement Assessment"
+        )
+        fit_data = session_state.get("fit_data") or session_state.get("fit_report") or {}
         test_results = session_state.get("test_results") or {}
         question_bank = session_state.get("question_bank") or {}
-        feedback = session_state.get("feedback") or {}
+        feedback = session_state.get("feedback") or session_state.get("feedback_data") or {}
         current_round = session_state.get("round_number") or session_state.get("round", 1)
 
         # -------------------------------------------------------------------------

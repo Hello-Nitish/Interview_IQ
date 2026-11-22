@@ -402,3 +402,83 @@ class Orchestrator:
             "progress_percentage": progress_pct,
             "days_completed": days_completed
         }
+
+    def ingest_data(self, resume_text: str, jd_text: str):
+        """Ingests raw candidate resume and target JD benchmarks."""
+        self.state["resume_raw_text"] = resume_text
+        self.state["jd_raw_text"] = jd_text
+        SessionManager.save_session(self.session_id, self.state)
+
+    def run_resume_review(self) -> dict:
+        """Runs the ResumeReviewerAgent on ingested resume text."""
+        resume_text = self.state.get("resume_raw_text", "")
+        profile = self.resume_agent.review_resume(resume_text)
+        self.state["resume_data"] = profile
+        self.state["profile"] = profile
+        self.state["candidate_name"] = profile.get("candidate_name") or profile.get("name", "Candidate")
+        SessionManager.save_session(self.session_id, self.state)
+        return profile
+
+    def run_jd_analysis(self) -> dict:
+        """Runs the JDAnalyzerAgent on ingested job description text."""
+        jd_text = self.state.get("jd_raw_text", "")
+        jd_analysis = self.jd_agent.analyze_jd(jd_text)
+        self.state["jd_data"] = jd_analysis
+        self.state["jd_analysis"] = jd_analysis
+        SessionManager.save_session(self.session_id, self.state)
+        return jd_analysis
+
+    def run_fit_analysis(self) -> dict:
+        """Runs FitAnalyzerAgent comparing candidate profile against JD benchmarks."""
+        profile = self.state.get("profile") or self.state.get("resume_data") or {}
+        jd_analysis = self.state.get("jd_analysis") or self.state.get("jd_data") or {}
+        fit_report = self.fit_agent.analyze_fit(profile, jd_analysis)
+        self.state["fit_data"] = fit_report
+        self.state["fit_report"] = fit_report
+        try:
+            from utils.database import DatabaseManager
+            DatabaseManager.save_session_state(self.session_id, self.state)
+        except Exception:
+            pass
+        SessionManager.save_session(self.session_id, self.state)
+        return fit_report
+
+    def generate_question_bank(self) -> dict:
+        """Runs QuestionBankAgent generating tailored probes and topic checklists."""
+        profile = self.state.get("profile") or self.state.get("resume_data") or {}
+        jd_analysis = self.state.get("jd_analysis") or self.state.get("jd_data") or {}
+        fit_report = self.state.get("fit_report") or self.state.get("fit_data") or {}
+        qb = self.qb_agent.generate_questions(profile, jd_analysis, fit_report)
+        company_name = jd_analysis.get("company_name", "")
+        if company_name:
+            try:
+                company_intel = self.company_intel_agent.get_company_intelligence(company_name, jd_analysis.get("role_title", ""))
+                qb = self.company_intel_agent.enrich_question_bank(qb, company_intel)
+                self.state["company_intel"] = company_intel
+            except Exception:
+                pass
+        self.state["question_bank"] = qb
+        SessionManager.save_session(self.session_id, self.state)
+        return qb
+
+    def run_feedback(self, candidate_name: str = "Candidate") -> dict:
+        """Runs FeedbackAgent generating unified readiness diagnostics."""
+        fit_report = self.state.get("fit_report") or self.state.get("fit_data") or {}
+        test_results = self.state.get("test_results") or {}
+        qb = self.state.get("question_bank") or {}
+        feedback = self.feedback_agent.generate_unified_feedback(fit_report, test_results, qb)
+        self.state["feedback"] = feedback
+        self.state["feedback_data"] = feedback
+        try:
+            from utils.database import DatabaseManager
+            current_round = self.state.get("round_number") or self.state.get("round", 1)
+            DatabaseManager.record_readiness_report(self.session_id, current_round, feedback)
+            DatabaseManager.save_session_state(self.session_id, self.state)
+        except Exception:
+            pass
+        SessionManager.save_session(self.session_id, self.state)
+        return feedback
+
+    def generate_micro_curriculum(self) -> dict:
+        """Runs MicroCurriculumAgent generating the 7-day personalized sprint."""
+        return self.generate_curriculum()

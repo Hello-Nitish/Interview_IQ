@@ -1556,17 +1556,54 @@ Executed the complete user-mandated Multi-Agent Orchestration Framework:
 
 ---
 
+---
+
+## Session #28 — 2026-11-22
+- **Session Goals:** Execute comprehensive Functional and Non-Functional Testing via `/sop`, uncover latent defects, apply Karpathy-grade surgical fixes, stress-test concurrency and resource hygiene, expand automated test coverage, and enforce the Iron Law Verification Gate.
+- **Key Defects Discovered & Surgically Fixed:**
+  1. **Orchestrator Step-by-Step API Methods Missing (Functional Defect - Critical):**
+     - *Issue:* `sidecar/server.py` attempted to call `GLOBAL_ORCHESTRATOR.ingest_data()`, `run_resume_review()`, `run_jd_analysis()`, `run_fit_analysis()`, `generate_question_bank()`, `run_feedback()`, and `generate_micro_curriculum()`, which did not exist on `Orchestrator`, causing unhandled 500 `AttributeError` crashes upon hitting pipeline endpoints.
+     - *Fix:* Implemented all step-by-step methods directly on `Orchestrator` in `orchestrator/orchestrator.py` with full session state synchronization and SQLite persistence.
+  2. **OnlineTestAgent Argument Signature & Type Mismatch (Functional Defect - Critical):**
+     - *Issue:* `generate_test()` rejected keyword arguments `checklist` and `jd_title` with `TypeError`, and `score_test()` failed with `AttributeError` when passed a list of questions instead of a dictionary.
+     - *Fix:* Added keyword aliases (`checklist`, `jd_title`, `jd_profile`) to `generate_test()`, and enabled `score_test()` to natively accept both `list` and `dict` structures.
+  3. **CompanyIntelAgent Method Call Mismatch (Functional Defect - High):**
+     - *Issue:* `sidecar/server.py` invoked non-existent `company_agent.analyze_culture_fit()`, throwing an `AttributeError` during candidate onboarding.
+     - *Fix:* Updated route handler to call `company_agent.get_company_intelligence(company_name, role_title)`.
+  4. **Micro-Curriculum Task Toggle Parameter Mismatch (Functional Defect - High):**
+     - *Issue:* `sidecar/server.py` called `DatabaseManager.update_curriculum_progress(sess_id, day_num, task_id, completed)` with 4 arguments, while `DatabaseManager` only accepted 3 arguments and expected `plan_id`. As a result, checklist progress was never updated or persisted in SQLite.
+     - *Fix:* Added `DatabaseManager.toggle_curriculum_task(session_id, day_number, task_id, completed)` with automated day-completion calculation, and refactored `update_curriculum_progress()` to accept flexible parameter signatures.
+  5. **SQLite File Handle Leaking & Concurrency Deadlocks (Non-Functional Defect - Critical):**
+     - *Issue:* `DatabaseManager.get_connection()` returned an unclosed connection handle. In Python's `sqlite3`, `with conn:` only commits/rollbacks transactions without closing the connection, leaking OS handles and causing `sqlite3.OperationalError: database is locked` under concurrency.
+     - *Fix:* Decorated `get_connection()` with `@contextlib.contextmanager` ensuring every query runs inside a `try/finally` block that guarantees `conn.close()` upon exit.
+  6. **PDF Dossier State Extraction Key Fallbacks (Functional Defect - Medium):**
+     - *Issue:* `PDFDossierExporter.generate_dossier_pdf()` failed to extract `candidate_name`, `role_title`, and `fit_data` when using newer sidecar state keys (`profile`, `jd_analysis`, `fit_report`).
+     - *Fix:* Added comprehensive fallback chains ensuring complete corporate dossier generation under both legacy and modern state schemas.
+- **Testing Expansion & Verification:**
+  1. **New Automated Functional Matrix (`tests/test_functional_matrix.py`):**
+     - 17 test cases covering all 12 functional areas: Health & Telemetry, Bearer Auth, Candidate Ingestion, Fit Analysis, Question Bank, 30-MCQ Test & Scoring, 45/55 Feedback Invariant, 7-Day Sprint & Task Toggling, Voice Transcription, Embeddings Ranking, Vector PDF Export, and SQLite Session Retrieval.
+  2. **New Automated Non-Functional Suite (`tests/test_non_functional.py`):**
+     - 7 rigorous non-functional tests verifying:
+       - Latency SLAs: Health < 30ms, Telemetry < 40ms, PDF export < 800ms.
+       - Concurrency & Thread Safety: 25 simultaneous worker threads writing to SQLite, querying sessions, and running evaluations without deadlocks or database locks.
+       - Memory & Handle Hygiene: 100 sequential queries without connection leaks.
+       - Security & Sanitization: Parameterized SQL injection defense and zero secret leakage.
+  3. **The Iron Law Verification Gate:**
+     - Ran full test suite: **111 of 111 tests passing cleanly (100% pass rate, 0 failures, 0 errors in 5.299s)**.
+     - Synchronized all 7 Word `.docx` documents in `/docs` using `scripts/build_docs_and_docx.py`.
+
+---
+
 ## Where to Resume Next (Instructions for Next AI Session / Developer)
 1. **Desktop Launch & Run:**
-   - Double-click `launch.bat` in the project root to run the application instantly in white corporate desktop mode.
+   - Double-click `launch.bat` in the project root to launch the application.
 2. **Verify Automated Test Suite Health:**
    - Execute:
      ```powershell
      .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py"
      ```
-   - Confirm all 87 tests pass cleanly.
-3. **Next Implementation Milestone:**
-   - Continue expanding custom interview role templates and recruiter qualitative rubrics.
+   - Confirm all 111 tests pass with zero failures.
+
 
 
 

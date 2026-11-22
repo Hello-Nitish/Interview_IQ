@@ -135,7 +135,11 @@ Return a JSON object with this exact structure:
 }}
 '''
         try:
-            return self.run_json(prompt)
+            res = self.run_json(prompt)
+            if isinstance(res, dict):
+                if "technical_match_pct" not in res:
+                    res["technical_match_pct"] = res.get("technical_rating", {}).get("strict_match_percentage", 0.0)
+            return res
         except Exception as e:
             return self._generate_failsafe_fit(resume_profile, jd_profile, error_reason=str(e))
 
@@ -262,6 +266,7 @@ Return a JSON object with this exact structure:
             ])
 
         return {
+            "technical_match_pct": match_pct,
             "placement_readiness_score": readiness_score,
             "summary": f"{candidate_name} exhibits a competitive baseline for {role_title} with solid core competencies ({match_pct}% mandatory match), alongside targeted gaps requiring focused interview preparation.",
             "candidate_details": {

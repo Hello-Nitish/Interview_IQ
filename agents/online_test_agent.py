@@ -1,5 +1,6 @@
 import json
 import random
+from typing import Any, Optional, Dict, List
 from agents.base_agent import BaseAgent
 
 class OnlineTestAgent(BaseAgent):
@@ -14,20 +15,36 @@ class OnlineTestAgent(BaseAgent):
         )
         super().__init__(name="OnlineTestAgent", role="Advanced Technical Examination Administrator", system_instruction=system_instruction, api_key=api_key)
 
-    def generate_test(self, jd_profile: dict, resume_profile: dict, fit_profile: dict, topic_checklist: list, num_questions: int = 30) -> dict:
+    def generate_test(
+        self,
+        jd_profile: Any = None,
+        resume_profile: dict = None,
+        fit_profile: dict = None,
+        topic_checklist: list = None,
+        num_questions: int = 30,
+        **kwargs
+    ) -> dict:
         """
         Generates a 30+ question advanced multiple choice test customized to the JD and domain,
         strictly aligned with the JD topic checklist weighting.
+        Supports keyword aliases (checklist, jd_title) for sidecar flexibility.
         """
-        jd_profile = jd_profile or {}
+        if topic_checklist is None:
+            topic_checklist = kwargs.get("checklist") or []
+        if jd_profile is None:
+            jd_profile = kwargs.get("jd_title") or kwargs.get("jd_profile") or {}
+
         if isinstance(jd_profile, str):
             role_title = jd_profile
-        else:
+            jd_profile = {"role_title": role_title}
+        elif isinstance(jd_profile, dict):
             role_title = jd_profile.get("role_title", "Target Role")
+        else:
+            role_title = "Target Role"
+            jd_profile = {"role_title": role_title}
 
         resume_profile = resume_profile or {}
         fit_profile = fit_profile or {}
-        topic_checklist = topic_checklist or []
         num_questions = max(30, num_questions)
 
         prompt = f'''
@@ -179,13 +196,19 @@ Return strict JSON:
         test_data["questions"] = shuffled_questions
         return test_data
 
-    def score_test(self, test_data: dict, candidate_answers: dict) -> dict:
+    def score_test(self, test_data: Any, candidate_answers: dict) -> dict:
         """
         Auto-scores the online test immediately upon submission.
         Produces overall score, percentage, itemized question review with explanations,
         and an analytical topic-wise performance breakdown.
+        Supports test_data as either a dict with 'questions' or directly as a list of questions.
         """
-        questions = test_data.get("questions", [])
+        if isinstance(test_data, list):
+            questions = test_data
+        elif isinstance(test_data, dict):
+            questions = test_data.get("questions", [])
+        else:
+            questions = []
         total_questions = len(questions)
         correct_count = 0
         review_items = []
@@ -268,7 +291,7 @@ Return strict JSON:
             "total_questions": total_questions,
             "percentage": percentage,
             "verdict": verdict,
-            "passed": percentage >= test_data.get("test_metadata", {}).get("pass_threshold_percentage", 70.0),
+            "passed": percentage >= (test_data.get("test_metadata", {}).get("pass_threshold_percentage", 70.0) if isinstance(test_data, dict) else 70.0),
             "topic_breakdown": topic_breakdown,
             "topic_accuracy": topic_accuracy,
             "weak_topics": weak_topics,
