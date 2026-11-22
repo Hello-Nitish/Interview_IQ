@@ -369,11 +369,16 @@ async def load_session(request: Request) -> JSONResponse:
     return JSONResponse({"error": "Session not found"}, status_code=404)
 
 
+async def favicon(request: Request) -> Response:
+    return Response(status_code=204)
+
+
 # ----------------------------------------------------------------------
 # Application Factory
 # ----------------------------------------------------------------------
 
 routes = [
+    Route("/favicon.ico", favicon, methods=["GET"]),
     Route("/health", health_check, methods=["GET"]),
     Route("/api/auth/validate-key", validate_api_key, methods=["POST"]),
     Route("/api/telemetry", get_telemetry, methods=["GET"]),
