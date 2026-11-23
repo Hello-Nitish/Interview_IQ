@@ -6,11 +6,10 @@ DirectML hardware acceleration, and SQLite persistence to the Wails Go runtime.
 
 import argparse
 import base64
-import json
 import logging
 import os
 import sys
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
 # Ensure project root is in sys.path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,13 +40,7 @@ from sidecar.directml.whisper_stt import get_speech_engine
 
 # Import Agents & Orchestration
 from orchestrator.orchestrator import Orchestrator
-from agents.resume_reviewer import ResumeReviewerAgent
-from agents.jd_analyzer import JDAnalyzerAgent
-from agents.fit_analyzer import FitAnalyzerAgent
-from agents.question_bank import QuestionBankAgent
 from agents.online_test_agent import OnlineTestAgent
-from agents.feedback_agent import FeedbackAgent
-from agents.micro_curriculum_agent import MicroCurriculumAgent
 from agents.company_intel_agent import CompanyIntelAgent
 
 # Import Utilities

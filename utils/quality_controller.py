@@ -5,7 +5,7 @@ Performs in-process schema validation, depth scoring, hallucination mitigation,
 and quality assurance across all sub-agent deliverables.
 """
 
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List
 
 
 class QualityAuditResult:

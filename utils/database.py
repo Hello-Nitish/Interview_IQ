@@ -3,7 +3,7 @@ import sqlite3
 import json
 import contextlib
 from datetime import datetime
-from typing import Optional, List, Dict, Any, Union
+from typing import Optional, List, Dict, Any
 
 class DatabaseManager:
     """
@@ -164,6 +164,8 @@ class DatabaseManager:
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_readiness_round ON readiness_reports(session_id, round_number);")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_curr_session ON curriculum_plans(session_id);")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_curr_session_updated ON curriculum_plans(session_id, updated_at);")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_snapshots_session ON session_snapshots(session_id);")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_snapshots_updated ON session_snapshots(updated_at);")
 
             conn.commit()
         cls._initialized_paths.add(path)

@@ -7,9 +7,8 @@ and natural cadence text-to-speech (TTS) synthesis.
 
 import io
 import math
-import os
 import wave
-from typing import Optional, Dict, Any, List, Tuple
+from typing import Dict, Any, List
 import numpy as np
 
 from utils.domain_vocabulary import DomainVocabularyCorrector

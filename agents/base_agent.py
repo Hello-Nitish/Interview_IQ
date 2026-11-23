@@ -1,6 +1,5 @@
 import json
 import re
-from typing import Optional, Any, Dict
 from utils.gemini_client import GeminiClient
 
 class BaseAgent:

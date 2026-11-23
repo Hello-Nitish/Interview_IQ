@@ -1,6 +1,5 @@
-import json
 import re
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 from agents.base_agent import BaseAgent
 
 class CompanyIntelAgent(BaseAgent):

@@ -5,7 +5,6 @@ Transforms diagnosed placement gaps into a structured day-by-day learning journe
 Integrates static curated free resources from YouTube, Coursera (free audit), Mode Analytics, Kaggle, and Cheat Sheets.
 """
 
-import json
 from typing import Dict, Any, List, Optional
 from agents.base_agent import BaseAgent
 from utils.curriculum_resources import CurriculumResourceLibrary

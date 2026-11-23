@@ -8,7 +8,7 @@ with multi-engine fallback (pdfplumber -> pypdfium2 -> pdfminer).
 import io
 import os
 import re
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 class DocumentParser:
     """Enterprise document parser for candidate resumes and job descriptions."""

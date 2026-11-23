@@ -6,7 +6,7 @@ chronological STAR structure, active vs. passive voice, and domain terminology.
 """
 
 import re
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any
 from utils.domain_vocabulary import DomainVocabularyCorrector
 
 
